@@ -95,3 +95,5 @@ A full [getting started](http://www.warp10.io/howto/getting-started/) is availab
 [Warp 10's Quantum](http://www.warp10.io/tools/quantum) is a web application aiming to allow users to interact with the platform in an user-friendly way, offering an alternative to command-line interaction.
 
 > A standalone version of Quantum is packaged in the Docker image you have just installed, listening on the port 8081. In a Linux system (with binding between Warp 10 API address and the host) you can access Quantum at `127.0.0.1:8081`. In Mac OS or Windows, there is no binding between Warp 10 API address and the host, you need to replace 127.0.0.1 by the real Ip address of the container as explained in the precedent section.
+
+![Quantum](http://www.warp10.io/img/getting-started/quantum-warpscript.png)
