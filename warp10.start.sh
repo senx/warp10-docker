@@ -4,6 +4,10 @@ source ${WARP10_HOME}/bin/setup.sh
 
 # Configuration file present launch Warp10, Sensision and Quantum
 if [ -e ${WARP10_VOLUME}/warp10/etc/conf-standalone.conf ]; then
+    
+killall java
+killall python
+
   # Legacy warp10 template with no revision
   if ! grep -q  REVISION_TAG ${WARP10_VOLUME}/warp10/etc/conf-standalone.conf; then
      # REPLACE Hard version link with soft links
@@ -34,6 +38,8 @@ if [ -e ${WARP10_VOLUME}/warp10/etc/conf-standalone.conf ]; then
 
   echo "Launch Warp10"
   sed -i -e "s/127.0.0.1/0.0.0.0/g" ${WARP10_HOME}/etc/conf-standalone.conf
+
+  # Launching Warp10
   ${WARP10_HOME}/bin/warp10-standalone.init start
   echo "Warp10 running"
 
@@ -41,9 +47,9 @@ if [ -e ${WARP10_VOLUME}/warp10/etc/conf-standalone.conf ]; then
   ${SENSISION_HOME}/bin/sensision.init start
   echo "Sensision running"
 
-  # TODO ends this script if warp10 is not running properly
-  echo "All process are running"
-  while true; do sleep 1; done
+echo "All process are running"
+read
+
 else
   echo "Unable to launch Warp10, configuration missing"
   exit -1

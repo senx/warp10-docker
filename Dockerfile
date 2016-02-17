@@ -1,27 +1,37 @@
-FROM lwieske/java-8:jdk-8u66-slim
-MAINTAINER Horacio Gonzalez <horacio.gonzalez@gmail.com>
+FROM debian:wheezy
 
-# Updating apk index
-RUN apk update && apk add bash curl python
+# oracle JDK 8
+RUN \
+  echo "deb http://ppa.launchpad.net/webupd8team/java/ubuntu precise main" | tee -a /etc/apt/sources.list && \
+  echo "deb-src http://ppa.launchpad.net/webupd8team/java/ubuntu precise main" | tee -a /etc/apt/sources.list && \
+  apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys EEA14886 && \
+  apt-get update
 
-# Installing build-dependencies
-RUN apk add --virtual=build-dependencies ca-certificates wget
+RUN \
+  echo debconf shared/accepted-oracle-license-v1-1 select true | debconf-set-selections && \
+  apt-get install -y oracle-java8-installer &&\
+  apt-get clean
 
-ENV WARP10_VERSION=1.2.6-rc1
+RUN echo "JAVA_HOME=/usr/lib/jvm/java-8-oracle" >> /etc/environment
+
+# Updating
+RUN apt-get update && apt-get install -y bash bash-builtins bash-completion curl ca-certificates wget python && apt-get clean
+# install domes tools
+RUN apt-get update && apt-get install -y aptitude emacs23-nox net-tools procps psmisc htop && apt-get clean
+
+ENV WARP10_VERSION=1.2.6
 ENV WARP10_URL=https://bintray.com/artifact/download/cityzendata/generic/io/warp10/warp10/$WARP10_VERSION
 
-# FOR local docker build (dev)
-# ENV WARP10_URL=http://{local_ip}:{localport}
+RUN mkdir -p /opt
 
 # Getting warp10
-RUN mkdir /opt \
-  && cd /opt \
+RUN cd /opt \
   && wget $WARP10_URL/warp10-$WARP10_VERSION.tar.gz \
   && tar xzf warp10-$WARP10_VERSION.tar.gz \
   && rm warp10-$WARP10_VERSION.tar.gz \
   && ln -s  /opt/warp10-$WARP10_VERSION /opt/warp10
 
-ENV SENSISION_VERSION=1.0.13
+ENV SENSISION_VERSION=1.0.12
 ENV SENSISION_URL=https://dl.bintray.com/cityzendata/generic/io/warp10/sensision-service/$SENSISION_VERSION
 # FOR local docker build (dev)
 # ENV SENSISION_URL = http://{local_ip}:{localport}
@@ -34,14 +44,14 @@ RUN cd /opt \
     && ln -s  /opt/sensision-$SENSISION_VERSION /opt/sensision
 
 # Deleting build-dependencies
-RUN apk del build-dependencies
+RUN apt-get autoremove && apt-get clean
 
 ENV JAVA_HOME=/usr \
   WARP10_HOME=/opt/warp10-${WARP10_VERSION} SENSISION_HOME=/opt/sensision-${SENSISION_VERSION} \
   WARP10_VOLUME=/data MAX_LONG=3153600000000 \
   WARP10_DATA_DIR=/data/warp10 \
   SENSISION_DATA_DIR=/data/sensision
-
+  
 ENV WARP10_JAR=${WARP10_HOME}/bin/warp10-${WARP10_VERSION}.jar \
   WARP10_CONF=${WARP10_HOME}/etc/conf-standalone.conf
 
@@ -54,6 +64,7 @@ RUN sed -i 's/^sensision\.scriptrunner\.root.*/sensision\.scriptrunner\.root= \/
 RUN sed -i "s/\/opt\/warp10-${WARP10_VERSION}/\/opt\/warp10/" ${WARP10_HOME}/etc/log4j.properties
 
 COPY warp10.start.sh ${WARP10_HOME}/bin/warp10.start.sh
+COPY worf.sh ${WARP10_HOME}/bin/worf.sh
 COPY setup.sh ${WARP10_HOME}/bin/setup.sh
 RUN chmod +x ${WARP10_HOME}/bin/*.sh
 
@@ -61,7 +72,10 @@ ENV PATH=$PATH:${WARP10_HOME}/bin
 
 VOLUME ${WARP10_VOLUME}
 
-# Exposing port 8080
+# Exposing port 8080 and 8081
 EXPOSE 8080 8081
+
+RUN java -version
+RUN python --version
 
 CMD ${WARP10_HOME}/bin/warp10.start.sh
