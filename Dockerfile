@@ -29,7 +29,7 @@ RUN cd /opt \
 # Deleting build-dependencies
 RUN apk del build-dependencies
 
-ENV QUANTUM_VERSION=1.0.3
+ENV QUANTUM_VERSION=1.0.5
 # Getting quantum
 RUN cd /opt \
     && wget https://github.com/cityzendata/warp10-quantum/archive/$QUANTUM_VERSION.tar.gz -O ./warp10-quantum-$QUANTUM_VERSION.tar.gz \

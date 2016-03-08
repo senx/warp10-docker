@@ -50,7 +50,7 @@ For the purposes of this setup, you need to generate write and read tokens for a
 
 
 ~~~
-docker run   -t -i warp10/warp10:1.0.1 worf.sh
+  docker run   -t -i warp10/warp10:1.0.1 worf.sh
 ~~~
 Or, if you used the volume mapping in the precedent section:
 
