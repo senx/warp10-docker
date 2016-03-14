@@ -12,7 +12,8 @@ ENV WARP10_VERSION=1.0.1
 # Getting warp10
 RUN mkdir /opt \
   && cd /opt \
-  && wget https://bintray.com/artifact/download/cityzendata/generic/warp10-$WARP10_VERSION.tar.gz \
+  # && wget https://bintray.com/artifact/download/cityzendata/generic/warp10-$WARP10_VERSION.tar.gz \
+  && curl -L https://bintray.com/artifact/download/cityzendata/generic/warp10-$WARP10_VERSION.tar.gz -o ./warp10-$WARP10_VERSION.tar.gz \
   && tar xzf warp10-$WARP10_VERSION.tar.gz \
   && rm warp10-$WARP10_VERSION.tar.gz \
   && ln -s  /opt/warp10-$WARP10_VERSION /opt/warp10
@@ -21,7 +22,8 @@ ENV SENSISION_VERSION=1.0.0
 
 # Getting Sensision
 RUN cd /opt \
-    && wget https://dl.bintray.com/cityzendata/generic/sensision-service-$SENSISION_VERSION.tar.gz \
+    # && wget https://dl.bintray.com/cityzendata/generic/sensision-service-$SENSISION_VERSION.tar.gz \
+    && curl -L https://dl.bintray.com/cityzendata/generic/sensision-service-$SENSISION_VERSION.tar.gz -o ./sensision-service-$SENSISION_VERSION.tar.gz \
     && tar xzf sensision-service-$SENSISION_VERSION.tar.gz \
     && rm sensision-service-$SENSISION_VERSION.tar.gz \
     && ln -s  /opt/sensision-$SENSISION_VERSION /opt/sensision
@@ -29,10 +31,11 @@ RUN cd /opt \
 # Deleting build-dependencies
 RUN apk del build-dependencies
 
-ENV QUANTUM_VERSION=1.0.5
+ENV QUANTUM_VERSION=1.0.7.2
 # Getting quantum
 RUN cd /opt \
-    && wget https://github.com/cityzendata/warp10-quantum/archive/$QUANTUM_VERSION.tar.gz -O ./warp10-quantum-$QUANTUM_VERSION.tar.gz \
+    # && wget https://github.com/cityzendata/warp10-quantum/archive/$QUANTUM_VERSION.tar.gz -O ./warp10-quantum-$QUANTUM_VERSION.tar.gz \
+    && curl -L https://github.com/cityzendata/warp10-quantum/archive/$QUANTUM_VERSION.tar.gz -o ./warp10-quantum-$QUANTUM_VERSION.tar.gz  \
     && tar xzf warp10-quantum-$QUANTUM_VERSION.tar.gz \
     && rm warp10-quantum-$QUANTUM_VERSION.tar.gz \
     && ln -s /opt/warp10-quantum-$QUANTUM_VERSION /opt/quantum
