@@ -7,7 +7,7 @@ RUN apk update && apk add bash curl python
 # Installing build-dependencies
 RUN apk add --virtual=build-dependencies ca-certificates wget
 
-ENV WARP10_VERSION=1.0.1
+ENV WARP10_VERSION=1.0.4
 
 # Getting warp10
 RUN mkdir /opt \
@@ -17,7 +17,7 @@ RUN mkdir /opt \
   && rm warp10-$WARP10_VERSION.tar.gz \
   && ln -s  /opt/warp10-$WARP10_VERSION /opt/warp10
 
-ENV SENSISION_VERSION=1.0.0
+ENV SENSISION_VERSION=1.0.4
 
 # Getting Sensision
 RUN cd /opt \
