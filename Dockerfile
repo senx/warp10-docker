@@ -7,18 +7,24 @@ RUN apk update && apk add bash curl python
 # Installing build-dependencies
 RUN apk add --virtual=build-dependencies ca-certificates wget
 
-ENV WARP10_VERSION=1.0.1
+ENV WARP10_VERSION=1.0.4
 
 # Getting warp10
 RUN mkdir /opt \
   && cd /opt \
+<<<<<<< HEAD
   # && wget https://bintray.com/artifact/download/cityzendata/generic/warp10-$WARP10_VERSION.tar.gz \
   && curl -L https://bintray.com/artifact/download/cityzendata/generic/warp10-$WARP10_VERSION.tar.gz -o ./warp10-$WARP10_VERSION.tar.gz \
   && tar xzf warp10-$WARP10_VERSION.tar.gz \
   && rm warp10-$WARP10_VERSION.tar.gz \
+=======
+  && wget https://bintray.com/artifact/download/cityzendata/generic/io/warp10/warp10/$WARP10_VERSION/warp10-$WARP10_VERSION.gz \
+  && tar xzf warp10-$WARP10_VERSION.gz \
+  && rm warp10-$WARP10_VERSION.gz \
+>>>>>>> 6b89db2b967cd975f67cdbffd0a9cd5ca8555bce
   && ln -s  /opt/warp10-$WARP10_VERSION /opt/warp10
 
-ENV SENSISION_VERSION=1.0.0
+ENV SENSISION_VERSION=1.0.4
 
 # Getting Sensision
 RUN cd /opt \
