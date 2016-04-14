@@ -18,7 +18,7 @@ Execute `docker build` inside your local copy
 
 ~~~
   cd warp10-docker
-  docker build -t warp10/warp10:1.0.1 .
+  docker build -t warp10/warp10:1.0.4 .
 ~~~
 
 
@@ -29,13 +29,13 @@ Start Warp 10 platform using:
 Start your image binding the external ports 8080 and 8081 in all interfaces to your container.
 
 ~~~
-  docker run  -p 8080:8080 -p 8081:8081 -d -i warp10/warp10:1.0.1
+  docker run  -p 8080:8080 -p 8081:8081 -d -i warp10/warp10:1.0.4
 ~~~
 
 Docker containers are easy to delete. If you delete your container instance, you'll lose the Warp10 store and configuration. If you are serious about keeping Warp data persistently, then consider adding a volume mapping to the containers `/data` folder:
 
 ~~~
-  docker run --volume=/var/warp10:/data -p 8080:8080 -p 8081:8081 -d -i warp10/warp10:1.0.1
+  docker run --volume=/var/warp10:/data -p 8080:8080 -p 8081:8081 -d -i warp10/warp10:1.0.4
 ~~~
 
 In this example you bind the container internal data folder, `/data` to your local folder `/var/warp10`.
@@ -50,12 +50,12 @@ For the purposes of this setup, you need to generate write and read tokens for a
 
 
 ~~~
-  docker run   -t -i warp10/warp10:1.0.1 worf.sh
+  docker run   -t -i warp10/warp10:1.0.4 worf.sh
 ~~~
 Or, if you used the volume mapping in the precedent section:
 
 ~~~
-  docker run --volume=/var/warp10:/data  -t -i warp10/warp10:1.0.1 worf.sh
+  docker run --volume=/var/warp10:/data  -t -i warp10/warp10:1.0.4 worf.sh
 ~~~
 
 
