@@ -46,16 +46,20 @@ If you use this option you *must* use the same `--volume` option in all your oth
 
 The Warp 10 platform is built with a robust security model that allows you to have a tight control of who has the right to write and/or read data. The model is structured around the [concepts](http://www.warp10.io//introduction/concepts) of `data producer`, `data owner` and `application`, and `WRITE` and `READ` tokens.  
 
-For the purposes of this setup, you need to generate write and read tokens for a test application for a test user that is both the producer and the owner of the data. In order to interact with the user/token/application system, you need an interactive access to Warp10's [Worf](http://www.warp10.io/tools/worf) component. You get it by starting another container in interactive mode:
+For the purposes of this setup, you need to generate write and read tokens for a test application for a test user that is both the producer and the owner of the data. In order to interact with the user/token/application system, you need an interactive access to Warp10's [Worf](http://www.warp10.io/tools/worf) component. You get it by executing `worf.sh` on the running container.
 
-
-~~~
-  docker run   -t -i warp10/warp10:1.0.4 worf.sh
-~~~
-Or, if you used the volume mapping in the precedent section:
+First, get the container id for your running Warp 10 image:
 
 ~~~
-  docker run --volume=/var/warp10:/data  -t -i warp10/warp10:1.0.4 worf.sh
+  $ docker ps
+  CONTAINER ID        IMAGE                 COMMAND                  CREATED             STATUS              PORTS                              NAMES
+  821b868e20be        warp10/warp10:1.0.4   "/bin/sh -c ${WARP10_"   3 minutes ago       Up 3 minutes        0.0.0.0:8080-8081->8080-8081/tcp   cranky_noyce
+~~~
+
+Then run `docker exec` to run Worf console on that container id:
+
+~~~
+  docker exec   -t -i 821b868e20be worf.sh
 ~~~
 
 
