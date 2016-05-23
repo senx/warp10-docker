@@ -24,7 +24,6 @@ Execute `docker build` inside your local copy
 
 ### Running your Warp10 image
 
-Start Warp 10 platform using:
 
 Start your image binding the external ports 8080 and 8081 in all interfaces to your container.
 
@@ -41,6 +40,7 @@ Docker containers are easy to delete. If you delete your container instance, you
 In this example you bind the container internal data folder, `/data` to your local folder `/var/warp10`.
 
 If you use this option you *must* use the same `--volume` option in all your other docker commands on warp10 image.
+
 
 ### Generating Tokens
 
