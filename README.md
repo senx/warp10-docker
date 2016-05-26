@@ -6,7 +6,7 @@
 
 ## Installation
 
-The easiest way to setup the Warp10 platform is to use [Docker](http://docker.io). Automated builds of the Docker Warp10 is available on [Dockerhub](https://hub.docker.com/r/warp10io/warp10/). It is the recommended method of installation. 
+The easiest way to setup the Warp10 platform is to use [Docker](http://docker.io). Builds of Warp10's Docker image are available on [Dockerhub](https://hub.docker.com/r/warp10io/warp10/). It is the recommended method of installation. 
 
 ### Running your Warp10 image
 
@@ -70,12 +70,10 @@ curl -v  --data-binary "'READ_TOKEN' 'test' {} NOW -1 FETCH" 'http://127.0.0.1:8
 
 If everything is OK, you should receive a HTTP 200 OK with your datapoint in JSON format.
 
-
 A full [getting started](http://www.warp10.io/howto/getting-started/) is available to guide your first steps into Warp 10.
 
 
-
-### Using Quantum
+## Using Quantum
 
 [Warp 10's Quantum](http://www.warp10.io/tools/quantum) is a web application aiming to allow users to interact with the platform in an user-friendly way, offering an alternative to command-line interaction.
 
