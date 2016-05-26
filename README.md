@@ -6,40 +6,21 @@
 
 ## Installation
 
-The easiest way to setup the Warp10 platform is to use [Docker](http://docker.io). Automated builds of the Docker Warp10 image will be available on [Dockerhub](https://hub.docker.com/) and is the recommended method of installation. Until then, you can build the image yourself:
-
-Clone this repository
-
-~~~
-  git clone https://github.com/cityzendata/warp10-docker.git
-~~~
-
-Execute `docker build` inside your local copy
-
-~~~
-  cd warp10-docker
-  docker build -t warp10/warp10:1.0.5 .
-~~~
-
+The easiest way to setup the Warp10 platform is to use [Docker](http://docker.io). Automated builds of the Docker Warp10 is available on [Dockerhub](https://hub.docker.com/r/warp10io/warp10/). It is the recommended method of installation. 
 
 ### Running your Warp10 image
 
-
 Start your image binding the external ports 8080 and 8081 in all interfaces to your container.
+Docker containers are easy to delete. If you delete your container instance, you'll lose the Warp10 store and configuration. 
+Consider adding a volume mapping to the containers `/data` folder.
 
 ~~~
-  docker run  -p 8080:8080 -p 8081:8081 -d -i warp10/warp10:1.0.5
-~~~
-
-Docker containers are easy to delete. If you delete your container instance, you'll lose the Warp10 store and configuration. If you are serious about keeping Warp data persistently, then consider adding a volume mapping to the containers `/data` folder:
-
-~~~
-  docker run --volume=/var/warp10:/data -p 8080:8080 -p 8081:8081 -d -i warp10/warp10:1.0.5
+  docker run --volume=/var/warp10:/data -p 8080:8080 -p 8081:8081 -d -i warp10/warp10:1.0.6
 ~~~
 
 In this example you bind the container internal data folder, `/data` to your local folder `/var/warp10`.
 
-If you use this option you *must* use the same `--volume` option in all your other docker commands on warp10 image.
+You *must* use the same `--volume` option in all your other docker commands on warp10 image.
 
 
 ### Generating Tokens
@@ -53,7 +34,7 @@ First, get the container id for your running Warp 10 image:
 ~~~
   $ docker ps
   CONTAINER ID        IMAGE                 COMMAND                  CREATED             STATUS              PORTS                              NAMES
-  821b868e20be        warp10/warp10:1.0.5   "/bin/sh -c ${WARP10_"   3 minutes ago       Up 3 minutes        0.0.0.0:8080-8081->8080-8081/tcp   cranky_noyce
+  821b868e20be        warp10io/warp10:1.0.6   "/bin/sh -c ${WARP10_"   3 minutes ago       Up 3 minutes        0.0.0.0:8080-8081->8080-8081/tcp   cranky_noyce
 ~~~
 
 Then run `docker exec` to run Worf console on that container id:
@@ -101,3 +82,18 @@ A full [getting started](http://www.warp10.io/howto/getting-started/) is availab
 > A standalone version of Quantum is packaged in the Docker image you have just installed, listening on the port 8081. In a Linux system (with binding between Warp 10 API address and the host) you can access Quantum at `127.0.0.1:8081`. In Mac OS or Windows, there is no binding between Warp 10 API address and the host, you need to replace 127.0.0.1 by the real Ip address of the container as explained in the precedent section.
 
 ![Quantum](http://www.warp10.io/img/getting-started/quantum-warpscript.png)
+
+# Build the image 
+
+If uou want to build your own Warp10 image, clone this repository
+
+~~~
+  git clone https://github.com/cityzendata/warp10-docker.git
+~~~
+
+Execute `docker build` inside your local copy
+
+~~~
+  cd warp10-docker
+  docker build -t warp10/warp10:1.0.6 .
+~~~
