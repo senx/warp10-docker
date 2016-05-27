@@ -11,8 +11,8 @@ The easiest way to setup the Warp10 platform is to use [Docker](http://docker.io
 ### Running your Warp10 image
 
 Start your image binding the external ports 8080 and 8081 in all interfaces to your container.
-Docker containers are easy to delete. If you delete your container instance, you'll lose the Warp10 store and configuration. 
-Consider adding a volume mapping to the containers `/data` folder.
+
+Docker containers are easy to delete. If you delete your container instance, you'll lose the Warp10 store and configuration. So by default you should add a volume mapping to the containers `/data` folder.
 
 ~~~
   docker run --volume=/var/warp10:/data -p 8080:8080 -p 8081:8081 -d -i warp10/warp10:1.0.6
