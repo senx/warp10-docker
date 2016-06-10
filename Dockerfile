@@ -7,11 +7,10 @@ RUN apk update && apk add bash curl python
 # Installing build-dependencies
 RUN apk add --virtual=build-dependencies ca-certificates wget
 
-# TODO updates the future warp10 release (not available yet)
 ENV WARP10_VERSION=1.0.7
-ENV WARP10_URL = https://bintray.com/artifact/download/cityzendata/generic/io/warp10/warp10/$WARP10_VERSION/
+# ENV WARP10_URL=https://bintray.com/artifact/download/cityzendata/generic/io/warp10/warp10/$WARP10_VERSION
 # FOR local docker build (dev)
-# ENV WARP10_URL = http://192.168.1.79:8000
+ENV WARP10_URL=http://192.168.1.79:8000
 
 # Getting warp10
 RUN mkdir /opt \
@@ -21,17 +20,16 @@ RUN mkdir /opt \
   && rm warp10-$WARP10_VERSION.gz \
   && ln -s  /opt/warp10-$WARP10_VERSION /opt/warp10
 
-# TODO updates the future sensision release (not available yet)
 ENV SENSISION_VERSION=1.0.5
-ENV SENSISION_URL = https://dl.bintray.com/cityzendata/generic
+ENV SENSISION_URL=https://dl.bintray.com/cityzendata/generic/io/warp10/sensision-service/$SENSISION_VERSION
 # FOR local docker build (dev)
-# ENV SENSISION_URL = http://192.168.1.79:8000
+# ENV SENSISION_URL = http://{local_ip}:{localport}
 
 # Getting Sensision
 RUN cd /opt \
-    && curl -L $SENSISION_URL/sensision-service-$SENSISION_VERSION.tar.gz -o ./sensision-service-$SENSISION_VERSION.tar.gz \
-    && tar xzf sensision-service-$SENSISION_VERSION.tar.gz \
-    && rm sensision-service-$SENSISION_VERSION.tar.gz \
+    && wget $SENSISION_URL/sensision-service-$SENSISION_VERSION.gz \
+    && tar xzf sensision-service-$SENSISION_VERSION.gz \
+    && rm sensision-service-$SENSISION_VERSION.gz \
     && ln -s  /opt/sensision-$SENSISION_VERSION /opt/sensision
 
 # Deleting build-dependencies
