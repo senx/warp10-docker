@@ -83,7 +83,7 @@ A full [getting started](http://www.warp10.io/howto/getting-started/) is availab
 
 # Build the image 
 
-If uou want to build your own Warp10 image, clone this repository
+If you want to build your own Warp10 image, clone this repository
 
 ~~~
   git clone https://github.com/cityzendata/warp10-docker.git
@@ -93,5 +93,5 @@ Execute `docker build` inside your local copy
 
 ~~~
   cd warp10-docker
-  docker build -t warp10io/warp10:1.0.7 .
+  docker build -t myrepo/warp10:1.0.7 .
 ~~~
