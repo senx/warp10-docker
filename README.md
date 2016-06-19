@@ -70,7 +70,7 @@ curl -v  --data-binary "'READ_TOKEN' 'test' {} NOW -1 FETCH" 'http://127.0.0.1:8
 
 If everything is OK, you should receive a HTTP 200 OK with your datapoint in JSON format.
 
-A full [getting started](http://www.warp10.io/howto/getting-started/) is available to guide your first steps into Warp 10.
+A full [getting started](http://www.warp10.io/getting-started/) is available to guide your first steps into Warp 10.
 
 
 ## Using Quantum
