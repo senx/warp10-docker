@@ -20,6 +20,8 @@ then
   ln -s ${WARP10_VOLUME}/warp10/data ${WARP10_HOME}/data
   mv ${WARP10_HOME}/macros ${WARP10_VOLUME}/warp10/macros
   ln -s ${WARP10_VOLUME}/warp10/macros ${WARP10_HOME}/macros
+  mv ${WARP10_HOME}/jars ${WARP10_VOLUME}/warp10/jars
+  ln -s ${WARP10_VOLUME}/warp10/jars ${WARP10_HOME}/jars
   mv ${WARP10_HOME}/warpscripts ${WARP10_VOLUME}/warp10/warpscripts
   ln -s ${WARP10_VOLUME}/warp10/warpscripts ${WARP10_HOME}/warpscripts
   mv ${WARP10_HOME}/logs ${WARP10_VOLUME}/warp10/logs
@@ -61,4 +63,6 @@ fi
 
 # Apply user permissions
 chown -R warp10:warp10 ${WARP10_VOLUME}
+chown -R warp10:warp10 ${WARP10_HOME}
 chown -R sensision:sensision ${WARP10_VOLUME}/sensision
+chown -R sensision:sensision ${SENSISION_HOME}
