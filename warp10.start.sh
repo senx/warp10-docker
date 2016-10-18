@@ -42,7 +42,7 @@ then
   echo "Sensision running"
 
   # Launching SimpleHTTPServer
-  cd /opt/quantum/vulcanized
+  cd /opt/quantum
   python -m SimpleHTTPServer 8081 &
   echo "Quantum running"
 
@@ -53,6 +53,3 @@ else
   echo "Unable to launch Warp10, configuration missing"
   exit -1
 fi
-
-
-

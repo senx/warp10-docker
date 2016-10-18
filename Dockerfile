@@ -7,7 +7,7 @@ RUN apk update && apk add bash curl python
 # Installing build-dependencies
 RUN apk add --virtual=build-dependencies ca-certificates wget
 
-ENV WARP10_VERSION=1.0.10
+ENV WARP10_VERSION=1.0.15-1-ga07cb94
 ENV WARP10_URL=https://bintray.com/artifact/download/cityzendata/generic/io/warp10/warp10/$WARP10_VERSION
 # FOR local docker build (dev)
 # ENV WARP10_URL=http://{local_ip}:{localport}
@@ -20,7 +20,7 @@ RUN mkdir /opt \
   && rm warp10-$WARP10_VERSION.tar.gz \
   && ln -s  /opt/warp10-$WARP10_VERSION /opt/warp10
 
-ENV SENSISION_VERSION=1.0.5-6-g7af72e1
+ENV SENSISION_VERSION=1.0.9
 ENV SENSISION_URL=https://dl.bintray.com/cityzendata/generic/io/warp10/sensision-service/$SENSISION_VERSION
 # FOR local docker build (dev)
 # ENV SENSISION_URL = http://{local_ip}:{localport}
@@ -35,14 +35,15 @@ RUN cd /opt \
 # Deleting build-dependencies
 RUN apk del build-dependencies
 
-ENV QUANTUM_VERSION=1.0.12
+ENV QUANTUM_VERSION=2.1.25
+ENV QUANTUM_URL=https://dl.bintray.com/cityzendata/generic/io/warp10/quantum/$QUANTUM_VERSION
 # Getting quantum
-RUN cd /opt \
-    # && wget https://github.com/cityzendata/warp10-quantum/archive/$QUANTUM_VERSION.tar.gz -O ./warp10-quantum-$QUANTUM_VERSION.tar.gz \
-    && curl -L https://github.com/cityzendata/warp10-quantum/archive/$QUANTUM_VERSION.tar.gz -o ./warp10-quantum-$QUANTUM_VERSION.tar.gz  \
-    && tar xzf warp10-quantum-$QUANTUM_VERSION.tar.gz \
-    && rm warp10-quantum-$QUANTUM_VERSION.tar.gz \
-    && ln -s /opt/warp10-quantum-$QUANTUM_VERSION /opt/quantum
+RUN mkdir /opt/quantum-$QUANTUM_VERSION \
+    && cd /opt/quantum-$QUANTUM_VERSION \
+    && curl $QUANTUM_URL/quantum-$QUANTUM_VERSION.tar.gz -o quantum-$QUANTUM_VERSION.tar.gz \
+    && tar xzf quantum-$QUANTUM_VERSION.tar.gz \
+    && rm quantum-$QUANTUM_VERSION.tar.gz \
+    && ln -s /opt/quantum-$QUANTUM_VERSION /opt/quantum
 
 
 ENV JAVA_HOME=/usr \
