@@ -48,7 +48,7 @@ then
 
   # TODO ends this script if warp10 is not running properly
   echo "All process are running"
-  read
+  while true; do sleep 1; done
 else
   echo "Unable to launch Warp10, configuration missing"
   exit -1
