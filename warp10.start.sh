@@ -22,7 +22,7 @@ if [ -e ${WARP10_VOLUME}/warp10/etc/conf-standalone.conf ]; then
   # Legacy sensision template
   if ! grep -q  REVISION_TAG ${WARP10_VOLUME}/sensision/etc/sensision.conf; then
     # REPLACE HARD LINKS IN SENSISION CONFIGURATION
-    sed -i 's/^sensision\.home.*/sensision\.home = \/opt\/sensision\/data/' ${WARP10_VOLUME}/sensision/etc/sensision.conf
+    sed -i 's/^sensision\.home.*/sensision\.home = \/opt\/sensision/' ${WARP10_VOLUME}/sensision/etc/sensision.conf
     sed -i 's/^sensision\.scriptrunner\.root.*/sensision\.scriptrunner\.root= \/opt\/sensision\/scripts/' ${WARP10_VOLUME}/sensision/etc/sensision.conf
 
     # ADDS REVISION TO THE TEMPLATE
