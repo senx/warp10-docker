@@ -7,12 +7,11 @@ RUN apk update && apk add bash curl python
 # Installing build-dependencies
 RUN apk add --virtual=build-dependencies ca-certificates wget
 
-ENV WARP10_VERSION=1.2.5-7-g8fdcc9e
-#ENV WARP10_URL=https://bintray.com/artifact/download/cityzendata/generic/io/warp10/warp10/$WARP10_VERSION
+ENV WARP10_VERSION=1.2.6-rc1
+ENV WARP10_URL=https://bintray.com/artifact/download/cityzendata/generic/io/warp10/warp10/$WARP10_VERSION
 
 # FOR local docker build (dev)
 # ENV WARP10_URL=http://{local_ip}:{localport}
-ENV WARP10_URL=http://192.168.1.138:8000
 
 # Getting warp10
 RUN mkdir /opt \
@@ -22,11 +21,10 @@ RUN mkdir /opt \
   && rm warp10-$WARP10_VERSION.tar.gz \
   && ln -s  /opt/warp10-$WARP10_VERSION /opt/warp10
 
-ENV SENSISION_VERSION=1.0.12-2-g80861c2
-#ENV SENSISION_URL=https://dl.bintray.com/cityzendata/generic/io/warp10/sensision-service/$SENSISION_VERSION
+ENV SENSISION_VERSION=1.0.13
+ENV SENSISION_URL=https://dl.bintray.com/cityzendata/generic/io/warp10/sensision-service/$SENSISION_VERSION
 # FOR local docker build (dev)
 # ENV SENSISION_URL = http://{local_ip}:{localport}
-ENV SENSISION_URL=http://192.168.1.138:8000
 
 # Getting Sensision
 RUN cd /opt \
@@ -41,7 +39,8 @@ RUN apk del build-dependencies
 ENV JAVA_HOME=/usr \
   WARP10_HOME=/opt/warp10-${WARP10_VERSION} SENSISION_HOME=/opt/sensision-${SENSISION_VERSION} \
   WARP10_VOLUME=/data MAX_LONG=3153600000000 \
-  WARP10_DATA_DIR=/data/warp10
+  WARP10_DATA_DIR=/data/warp10 \
+  SENSISION_DATA_DIR=/data/sensision
 
 ENV WARP10_JAR=${WARP10_HOME}/bin/warp10-${WARP10_VERSION}.jar \
   WARP10_CONF=${WARP10_HOME}/etc/conf-standalone.conf
