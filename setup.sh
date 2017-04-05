@@ -1,3 +1,6 @@
+
+export TERM=xterm
+
 # Create user warp10
 if [ "`which useradd`" = "" ]; then
   adduser -D -s -H -h ${WARP10_HOME} -s /bin/bash warp10
@@ -42,6 +45,28 @@ else
 
   rm -rf ${WARP10_HOME}/datalog_done
   ln -s ${WARP10_VOLUME}/warp10/datalog_done ${WARP10_HOME}/datalog_done
+
+  # change default parameters
+  sed -i -e "s/127.0.0.1/0.0.0.0/g" ${WARP10_HOME}/etc/conf-standalone.conf
+  sed -i -e "s/warp.timeunits = us/warp.timeunits = ns/g" ${WARP10_HOME}/etc/conf-standalone.conf
+  sed -i -e "s/warpscript.maxops = 1000/warpscript.maxops = 10000000000/g" ${WARP10_HOME}/etc/conf-standalone.conf
+  sed -i -e "s/warpscript.maxops.hard = 2000/warpscript.maxops.hard = 10000000000/g" ${WARP10_HOME}/etc/conf-standalone.conf
+  sed -i -e "s/warpscript.maxbuckets = 1000000/warpscript.maxbuckets = 10000000/g" ${WARP10_HOME}/etc/conf-standalone.conf
+  sed -i -e "s/warpscript.maxbuckets.hard = 100000/warpscript.maxbuckets.hard = 1000000000/g" ${WARP10_HOME}/etc/conf-standalone.conf
+  sed -i -e "s/warpscript.maxdepth = 1000/warpscript.maxdepth  = 10000/g" ${WARP10_HOME}/etc/conf-standalone.conf
+  sed -i -e "s/warpscript.maxdepth.hard = 1000/warpscript.maxdepth.hard = 1000000000/g" ${WARP10_HOME}/etc/conf-standalone.conf
+  sed -i -e "s/warpscript.maxfetch = 100000/warpscript.maxfetch = 1000000000/g" ${WARP10_HOME}/etc/conf-standalone.conf
+  sed -i -e "s/warpscript.maxfetch.hard = 1000000/warpscript.maxfetch.hard = 10000000000/g" ${WARP10_HOME}/etc/conf-standalone.conf
+  sed -i -e "s/warpscript.maxgts = 100000/warpscript.maxgts = 1000000000/g" ${WARP10_HOME}/etc/conf-standalone.conf
+  sed -i -e "s/warpscript.maxgts.hard = 100000/warpscript.maxgts.hard = 1000000000/g" ${WARP10_HOME}/etc/conf-standalone.conf
+  sed -i -e "s/warpscript.maxloop = 5000/warpscript.maxloop = 10000000/g" ${WARP10_HOME}/etc/conf-standalone.conf
+  sed -i -e "s/warpscript.maxloop.hard = 10000/warpscript.maxloop.hard = 100000000/g" ${WARP10_HOME}/etc/conf-standalone.conf
+  sed -i -e "s/warpscript.maxrecursion = 16/warpscript.maxrecursion = 24/g" ${WARP10_HOME}/etc/conf-standalone.conf
+  sed -i -e "s/warpscript.maxrecursion.hard = 32/warpscript.maxrecursion.hard = 10000000/g" ${WARP10_HOME}/etc/conf-standalone.conf
+  sed -i -e "s/warpscript.maxsymbols = 64/warpscript.maxsymbols = 1024/g" ${WARP10_HOME}/etc/conf-standalone.conf
+  sed -i -e "s/warpscript.maxsymbols.hard = 256/warpscript.maxsymbols.hard = 10000000/g" ${WARP10_HOME}/etc/conf-standalone.conf
+  sed -i -e "s/warpscript.maxpixels = 1000000/warpscript.maxpixels = 10000000/g" ${WARP10_HOME}/etc/conf-standalone.conf
+  sed -i -e "s/warpscript.maxpixels.hard = 1000000/warpscript.maxpixels.hard = 1000000000/g" ${WARP10_HOME}/etc/conf-standalone.conf
 fi
 
 # REPLACE HARD LINKS
