@@ -21,7 +21,7 @@ RUN mkdir /opt \
   && rm warp10-$WARP10_VERSION.tar.gz \
   && ln -s  /opt/warp10-$WARP10_VERSION /opt/warp10
 
-ENV SENSISION_VERSION=1.0.13
+ENV SENSISION_VERSION=1.0.13-rc1
 ENV SENSISION_URL=https://dl.bintray.com/cityzendata/generic/io/warp10/sensision-service/$SENSISION_VERSION
 # FOR local docker build (dev)
 # ENV SENSISION_URL = http://{local_ip}:{localport}
