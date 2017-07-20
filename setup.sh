@@ -8,11 +8,20 @@ else
   useradd -d ${SENSISION_HOME} -M -r sensision -G warp10
 fi
 
+chown -R warp10:warp10 ${WARP10_HOME}
+
 # WARP10 - install and manage upgrade
-if [ ! -d ${WARP10_VOLUME}/warp10 ]; then
+# REPLACE HARD LINKS AND USE DATA DIR
+sed -i "s/^#WARP10_HOME.*/WARP10_HOME=\/opt\/warp10/" ${WARP10_HOME}/bin/warp10-standalone.sh
+sed -i "s~^#WARP10_DATA_DIR.*~WARP10_DATA_DIR=${WARP10_DATA_DIR}~" ${WARP10_HOME}/bin/warp10-standalone.sh
+
+if [ ! -d ${WARP10_DATA_DIR} ]; then
+  mkdir -p ${WARP10_DATA_DIR}
+  chown warp10:warp10 ${WARP10_DATA_DIR}
+  chmod 775 ${WARP10_DATA_DIR}
+
   echo "Install Warp10"
-  # Stop/start to init config
-  ${WARP10_HOME}/bin/warp10-standalone.init start && ${WARP10_HOME}/bin/warp10-standalone.init stop
+  ${WARP10_HOME}/bin/warp10-standalone.init bootstrap
 else
   echo "Warp10 already installed"
 
@@ -44,15 +53,8 @@ else
   ln -s ${WARP10_VOLUME}/warp10/datalog_done ${WARP10_HOME}/datalog_done
 fi
 
-# REPLACE HARD LINKS
-sed -i "s/^standalone\.home.*/standalone\.home = \/opt\/warp10/" ${WARP10_CONF}
-sed -i "s/^LEVELDB\_HOME=.*/LEVELDB\_HOME=\/opt\/warp10\/leveldb/" ${WARP10_HOME}/bin/snapshot.sh
-
-sed -i "s/warpLog\.File=.*/warpLog\.File=\/opt\/warp10\/logs\/warp10\.log/" ${WARP10_HOME}/etc/log4j.properties
-sed -i "s/warpscriptLog\.File=.*/warpscriptLog\.File=\/opt\/warp10\/logs\/warpscript.out/" ${WARP10_HOME}/etc/log4j.properties
-
 # Sensision install
-if [ ! -d ${WARP10_VOLUME}/sensision ]; then
+if [ ! -d ${SENSISION_DATA_DIR} ]; then
   echo "Install Sensision"
   # Stop/start to init config
   ${SENSISION_HOME}/bin/sensision.init start && ${SENSISION_HOME}/bin/sensision.init stop
