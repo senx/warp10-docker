@@ -1,5 +1,5 @@
 FROM lwieske/java-8:jdk-8u66-slim
-MAINTAINER Horacio Gonzalez <horacio.gonzalez@gmail.com>
+MAINTAINER CityZen Data <contact@cityzendata.com>
 
 # Updating apk index
 RUN apk update && apk add bash curl python
@@ -7,7 +7,7 @@ RUN apk update && apk add bash curl python
 # Installing build-dependencies
 RUN apk add --virtual=build-dependencies ca-certificates wget
 
-ENV WARP10_VERSION=1.2.9
+ENV WARP10_VERSION=1.2.12-rc2
 ENV WARP10_URL=https://bintray.com/artifact/download/cityzendata/generic/io/warp10/warp10/$WARP10_VERSION
 
 # FOR local docker build (dev)
@@ -21,7 +21,7 @@ RUN mkdir /opt \
   && rm warp10-$WARP10_VERSION.tar.gz \
   && ln -s  /opt/warp10-$WARP10_VERSION /opt/warp10
 
-ENV SENSISION_VERSION=1.0.13-rc1
+ENV SENSISION_VERSION=1.0.16-rc1
 ENV SENSISION_URL=https://dl.bintray.com/cityzendata/generic/io/warp10/sensision-service/$SENSISION_VERSION
 # FOR local docker build (dev)
 # ENV SENSISION_URL = http://{local_ip}:{localport}
