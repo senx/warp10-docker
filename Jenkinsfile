@@ -26,18 +26,25 @@ pipeline {
                 sh "docker tag  warp10io/warp10:$version warp10io/warp10"
             }
         }
-        stage('Deploy to DockerHub') {
-            options {
-                timeout(time: 2, unit: 'HOURS')
+        stage('Deploy') {
+            when {
+                expression { return isItATagCommit() }
             }
-            input {
-                message 'Should we deploy to DockerHub?'
-            }
-            steps {
-                sh "docker push warp10io/warp10:$version"
-                sh "docker push warp10io/warp10"
-                sh "docker rmi warp10io/warp10:$version"
-                this.notifyBuild('PUBLISHED', version)
+            parallel {
+                stage('Deploy to DockerHub') {
+                    options {
+                        timeout(time: 2, unit: 'HOURS')
+                    }
+                    input {
+                        message 'Should we deploy to DockerHub?'
+                    }
+                    steps {
+                        sh "docker push warp10io/warp10:$version"
+                        sh "docker push warp10io/warp10"
+                        sh "docker rmi warp10io/warp10:$version"
+                        this.notifyBuild('PUBLISHED', version)
+                    }
+                }
             }
         }
     }
@@ -84,7 +91,7 @@ void notifyBuild(String buildStatus, String version) {
 void notifySlack(String color, String message, String buildStatus) {
     String slackURL = getParam('slackUrl')
     String payload = "{\"username\": \"${env.JOB_NAME}\",\"attachments\":[{\"title\": \"${env.JOB_NAME} ${buildStatus}\",\"color\": \"${color}\",\"text\": \"${message}\"}]}" as String
-    // sh "curl -X POST -H 'Content-type: application/json' --data '${payload}' ${slackURL}" as String
+    sh "curl -X POST -H 'Content-type: application/json' --data '${payload}' ${slackURL}" as String
 }
 
 String getParam(String key) {
