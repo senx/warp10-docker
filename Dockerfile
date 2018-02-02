@@ -7,7 +7,7 @@ RUN apk update && apk add bash curl python
 # Installing build-dependencies
 RUN apk add --virtual=build-dependencies ca-certificates wget
 
-ENV WARP10_VERSION=1.2.12-rc2
+ENV WARP10_VERSION=1.2.13
 ENV WARP10_URL=https://bintray.com/artifact/download/cityzendata/generic/io/warp10/warp10/$WARP10_VERSION
 
 # FOR local docker build (dev)
