@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 # Create user warp10
 if [ "`which useradd`" = "" ]; then
   adduser -D -s -H -h ${WARP10_HOME} -s /bin/bash warp10
