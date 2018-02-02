@@ -37,6 +37,7 @@ pipeline {
                 sh "docker push warp10io/warp10:$version"
                 sh "docker push warp10io/warp10"
                 sh "docker rmi warp10io/warp10:$version"
+                this.notifyBuild('PUBLISHED', version)
             }
         }
     }
