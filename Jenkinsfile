@@ -26,21 +26,17 @@ pipeline {
                 sh "docker tag  warp10io/warp10:$version warp10io/warp10"
             }
         }
-
-        stage('Deploy') {
-
-            stage('Deploy to DockerHub') {
-                options {
-                    timeout(time: 2, unit: 'HOURS')
-                }
-                input {
-                    message 'Should we deploy to DockerHub?'
-                }
-                steps {
-                    sh "docker push warp10io/warp10:$version"
-                    sh "docker push warp10io/warp10"
-                    sh "docker rmi warp10io/warp10:$version"
-                }
+        stage('Deploy to DockerHub') {
+            options {
+                timeout(time: 2, unit: 'HOURS')
+            }
+            input {
+                message 'Should we deploy to DockerHub?'
+            }
+            steps {
+                sh "docker push warp10io/warp10:$version"
+                sh "docker push warp10io/warp10"
+                sh "docker rmi warp10io/warp10:$version"
             }
         }
     }
@@ -96,10 +92,4 @@ String getParam(String key) {
 
 String getVersion() {
     return sh(returnStdout: true, script: 'git describe --abbrev=0 --tags').trim()
-}
-
-boolean isItATagCommit() {
-    String lastCommit = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
-    String tag = sh(returnStdout: true, script: "git show-ref --tags -d | grep ^${lastCommit} | sed -e 's,.* refs/tags/,,' -e 's/\\^{}//'").trim()
-    return tag != ''
 }
