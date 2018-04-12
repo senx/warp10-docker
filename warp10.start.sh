@@ -19,6 +19,18 @@ if [ -e ${WARP10_VOLUME}/warp10/etc/conf-standalone.conf ]; then
      # ADDS REVISION TO THE TEMPLATE
      sed -i "4s/\/\/.*/\/\/ REVISION_TAG=1\.0/" ${WARP10_VOLUME}/warp10/etc/conf-standalone.conf
   fi
+  # Standalone mode
+  if [ -z ${IN_MEMORY+x} ]; then
+   sed -i 's/^leveldb\.home = ${standalone.home}\/leveldb/leveldb\.home = \/dev\/null/' ${WARP10_HOME}/etc/conf-standalone.conf
+   sed -i 's/^in\.memory = false/in\.memory = true/' ${WARP10_HOME}/etc/conf-standalone.conf
+   sed -i 's/^\/\/in\.memory\.depth =/in\.memory\.depth = 315360000000/' ${WARP10_HOME}/etc/conf-standalone.conf
+   sed -i 's/^\/\/in\.memory\.highwatermark =/in\.memory\.highwatermark = 268435456/' ${WARP10_HOME}/etc/conf-standalone.conf
+   sed -i 's/^\/\/in\.memory\.lowwatermark =/in\.memory\.lowwatermark = 134217728/' ${WARP10_HOME}/etc/conf-standalone.conf
+   sed -i 's/^\/\/in\.memory\.lowwatermark =/in\.memory\.lowwatermark = 134217728/' ${WARP10_HOME}/etc/conf-standalone.conf
+   sed -i "s/^#in\.memory\.load =/in\.memory\.load =  ${WARP10_HOME}\/data\/dump/" ${WARP10_HOME}/etc/conf-standalone.conf
+   sed -i "s/^#in\.memory\.dump =/in\.memory\.dump =  ${WARP10_HOME}\/data\/dump/" ${WARP10_HOME}/etc/conf-standalone.conf
+  fi
+
   # Legacy sensision template
   if ! grep -q  REVISION_TAG ${WARP10_VOLUME}/sensision/etc/sensision.conf; then
     # REPLACE HARD LINKS IN SENSISION CONFIGURATION
