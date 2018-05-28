@@ -6,28 +6,29 @@ source ${WARP10_HOME}/bin/setup.sh
 if [ -e ${WARP10_VOLUME}/warp10/etc/conf-standalone.conf ]; then
   # Legacy warp10 template with no revision
   if ! grep -q  REVISION_TAG ${WARP10_VOLUME}/warp10/etc/conf-standalone.conf; then
-     # REPLACE Hard version link with soft links
-     sed -i 's_/opt/warp10-[0-9]+\.[0-9]+\.[0-9]+\(-rc[0-9]+\)?\(-[0-9]+-[a-z0-9]+\)*_\$\{standalone\.home\}_g' ${WARP10_VOLUME}/warp10/etc/conf-standalone.conf
-     # Adds new var in the file
-     echo >> ${WARP10_VOLUME}/warp10/etc/conf-standalone.conf
-     echo "//" >> ${WARP10_VOLUME}/warp10/etc/conf-standalone.conf
-     echo "// Directory of Warp10 standalone install" >> ${WARP10_VOLUME}/warp10/etc/conf-standalone.conf
-     echo "//" >> ${WARP10_VOLUME}/warp10/etc/conf-standalone.conf
-     echo "standalone.home = /opt/warp10" >> ${WARP10_VOLUME}/warp10/etc/conf-standalone.conf
+    # REPLACE Hard version link with soft links
+    sed -i 's_/opt/warp10-[0-9]+\.[0-9]+\.[0-9]+\(-rc[0-9]+\)?\(-[0-9]+-[a-z0-9]+\)*_\$\{standalone\.home\}_g' ${WARP10_VOLUME}/warp10/etc/conf-standalone.conf
+    # Adds new var in the file
+    echo >> ${WARP10_VOLUME}/warp10/etc/conf-standalone.conf
+    echo "//" >> ${WARP10_VOLUME}/warp10/etc/conf-standalone.conf
+    echo "// Directory of Warp10 standalone install" >> ${WARP10_VOLUME}/warp10/etc/conf-standalone.conf
+    echo "//" >> ${WARP10_VOLUME}/warp10/etc/conf-standalone.conf
+    echo "standalone.home = /opt/warp10" >> ${WARP10_VOLUME}/warp10/etc/conf-standalone.conf
 
-     sed -i 's_/opt/warp10-[0-9]+\.[0-9]+\.[0-9]+\(-rc[0-9]+\)?\(-[0-9]+-[a-z0-9]+\)*_/opt/warp10_g' ${WARP10_VOLUME}/warp10/etc/log4j.properties
-     # ADDS REVISION TO THE TEMPLATE
-     sed -i "4s/\/\/.*/\/\/ REVISION_TAG=1\.0/" ${WARP10_VOLUME}/warp10/etc/conf-standalone.conf
+    sed -i 's_/opt/warp10-[0-9]+\.[0-9]+\.[0-9]+\(-rc[0-9]+\)?\(-[0-9]+-[a-z0-9]+\)*_/opt/warp10_g' ${WARP10_VOLUME}/warp10/etc/log4j.properties
+    # ADDS REVISION TO THE TEMPLATE
+    sed -i "4s/\/\/.*/\/\/ REVISION_TAG=1\.0/" ${WARP10_VOLUME}/warp10/etc/conf-standalone.conf
   fi
   # Standalone mode
-  if [ -z ${IN_MEMORY+x} ]; then
-   sed -i 's/^leveldb\.home = ${standalone.home}\/leveldb/leveldb\.home = \/dev\/null/' ${WARP10_HOME}/etc/conf-standalone.conf
-   sed -i 's/^in\.memory = false/in\.memory = true/' ${WARP10_HOME}/etc/conf-standalone.conf
-   sed -i 's/^\/\/in\.memory\.chunked = true/in\.memory\.chunked = true/' ${WARP10_HOME}/etc/conf-standalone.conf
-   sed -i 's/^\/\/in\.memory\.chunk\.count =/in\.memory\.chunk\.count = 2' ${WARP10_HOME}/etc/conf-standalone.conf
-   sed -i 's/^\/\/in\.memory\.chunk\.length =/in\.memory\.chunk\.length = 86400000000/' ${WARP10_HOME}/etc/conf-standalone.conf
-   sed -i "s/^#in\.memory\.load =/in\.memory\.load =  ${WARP10_HOME}\/data\/dump/" ${WARP10_HOME}/etc/conf-standalone.conf
-   sed -i "s/^#in\.memory\.dump =/in\.memory\.dump =  ${WARP10_HOME}\/data\/dump/" ${WARP10_HOME}/etc/conf-standalone.conf
+  if [ "${IN_MEMORY}" = "true" ]; then
+    echo "Setting 'IN MEMORY' parameters"
+    sed -i 's~^leveldb.home = ${standalone.home}/leveldb~leveldb.home = /dev/null~' ${WARP10_HOME}/etc/conf-standalone.conf
+    sed -i 's~^in.memory = false~in.memory = true~' ${WARP10_HOME}/etc/conf-standalone.conf
+    sed -i 's~^//in.memory.chunked = true~in.memory.chunked = true~' ${WARP10_HOME}/etc/conf-standalone.conf
+    sed -i 's~^//in.memory.chunk.count =~in.memory.chunk.count = 2~' ${WARP10_HOME}/etc/conf-standalone.conf
+    sed -i 's~^//in.memory.chunk.length =~in.memory.chunk.length = 86400000000~' ${WARP10_HOME}/etc/conf-standalone.conf
+    sed -i "s~^#in.memory.load =~in.memory.load = ${WARP10_HOME}/data/dump~" ${WARP10_HOME}/etc/conf-standalone.conf
+    sed -i "s~^#in.memory.dump =~in.memory.dump = ${WARP10_HOME}/data/dump~" ${WARP10_HOME}/etc/conf-standalone.conf
   fi
 
   # Legacy sensision template
