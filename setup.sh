@@ -9,12 +9,13 @@ else
   useradd -d ${SENSISION_HOME} -M -r sensision -G warp10
 fi
 
-chown -R warp10:warp10 ${WARP10_HOME}
+chown -R warp10:warp10 ${WARP10_HOME}*
+chown -R sensision:warp10 ${SENSISION_HOME}*
 
 # WARP10 - install and manage upgrade
 # REPLACE HARD LINKS AND USE DATA DIR
-sed -i "s/^#WARP10_HOME.*/WARP10_HOME=\/opt\/warp10/" ${WARP10_HOME}/bin/warp10-standalone.sh
-sed -i "s~^#WARP10_DATA_DIR.*~WARP10_DATA_DIR=${WARP10_DATA_DIR}~" ${WARP10_HOME}/bin/warp10-standalone.sh
+#sed -i "s/^#WARP10_HOME.*/WARP10_HOME=\/opt\/warp10/" ${WARP10_HOME}/bin/warp10-standalone.sh
+#sed -i "s~^#WARP10_DATA_DIR.*~WARP10_DATA_DIR=${WARP10_DATA_DIR}~" ${WARP10_HOME}/bin/warp10-standalone.sh
 
 if [ ! -d ${WARP10_DATA_DIR} ]; then
   mkdir -p ${WARP10_DATA_DIR}
@@ -34,13 +35,13 @@ else
 
   rm -rf ${WARP10_HOME}/macros
   ln -s ${WARP10_VOLUME}/warp10/macros ${WARP10_HOME}/macros
-  
+
   rm -rf ${WARP10_HOME}/warpscripts
   ln -s ${WARP10_VOLUME}/warp10/warpscripts ${WARP10_HOME}/warpscripts
-  
+
   rm -rf ${WARP10_HOME}/logs
   ln -s ${WARP10_VOLUME}/warp10/logs ${WARP10_HOME}/logs
-  
+
   rm -rf ${WARP10_HOME}/jars
   ln -s ${WARP10_VOLUME}/warp10/jars ${WARP10_HOME}/jars
 
@@ -72,7 +73,10 @@ else
   ln -s ${WARP10_VOLUME}/sensision/queued ${SENSISION_HOME}/queued
 fi
 
-# REPLACE HARD LINKS
-sed -i "s/^sensision\.home.*/sensision\.home = \/opt\/sensision/" ${SENSISION_HOME}/etc/sensision.conf
-sed -i "s/^sensision\.scriptrunner\.root.*/sensision\.scriptrunner\.root = \/opt\/sensision\/scripts/" ${SENSISION_HOME}/etc/sensision.conf
-sed -i "s/sensisionLog\.File=.*/sensisionLog\.File=\/opt\/sensision\/logs\/nohup.out/" ${SENSISION_HOME}/etc/log4j.properties
+# # REPLACE HARD LINKS
+# sed -i 's/^standalone\.home.*/standalone\.home = \/opt\/warp10/' ${WARP10_HOME}/etc/conf-standalone
+# sed -i "s/\/opt\/warp10-${WARP10_VERSION}/\/opt\/warp10/" ${WARP10_HOME}/etc/log4j.properties
+
+# sed -i "s/^sensision\.home.*/sensision\.home = \/opt\/sensision/" ${SENSISION_HOME}/etc/sensision.conf
+# sed -i "s/^sensision\.scriptrunner\.root.*/sensision\.scriptrunner\.root = \/opt\/sensision\/scripts/" ${SENSISION_HOME}/etc/sensision.conf
+# sed -i "s/sensisionLog\.File=.*/sensisionLog\.File=\/opt\/sensision\/logs\/nohup.out/" ${SENSISION_HOME}/etc/log4j.properties
