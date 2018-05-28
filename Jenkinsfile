@@ -23,7 +23,7 @@ pipeline {
         stage('Docker image') {
             steps {
                 sh "docker build -t warp10io/warp10:$version ."
-                sh "docker tag  warp10io/warp10:$version warp10io/warp10"
+                sh "docker tag warp10io/warp10:$version warp10io/warp10"
             }
         }
         stage('Deploy') {
@@ -40,7 +40,7 @@ pipeline {
                     }
                     steps {
                         sh "docker push warp10io/warp10:$version"
-                        sh "docker push warp10io/warp10"
+                        sh "docker push warp10io/warp10:latest"
                         sh "docker rmi warp10io/warp10:$version"
                         this.notifyBuild('PUBLISHED', version)
                     }
