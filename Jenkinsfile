@@ -41,7 +41,8 @@ pipeline {
                     steps {
                         sh "docker push warp10io/warp10:$version"
                         sh "docker push warp10io/warp10:latest"
-                        sh "docker rmi -f $(docker images warp10io/warp10:$version -q)"
+                        def image_id = sh(script: 'docker images warp10io/warp10:$version -q', returnStdout: true).trim()
+                        sh "docker rmi -f ${image_id}"
                         this.notifyBuild('PUBLISHED', version)
                     }
                 }
