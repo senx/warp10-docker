@@ -41,7 +41,7 @@ pipeline {
                     steps {
                         sh "docker push warp10io/warp10:$version"
                         sh "docker push warp10io/warp10:latest"
-                        sh "docker rmi warp10io/warp10:$version"
+                        sh "docker rmi -f $(docker images warp10io/warp10:$version -q)"
                         this.notifyBuild('PUBLISHED', version)
                     }
                 }
