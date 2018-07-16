@@ -33,7 +33,7 @@ Start your image binding the external ports `8080` for Warp 10 and `8081` for Qu
 docker run -d -p 8080:8080 -p 8081:8081 warp10io/warp10:latest
 ```
 
-You can set the image version with warp10io/warp10:`X.Y.Z` (the current one being `1.2.17`).
+You can set the image version with warp10io/warp10:`X.Y.Z`.
 
 ### Mapping volume for persistancy
 
@@ -43,7 +43,7 @@ Docker containers are easy to delete. If you delete your container instance, you
 docker run -d -p 8080:8080 -p 8081:8081 --volume=/var/warp10:/data warp10io/warp10:latest
 ```
 
-In this example you bind the container internal data folder, `/data` to your local folder `/var/warp10`.
+In this example, you bind the container internal data folder `/data` to your local folder `/var/warp10`.
 You *must* use the same `--volume` option in all your other docker commands on Warp 10 image.
 
 ### Working in memory
