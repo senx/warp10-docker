@@ -30,6 +30,12 @@ if [ -e ${WARP10_VOLUME}/warp10/etc/conf-standalone.conf ]; then
     sed -i "s~^#in.memory.load =~in.memory.load = ${WARP10_HOME}/data/dump~" ${WARP10_HOME}/etc/conf-standalone.conf
     sed -i "s~^#in.memory.dump =~in.memory.dump = ${WARP10_HOME}/data/dump~" ${WARP10_HOME}/etc/conf-standalone.conf
   fi
+  # Custom macro mode
+  if [ "${CUSTOM_MACRO}" = "true" ]; then
+    echo "Configure macros directory"
+    sed -i "s~^warpscript.repository.directory = .*~warpscript.repository.directory = ${WARP10_MACROS}~" ${WARP10_HOME}/etc/conf-standalone.conf
+    sed -i 's~^warpscript.repository.refresh = 60000~warpscript.repository.refresh = 1000~' ${WARP10_HOME}/etc/conf-standalone.conf
+  fi
 
   # Legacy sensision template
   if ! grep -q  REVISION_TAG ${WARP10_VOLUME}/sensision/etc/sensision.conf; then
