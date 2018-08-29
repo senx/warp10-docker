@@ -16,7 +16,7 @@ ENV JAVA_HOME=/usr \
   SENSISION_HOME=/opt/sensision \
   SENSISION_DATA_DIR=/data/sensision
 
-ARG WARP10_VERSION=1.2.19
+ARG WARP10_VERSION=1.2.22
 ARG WARP10_URL=https://bintray.com/artifact/download/cityzendata/generic/io/warp10/warp10/${WARP10_VERSION}
 
 # Getting Warp 10
