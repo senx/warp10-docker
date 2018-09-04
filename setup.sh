@@ -13,10 +13,6 @@ chown -R warp10:warp10 ${WARP10_HOME}*
 chown -R sensision:warp10 ${SENSISION_HOME}*
 
 # WARP10 - install and manage upgrade
-# REPLACE HARD LINKS AND USE DATA DIR
-#sed -i "s/^#WARP10_HOME.*/WARP10_HOME=\/opt\/warp10/" ${WARP10_HOME}/bin/warp10-standalone.sh
-#sed -i "s~^#WARP10_DATA_DIR.*~WARP10_DATA_DIR=${WARP10_DATA_DIR}~" ${WARP10_HOME}/bin/warp10-standalone.sh
-
 if [ ! -d ${WARP10_DATA_DIR} ]; then
   mkdir -p ${WARP10_DATA_DIR}
   chown warp10:warp10 ${WARP10_DATA_DIR}
@@ -59,7 +55,7 @@ fi
 if [ ! -d ${SENSISION_DATA_DIR} ]; then
   echo "Install Sensision"
   # Stop/start to init config
-  ${SENSISION_HOME}/bin/sensision.init start && ${SENSISION_HOME}/bin/sensision.init stop
+  ${SENSISION_HOME}/bin/sensision.init bootstrap
 else
   echo "Sensision already installed"
   #clean
@@ -72,11 +68,3 @@ else
   ln -s ${WARP10_VOLUME}/sensision/targets ${SENSISION_HOME}/targets
   ln -s ${WARP10_VOLUME}/sensision/queued ${SENSISION_HOME}/queued
 fi
-
-# # REPLACE HARD LINKS
-# sed -i 's/^standalone\.home.*/standalone\.home = \/opt\/warp10/' ${WARP10_HOME}/etc/conf-standalone
-# sed -i "s/\/opt\/warp10-${WARP10_VERSION}/\/opt\/warp10/" ${WARP10_HOME}/etc/log4j.properties
-
-# sed -i "s/^sensision\.home.*/sensision\.home = \/opt\/sensision/" ${SENSISION_HOME}/etc/sensision.conf
-# sed -i "s/^sensision\.scriptrunner\.root.*/sensision\.scriptrunner\.root = \/opt\/sensision\/scripts/" ${SENSISION_HOME}/etc/sensision.conf
-# sed -i "s/sensisionLog\.File=.*/sensisionLog\.File=\/opt\/sensision\/logs\/nohup.out/" ${SENSISION_HOME}/etc/log4j.properties
