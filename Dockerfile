@@ -1,4 +1,4 @@
-FROM lwieske/java-8:jdk-8u172-slim
+FROM openjdk:8-jre-alpine
 
 LABEL author="Cityzen Data"
 LABEL maintainer="contact@cityzendata.com"
@@ -17,7 +17,7 @@ ENV JAVA_HOME=/usr \
   SENSISION_DATA_DIR=/data/sensision
 
 ARG WARP10_VERSION=1.2.22
-ARG WARP10_URL=https://bintray.com/artifact/download/cityzendata/generic/io/warp10/warp10/${WARP10_VERSION}
+ARG WARP10_URL=https://dl.bintray.com/cityzendata/generic/io/warp10/warp10/${WARP10_VERSION}
 
 # Getting Warp 10
 RUN mkdir /opt \
@@ -27,7 +27,7 @@ RUN mkdir /opt \
   && rm warp10-${WARP10_VERSION}.tar.gz \
   && ln -s /opt/warp10-${WARP10_VERSION} ${WARP10_HOME}
 
-ARG SENSISION_VERSION=1.0.16-rc1
+ARG SENSISION_VERSION=1.0.16
 ARG SENSISION_URL=https://dl.bintray.com/cityzendata/generic/io/warp10/sensision-service/${SENSISION_VERSION}
 
 # Getting Sensision
@@ -46,12 +46,6 @@ ENV WARP10_JAR=${WARP10_HOME}/bin/warp10-${WARP10_VERSION}.jar \
 
 COPY warp10.start.sh ${WARP10_HOME}/bin/warp10.start.sh
 COPY setup.sh ${WARP10_HOME}/bin/setup.sh
-
-# Replace default snapshot.sh
-RUN mv ${WARP10_HOME}/bin/snapshot.sh ${WARP10_HOME}/bin/snapshot.sh.ORIG
-COPY snapshot.sh ${WARP10_HOME}/bin/snapshot.sh
-
-RUN chmod +x ${WARP10_HOME}/bin/*.sh
 
 ENV PATH=$PATH:${WARP10_HOME}/bin
 

@@ -19,7 +19,7 @@ if [ -e ${WARP10_VOLUME}/warp10/etc/conf-standalone.conf ]; then
     # ADDS REVISION TO THE TEMPLATE
     sed -i "4s/\/\/.*/\/\/ REVISION_TAG=1\.0/" ${WARP10_VOLUME}/warp10/etc/conf-standalone.conf
   fi
-  # Standalone mode
+  # Standalone IN_MEMORY mode
   if [ "${IN_MEMORY}" = "true" ]; then
     echo "Setting 'IN MEMORY' parameters"
     sed -i 's~^leveldb.home = ${standalone.home}/leveldb~leveldb.home = /dev/null~' ${WARP10_HOME}/etc/conf-standalone.conf
