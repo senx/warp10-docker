@@ -54,16 +54,20 @@ You can add `-e IN_MEMORY=true` to pop an in-memory Warp 10 instance.
 docker run -d -p 8080:8080 -p 8081:8081 -e IN_MEMORY=true warp10io/warp10:latest
 ```
 
-<!--
 ### Continuous Integration
 
-A 'Continuous Integration' version is available on Dockerhub with the 'ci' suffix. This version embeds a pair of READ/WRITE tokens named respectively 'READ', 'WRITE'. -->
+A 'Continuous Integration' version is available on Dockerhub with the 'ci' suffix.
+
+This version embeds a pair of READ/WRITE tokens named respectively 'readTokenCI', 'writeTokenCI'.
+
+Example:
+```console
+[ 'readTokenCI' '~.*' {} NOW -1 ] FETCH // Retrieve the last point for all GTS
+```
 
 ## Getting Tokens
 
 The Warp 10 platform is built with a robust security model that allows you to have a tight control of who has the right to write and/or read data. The model is structured around the [concepts](http://www.warp10.io//introduction/concepts) of `data producer`, `data owner` and `application`, and `WRITE` and `READ` tokens.
-
-The 'ci' version embeds a pair of pre-generated READ/WRITE tokens named respectively 'READ', 'WRITE'. These tokens are in the `predictible-tokens-for-ci/ci.tokens` file.
 
 Otherwise, for the purposes of this setup, you need to generate write and read tokens for a test application for a test user that is both the producer and the owner of the data. In order to interact with the user/token/application system, you need an interactive access to Warp 10's [Worf](http://www.warp10.io/tools/worf) component. You get it by executing `warp10-standalone.sh worf` on the running container.
 

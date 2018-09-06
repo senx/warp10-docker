@@ -23,8 +23,9 @@ pipeline {
         stage('Docker image') {
             steps {
                 sh "docker rmi -f warp10io/warp10:latest"
-                sh "docker build -t warp10io/warp10:$version --build-arg WARP10_VERSION=$version ."
-                sh "docker tag warp10io/warp10:$version warp10io/warp10"
+                sh "docker build -t warp10io/warp10:${version} --build-arg WARP10_VERSION=${version} ."
+                sh "docker build -t warp10io/warp10:${version}-ci --build-arg WARP10_VERSION=${version}-ci ."
+                sh "docker tag warp10io/warp10:${version} warp10io/warp10"
             }
         }
         stage('Deploy') {
@@ -40,9 +41,11 @@ pipeline {
                         message 'Should we deploy to DockerHub?'
                     }
                     steps {
-                        sh "docker push warp10io/warp10:$version"
+                        sh "docker push warp10io/warp10:${version}"
+                        sh "docker push warp10io/warp10:${version}-ci"
                         sh "docker push warp10io/warp10:latest"
-                        sh "docker rmi warp10io/warp10:$version"
+                        sh "docker rmi warp10io/warp10:${version}"
+                        sh "docker rmi warp10io/warp10:${version}-ci"
                         sh "docker rmi warp10io/warp10:latest"
                         this.notifyBuild('PUBLISHED', version)
                     }
