@@ -1,14 +1,9 @@
-token.write.0.name=WRITE
-
+token.write.0.name=writeTokenCI
 token.write.0.producer=42424242-4242-4242-4242-424242424242
-
 token.write.0.owner=42424242-4242-4242-4242-424242424242
+token.write.0.app=testCI
 
-token.write.0.app=test
 
-
-token.read.0.name=READ
-
+token.read.0.name=readTokenCI
 token.read.0.owner=42424242-4242-4242-4242-424242424242
-
-token.read.0.app=test
+token.read.0.app=testCI
