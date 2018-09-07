@@ -24,7 +24,7 @@ pipeline {
             steps {
                 sh "docker rmi -f warp10io/warp10:latest"
                 sh "docker build -t warp10io/warp10:${version} --build-arg WARP10_VERSION=${version} ."
-                sh "docker build -t warp10io/warp10:${version}-ci -f predictible-tokens-for-ci/Dockerfile ."
+                sh "docker build -t warp10io/warp10:${version}-ci predictible-tokens-for-ci"
                 sh "docker tag warp10io/warp10:${version} warp10io/warp10"
             }
         }
