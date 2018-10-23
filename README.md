@@ -49,6 +49,8 @@ You *must* use the same `--volume` option in all your other docker commands on W
 ### Working in memory
 
 You can add `-e IN_MEMORY=true` to pop an in-memory Warp 10 instance.
+By default, it will retained all last 2*24 hours.
+This is configurable.
 
 ```console
 docker run -d -p 8080:8080 -p 8081:8081 -e IN_MEMORY=true warp10io/warp10:latest
@@ -61,6 +63,7 @@ A 'Continuous Integration' version is available on Dockerhub with the 'ci' suffi
 This version embeds a pair of READ/WRITE tokens named respectively 'readTokenCI', 'writeTokenCI'.
 
 Example:
+
 ```console
 [ 'readTokenCI' '~.*' {} NOW -1 ] FETCH // Retrieve the last point for all GTS
 ```
