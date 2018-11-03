@@ -4,11 +4,11 @@
 
 - **Where to get help:** [Warp10.io](https://warp10.io), [Warp 10 users group](https://groups.google.com/group/warp10-users)
 
-- **Warp 10 Platform repository:** [https://github.com/cityzendata/warp10-platform](https://github.com/cityzendata/warp10-platform)
+- **Warp 10 Platform repository:** [https://github.com/senx/warp10-platform](https://github.com/senx/warp10-platform)
 
-- **Warp 10 Docker repository:** [https://github.com/cityzendata/warp10-docker](https://github.com/cityzendata/warp10-docker)
+- **Warp 10 Docker repository:** [https://github.com/senx/warp10-docker](https://github.com/senx/warp10-docker)
 
-- **Maintained by:** [Cityzen Data](http://www.cityzendata.com/)
+- **Maintained by:** [SenX](https://senx.io/)
 
 ## What is Warp 10
 
@@ -133,7 +133,7 @@ A full [getting started](http://www.warp10.io/getting-started/) is available to 
 If you want to build your own Warp 10 image, clone the Warp 10 docker repository:
 
 ```console
-git clone https://github.com/cityzendata/warp10-docker.git
+git clone https://github.com/senx/warp10-docker.git
 ```
 
 Execute `docker build` inside your local copy:
