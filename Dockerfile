@@ -43,7 +43,7 @@ RUN mkdir /opt \
   && rm warp10-${WARP10_VERSION}.tar.gz \
   && ln -s /opt/warp10-${WARP10_VERSION} ${WARP10_HOME}
 
-ARG SENSISION_VERSION=1.0.16
+ARG SENSISION_VERSION=1.0.17
 ARG SENSISION_URL=https://dl.bintray.com/senx/generic/io/warp10/sensision-service/${SENSISION_VERSION}
 
 # Getting Sensision
