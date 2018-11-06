@@ -32,8 +32,8 @@ ENV JAVA_HOME=/usr \
   SENSISION_HOME=/opt/sensision \
   SENSISION_DATA_DIR=/data/sensision
 
-ARG WARP10_VERSION=1.2.22
-ARG WARP10_URL=https://dl.bintray.com/cityzendata/generic/io/warp10/warp10/${WARP10_VERSION}
+ARG WARP10_VERSION=1.2.26
+ARG WARP10_URL=https://dl.bintray.com/senx/generic/io/warp10/warp10/${WARP10_VERSION}
 
 # Getting Warp 10
 RUN mkdir /opt \
@@ -44,7 +44,7 @@ RUN mkdir /opt \
   && ln -s /opt/warp10-${WARP10_VERSION} ${WARP10_HOME}
 
 ARG SENSISION_VERSION=1.0.16
-ARG SENSISION_URL=https://dl.bintray.com/cityzendata/generic/io/warp10/sensision-service/${SENSISION_VERSION}
+ARG SENSISION_URL=https://dl.bintray.com/senx/generic/io/warp10/sensision-service/${SENSISION_VERSION}
 
 # Getting Sensision
 RUN cd /opt \
