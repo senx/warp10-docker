@@ -38,7 +38,7 @@ pipeline {
 
         stage('Docker image') {
             steps {
-                sh "docker rmi -f warp10io/warp10:latest"
+                sh "docker system prune --force --all --volumes --filter 'label=maintainer=contact@senx.io'"
                 sh "docker build -t warp10io/warp10:${version} --build-arg WARP10_VERSION=${version} ."
                 sh "docker build -t warp10io/warp10:${version}-ci predictible-tokens-for-ci"
                 sh "docker tag warp10io/warp10:${version} warp10io/warp10"
@@ -60,9 +60,7 @@ pipeline {
                         sh "docker push warp10io/warp10:${version}"
                         sh "docker push warp10io/warp10:${version}-ci"
                         sh "docker push warp10io/warp10:latest"
-                        sh "docker rmi warp10io/warp10:${version}"
-                        sh "docker rmi warp10io/warp10:${version}-ci"
-                        sh "docker rmi warp10io/warp10:latest"
+                        sh "docker system prune --force --all --volumes --filter 'label=maintainer=contact@senx.io'"
                         this.notifyBuild('PUBLISHED', version)
                     }
                 }
