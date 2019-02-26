@@ -36,7 +36,7 @@ ARG WARP10_VERSION=2.0.3
 ARG WARP10_URL=https://dl.bintray.com/senx/generic/io/warp10/warp10/${WARP10_VERSION}
 
 # Getting Warp 10
-RUN mkdir /opt \
+RUN mkdir -p /opt \
   && cd /opt \
   && wget -nv ${WARP10_URL}/warp10-${WARP10_VERSION}.tar.gz \
   && tar xzf warp10-${WARP10_VERSION}.tar.gz \
