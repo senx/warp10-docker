@@ -39,8 +39,8 @@ pipeline {
         stage('Docker image') {
             steps {
                 sh "docker system prune --force --all --volumes --filter 'label=maintainer=contact@senx.io'"
-                sh "docker build -t warp10io/warp10:${version} --build-arg WARP10_VERSION=${version} ."
-                sh "docker build -t warp10io/warp10:${version}-ci predictible-tokens-for-ci"
+                sh "docker build --squash -t warp10io/warp10:${version} --build-arg WARP10_VERSION=${version} ."
+                sh "docker build --squash -t warp10io/warp10:${version}-ci predictible-tokens-for-ci"
                 sh "docker tag warp10io/warp10:${version} warp10io/warp10"
             }
         }
