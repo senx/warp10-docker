@@ -34,10 +34,10 @@ if [ ! -d ${WARP10_DATA_DIR} ]; then
   chown warp10:warp10 ${WARP10_DATA_DIR}
   chmod 775 ${WARP10_DATA_DIR}
 
-  echo "Install Warp10"
+  echo "Install Warp 10"
   ${WARP10_HOME}/bin/warp10-standalone.init bootstrap
 else
-  echo "Warp10 already installed"
+  echo "Warp 10 already installed"
 
   rm -rf ${WARP10_HOME}/etc
   ln -s ${WARP10_DATA_DIR}/etc ${WARP10_HOME}/etc
