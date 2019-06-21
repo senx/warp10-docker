@@ -19,11 +19,10 @@ FROM openjdk:8-jre-alpine
 LABEL author="SenX S.A.S."
 LABEL maintainer="contact@senx.io"
 
-# Updating apk index
-RUN apk update && apk add bash curl python
 
-# Installing build-dependencies
-RUN apk add --virtual=build-dependencies ca-certificates wget
+# Installing utils need by Warp 10 and build-dependencies
+RUN apk --no-cache add bash curl python fontconfig unifont \
+  && apk --no-cache add --virtual=build-dependencies ca-certificates wget
 
 ENV JAVA_HOME=/usr \
   WARP10_VOLUME=/data \
@@ -54,7 +53,7 @@ RUN cd /opt \
   && ln -s /opt/sensision-${SENSISION_VERSION} ${SENSISION_HOME}
 
 # Deleting build-dependencies
-RUN apk del build-dependencies
+RUN apk --no-cache del build-dependencies
 
 ENV WARP10_JAR=${WARP10_HOME}/bin/warp10-${WARP10_VERSION}.jar \
   WARP10_CONF=${WARP10_HOME}/etc/conf-standalone.conf \
