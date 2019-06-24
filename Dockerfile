@@ -56,7 +56,8 @@ RUN cd /opt \
 RUN apk --no-cache del build-dependencies
 
 ENV WARP10_JAR=${WARP10_HOME}/bin/warp10-${WARP10_VERSION}.jar \
-  WARP10_CONF=${WARP10_HOME}/etc/conf-standalone.conf \
+  WARP10_CONFIG_DIR=${WARP10_HOME}/etc/conf.d \
+  WARP10_CONF=${WARP10_HOME}/etc/conf.d/00_warp10.conf \
   WARP10_MACROS=${WARP10_VOLUME}/custom_macros
 
 COPY warp10.start.sh ${WARP10_HOME}/bin/warp10.start.sh
