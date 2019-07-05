@@ -102,6 +102,6 @@ if [ -e ${WARP10_CONF} ]; then
 else
   echo "ERROR: Unable to launch Warp10, configuration missing"
   echo "WARNING: Since version 2.1.0, Warp 10 can use multiple configuration files. The files have to be present in ${WARP10_CONFIG_DIR}"
-  echo "WARNING: Default configuration file must be named ${WARP10_CONFIG_DIR}/00_warp.conf"
+  echo "WARNING: Default configuration file must be named ${WARP10_CONF}"
   exit -1
 fi
