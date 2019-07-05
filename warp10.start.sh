@@ -15,6 +15,9 @@
 #   limitations under the License.
 #
 
+
+IN_MEMORY_CONFIG=${WARP10_CONFIG_DIR}/20_in-memory.conf
+
 warp10_pid=
 sensision_pid=
 
@@ -47,39 +50,32 @@ term_handler() {
 # Configuration file present launch Warp 10, Sensision and Quantum
 if [ -e ${WARP10_CONF} ]; then
 
-  # Legacy warp10 template with no revision
-  if ! grep -q  REVISION_TAG ${WARP10_CONF}; then
-    # REPLACE Hard version link with soft links
-    sed -i 's|^standalone.home.*|standalone.home = /opt/warp10|' ${WARP10_CONF}
-    sed -i 's_/opt/warp10-[0-9]+\.[0-9]+\.[0-9]+\(-rc[0-9]+\)?\(-[0-9]+-[a-z0-9]+\)*_/opt/warp10_g' ${WARP10_DATA_DIR}/etc/log4j.properties
-  fi
-  # Standalone IN_MEMORY mode
+  #
+  # Standalone IN_MEMORY configuration
+  #
   if [ "${IN_MEMORY}" = "true" ]; then
     echo "Setting 'IN MEMORY' parameters"
-    sed -i 's~^leveldb.home = ${standalone.home}/leveldb~leveldb.home = /dev/null~' ${WARP10_CONF}
-    sed -i 's~^in.memory = false~in.memory = true~' ${WARP10_CONF}
-    sed -i 's~^//in.memory.chunked = true~in.memory.chunked = true~' ${WARP10_CONF}
-    sed -i 's~^//in.memory.chunk.count =~in.memory.chunk.count = 2~' ${WARP10_CONF}
-    sed -i 's~^//in.memory.chunk.length =~in.memory.chunk.length = 86400000000~' ${WARP10_CONF}
-    sed -i "s~^#in.memory.load =~in.memory.load = ${WARP10_DATA_DIR}/memory.dump~" ${WARP10_CONF}
-    sed -i "s~^#in.memory.dump =~in.memory.dump = ${WARP10_DATA_DIR}/memory.dump~" ${WARP10_CONF}
-  fi
-  # Custom macro mode
-  if [ "${CUSTOM_MACRO}" = "true" ]; then
-    echo "Configure macros directory"
-    sed -i "s~^warpscript.repository.directory = .*~warpscript.repository.directory = ${WARP10_MACROS}~" ${WARP10_CONF}
-    sed -i 's~^warpscript.repository.refresh = 60000~warpscript.repository.refresh = 1000~' ${WARP10_CONF}
+    echo "leveldb.home = /dev/null" > ${IN_MEMORY_CONFIG}
+    echo "in.memory = true" >> ${IN_MEMORY_CONFIG}
+    echo "in.memory.chunked = true" >> ${IN_MEMORY_CONFIG}
+    echo "in.memory.chunk.count = 2" >> ${IN_MEMORY_CONFIG}
+    echo "in.memory.chunk.length = 86400000000" >> ${IN_MEMORY_CONFIG}
+    echo "in.memory.load = ${WARP10_DATA_DIR}/memory.dump" >> ${IN_MEMORY_CONFIG}
+    echo "in.memory.dump = ${WARP10_DATA_DIR}/memory.dump" >> ${IN_MEMORY_CONFIG}
+  else
+    echo "Unsetting 'IN MEMORY' parameters"
+    echo "leveldb.home = \${standalone.home}/leveldb" > ${IN_MEMORY_CONFIG}
+    echo "in.memory = false" >> ${IN_MEMORY_CONFIG}
   fi
 
-  # Legacy sensision template
-  if ! grep -q  REVISION_TAG ${SENSISION_DATA_DIR}/etc/sensision.conf; then
-    # REPLACE HARD LINKS IN SENSISION CONFIGURATION
-    sed -i 's/^sensision\.home.*/sensision\.home = \/opt\/sensision/' ${SENSISION_DATA_DIR}/etc/sensision.conf
-    sed -i 's/^sensision\.scriptrunner\.root.*/sensision\.scriptrunner\.root= \/opt\/sensision\/scripts/' ${SENSISION_DATA_DIR}/etc/sensision.conf
+  # # Custom macro mode
+  # if [ "${CUSTOM_MACRO}" = "true" ]; then
+  #   echo "Configure macros directory"
+  #   sed -i "s~^warpscript.repository.directory = .*~warpscript.repository.directory = ${WARP10_MACROS}~" ${WARP10_CONF}
+  #   sed -i 's~^warpscript.repository.refresh = 60000~warpscript.repository.refresh = 1000~' ${WARP10_CONF}
+  # fi
 
-    # ADDS REVISION TO THE TEMPLATE
-    sed -i "10s/.*/## REVISION_TAG=1\.0/" ${SENSISION_DATA_DIR}/etc/sensision.conf
-  fi
+  chown -R warp10:warp10 ${WARP10_CONFIG_DIR}
 
   echo "Configuration File exists - Update Quantum port (8081)"
   sed -i 's/^quantum\.port.*/quantum\.port = 8081/' ${WARP10_CONF}
@@ -98,13 +94,14 @@ if [ -e ${WARP10_CONF} ]; then
   # TODO ends this script if warp10 is not running properly
   echo "All process are running"
 
-  # trap 'kill ${!}; term_handler' SIGTERM SIGKILL SIGINT
   trap 'kill ${!}; term_handler' SIGTERM SIGKILL SIGINT
 
   # wait indefinitely
   tail -f /dev/null & wait ${!}
 
 else
-  echo "Unable to launch Warp10, configuration missing"
+  echo "ERROR: Unable to launch Warp10, configuration missing"
+  echo "WARNING: Since version 2.1.0, Warp 10 can use multiple configuration files. The files have to be present in ${WARP10_CONFIG_DIR}"
+  echo "WARNING: Default configuration file must be named ${WARP10_CONFIG_DIR}/00_warp.conf"
   exit -1
 fi

@@ -15,25 +15,11 @@
 #   limitations under the License.
 #
 
-# Create user warp10
-if [ "`which useradd`" = "" ]; then
-  adduser -D -s -H -h ${WARP10_HOME} -s /bin/bash warp10
-  adduser -D -s -H -h ${SENSISION_HOME} -s /bin/bash sensision
-  addgroup sensision warp10
-else
-  useradd -d ${WARP10_HOME} -M -r warp10
-  useradd -d ${SENSISION_HOME} -M -r sensision -G warp10
-fi
-
-chown -R warp10:warp10 ${WARP10_HOME}*
-chown -R sensision:warp10 ${SENSISION_HOME}*
+chown -R warp10:warp10 ${WARP10_HOME} ${WARP10_DATA_DIR}
+chown -R sensision:warp10 ${SENSISION_HOME} ${SENSISION_DATA_DIR}
 
 # WARP10 - install and manage upgrade
 if [ ! -d ${WARP10_DATA_DIR} ]; then
-  mkdir -p ${WARP10_DATA_DIR}
-  chown warp10:warp10 ${WARP10_DATA_DIR}
-  chmod 775 ${WARP10_DATA_DIR}
-
   echo "Install Warp 10™"
   ${WARP10_HOME}/bin/warp10-standalone.init bootstrap
 else

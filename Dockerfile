@@ -42,7 +42,7 @@ RUN mkdir -p /opt \
   && rm warp10-${WARP10_VERSION}.tar.gz \
   && ln -s /opt/warp10-${WARP10_VERSION} ${WARP10_HOME}
 
-ARG SENSISION_VERSION=1.0.17
+ARG SENSISION_VERSION=1.0.18
 ARG SENSISION_URL=https://dl.bintray.com/senx/generic/io/warp10/sensision-service/${SENSISION_VERSION}
 
 # Getting Sensision
@@ -66,8 +66,11 @@ COPY setup.sh ${WARP10_HOME}/bin/setup.sh
 ENV PATH=$PATH:${WARP10_HOME}/bin
 
 VOLUME ${WARP10_VOLUME}
-VOLUME ${WARP10_MACROS}
+# VOLUME ${WARP10_MACROS}
 
+RUN  adduser -D -s -H -h ${WARP10_HOME} -s /bin/bash warp10 \
+  && adduser -D -s -H -h ${SENSISION_HOME} -s /bin/bash sensision \
+  && addgroup sensision warp10
 
 # Exposing port 8080
 EXPOSE 8080 8081
