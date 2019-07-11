@@ -1,4 +1,4 @@
-# Warp 10 Docker image
+# Warp 10™ Docker image
 
 ## Quick reference
 
@@ -19,15 +19,15 @@ The Warp 10 Platform is designed to collect, store and manipulate sensor data. S
 
 ## How to use this image
 
-The easiest way to setup the Warp 10 platform is to use [Docker](https://www.docker.com/). Officials builds are available on [Docker Store](https://store.docker.com/community/images/warp10io/warp10) containing:
+The easiest way to setup the Warp 10™ platform is to use [Docker](https://www.docker.com/). Officials builds are available on [Docker Store](https://store.docker.com/community/images/warp10io/warp10) containing:
 
 - The Warp 10 platform for storing and analysing Geo Time Series™
-- Quantum:  a web application aiming to allow users to interact with the platform
+- WarpStudio:  a web application aiming to allow users to interact with the platform
 - Sensision: a service for monitoring Warp 10 platform metrics
 
 ### Start a Warp 10 instance
 
-Start your image binding the external ports `8080` for Warp 10 and `8081` for Quantum:
+Start your image binding the external ports `8080` for Warp 10 and `8081` for WarpStudio:
 
 ```console
 docker run -d -p 8080:8080 -p 8081:8081 warp10io/warp10:latest
@@ -120,13 +120,12 @@ If everything is OK, you should receive a HTTP 200 OK with your datapoint in JSO
 
 A full [getting started](http://www.warp10.io/getting-started/) is available to guide your first steps into Warp 10.
 
-## Using Quantum
+## Using WarpStudio
+![WarpStudio](https://studio.senx.io/assets/img/warpStudio_blanc.png)
 
-[Warp 10's Quantum](http://www.warp10.io/tools/quantum) is a web application aiming to allow users to interact with the platform in an user-friendly way, offering an alternative to command-line interaction.
+[Warp 10's WarpStudio](http://studio.senx.io/) is a web application aiming to allow users to interact with the platform in an user-friendly way, offering an alternative to command-line interaction.
 
-> A standalone version of Quantum is packaged in the Docker image you have just installed, listening on the port 8081. In a Linux system (with binding between Warp 10 API address and the host) you can access Quantum at `127.0.0.1:8081`. In Mac OS or Windows, there is no binding between Warp 10 API address and the host, you need to replace 127.0.0.1 by the real Ip address of the container as explained in the precedent section.
-
-![Quantum](http://www.warp10.io/img/getting-started/quantum-warpscript.png)
+> A standalone version of WarpStudio is packaged in the Docker image you have just installed, listening on the port 8081. In a Linux system (with binding between Warp 10 API address and the host) you can access WarpStudio at `127.0.0.1:8081`. In Mac OS or Windows, there is no binding between Warp 10 API address and the host, you need to replace 127.0.0.1 by the real Ip address of the container as explained in the precedent section.
 
 ## Build the image
 
