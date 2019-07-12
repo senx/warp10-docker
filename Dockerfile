@@ -34,26 +34,26 @@ ENV JAVA_HOME=/usr \
 ARG WARP10_VERSION=2.1.0
 ARG WARP10_URL=https://dl.bintray.com/senx/generic/io/warp10/warp10/${WARP10_VERSION}
 
-ARG WARPSTUDIO_VERSION=0.0.82
+ARG WARPSTUDIO_VERSION=1.0.0
 ARG WARPSTUDIO_URL=https://dl.bintray.com/senx/maven/io/warp10/warp10-plugin-warpstudio/${WARPSTUDIO_VERSION}
 
 # Getting Warp 10
 RUN mkdir -p /opt \
   && cd /opt \
-  && wget -nv ${WARP10_URL}/warp10-${WARP10_VERSION}.tar.gz \
+  && wget -q ${WARP10_URL}/warp10-${WARP10_VERSION}.tar.gz \
   && tar xzf warp10-${WARP10_VERSION}.tar.gz \
   && rm warp10-${WARP10_VERSION}.tar.gz \
   && ln -s /opt/warp10-${WARP10_VERSION} ${WARP10_HOME} \
   && adduser -D -s -H -h ${WARP10_HOME} -s /bin/bash warp10 \
   && chown -h warp10:warp10 ${WARP10_HOME} \
-  && wget -nv -P ${WARP10_HOME}/lib ${WARPSTUDIO_URL}/warp10-plugin-warpstudio-${WARPSTUDIO_VERSION}.jar
+  && wget -q -P ${WARP10_HOME}/lib ${WARPSTUDIO_URL}/warp10-plugin-warpstudio-${WARPSTUDIO_VERSION}.jar
 
 ARG SENSISION_VERSION=1.0.19
 ARG SENSISION_URL=https://dl.bintray.com/senx/generic/io/warp10/sensision-service/${SENSISION_VERSION}
 
 # Getting Sensision
 RUN cd /opt \
-  && wget -nv $SENSISION_URL/sensision-service-${SENSISION_VERSION}.tar.gz \
+  && wget -q $SENSISION_URL/sensision-service-${SENSISION_VERSION}.tar.gz \
   && tar xzf sensision-service-${SENSISION_VERSION}.tar.gz \
   && rm sensision-service-${SENSISION_VERSION}.tar.gz \
   && ln -s /opt/sensision-${SENSISION_VERSION} ${SENSISION_HOME} \
@@ -76,7 +76,7 @@ ENV PATH=$PATH:${WARP10_HOME}/bin
 VOLUME ${WARP10_VOLUME}
 # VOLUME ${WARP10_MACROS}
 
-# Exposing port 8080
+# Exposing port
 EXPOSE 8080 8081
 
 CMD ${WARP10_HOME}/bin/warp10.start.sh
