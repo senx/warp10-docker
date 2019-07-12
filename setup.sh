@@ -15,9 +15,6 @@
 #   limitations under the License.
 #
 
-chown -R warp10:warp10 ${WARP10_HOME} ${WARP10_DATA_DIR}
-chown -R sensision:warp10 ${SENSISION_HOME} ${SENSISION_DATA_DIR}
-
 # WARP10 - install and manage upgrade
 if [ ! -d ${WARP10_DATA_DIR} ]; then
   echo "Install Warp 10™"
@@ -70,3 +67,6 @@ else
   ln -s ${SENSISION_DATA_DIR}/targets ${SENSISION_HOME}/targets
   ln -s ${SENSISION_DATA_DIR}/queued ${SENSISION_HOME}/queued
 fi
+
+chown -Rf warp10:warp10 ${WARP10_DATA_DIR}
+chown -Rf sensision:sensision ${SENSISION_DATA_DIR}
