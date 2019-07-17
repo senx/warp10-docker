@@ -15,6 +15,8 @@
 #   limitations under the License.
 #
 
+set -euo pipefail
+
 # WARP10 - install and manage upgrade
 if [ ! -d ${WARP10_DATA_DIR} ]; then
   echo "Install Warp 10™"

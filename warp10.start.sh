@@ -14,6 +14,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #
+set -euo pipefail
 
 WARPSTUDIO_CONFIG=${WARP10_CONFIG_DIR}/80-warpstudio-plugin.conf
 
@@ -57,7 +58,7 @@ if [ ${#files[@]} -gt 0 ]; then
   #
   # Standalone IN_MEMORY configuration
   #
-  if [ "${IN_MEMORY}" = "true" ]; then
+  if [ "${IN_MEMORY:-}" = "true" ]; then
     echo "'IN MEMORY' mode is enabled"
     sed -i -e 's/.*leveldb.home =.*/leveldb.home = \/dev\/null/g' ${WARP10_CONFIG_DIR}/*
     sed -i -e 's/.*in.memory =.*/in.memory = true/g' ${WARP10_CONFIG_DIR}/*
@@ -68,7 +69,7 @@ if [ ${#files[@]} -gt 0 ]; then
     sed -i -e "s~.*in.memory.dump =.*~in.memory.dump = ${WARP10_DATA_DIR}/memory.dump~g" ${WARP10_CONFIG_DIR}/*
   else
     echo "'IN MEMORY' mode is disabled"
-    sed -i -e 's/.*leveldb.home =.*/leveldb.home = \${standalone.home}/leveldb/g' ${WARP10_CONFIG_DIR}/*
+    sed -i -e 's~.*leveldb.home =.*~leveldb.home = \${standalone.home}/leveldb~g' ${WARP10_CONFIG_DIR}/*
     sed -i -e 's/.*in.memory = .*/in.memory = false/g' ${WARP10_CONFIG_DIR}/*
   fi
 
