@@ -31,7 +31,7 @@ ENV JAVA_HOME=/usr \
   SENSISION_HOME=/opt/sensision \
   SENSISION_DATA_DIR=/data/sensision
 
-ARG WARP10_VERSION=2.1.1
+ARG WARP10_VERSION=2.2.0
 ARG WARP10_URL=https://dl.bintray.com/senx/generic/io/warp10/warp10/${WARP10_VERSION}
 
 ARG WARPSTUDIO_VERSION=1.0.4
