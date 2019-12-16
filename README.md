@@ -60,12 +60,16 @@ $ docker run -d -p 8080:8080 -p 8081:8081 -e IN_MEMORY=true warp10io/warp10:late
 
 A 'Continuous Integration' version is available on Dockerhub with the 'ci' suffix.
 
-This version embeds a pair of READ/WRITE tokens named respectively 'readTokenCI', 'writeTokenCI'.
+This version embeds a pair of READ/WRITE tokens, respectively 'readTokenCI', 'writeTokenCI'.
 
-Example:
+Examples:
 
 ```bash
 [ 'readTokenCI' '~.*' {} NOW -1 ] FETCH // Retrieve the last point for all GTS
+```
+
+```bash
+curl -v -H 'X-Warp10-Token: writeTokenCI' --data-binary "1// test{} 42" 'http://127.0.0.1:8080/api/v0/update'
 ```
 
 ## Getting Tokens
