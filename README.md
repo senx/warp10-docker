@@ -119,7 +119,7 @@ You should receive a HTTP 200.
 Get this data using your READ tokens.
 
 ```bash
-$ curl -v --data-binary "'READ_TOKEN' 'test' {} NOW -1 FETCH" 'http://127.0.0.1:8080/api/v0/exec'
+$ curl -v --data-binary "[ 'READ_TOKEN' 'test' {} NOW -1 ] FETCH" 'http://127.0.0.1:8080/api/v0/exec'
 ```
 
 You should receive a HTTP 200 OK with your datapoint in JSON format.
