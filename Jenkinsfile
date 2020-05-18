@@ -38,10 +38,11 @@ pipeline {
 
         stage('Docker image') {
             steps {
+                sh 'DOCKER_BUILD_KIT=1 DOCKER_CLI_EXPERIMENTAL=enabled docker buildx use multiarch'
                 sh "docker system prune --force --all --volumes --filter 'label=maintainer=contact@senx.io'"
-                sh "docker build --squash -t warp10io/warp10:${version} --build-arg WARP10_VERSION=${version} ."
-                sh "docker build --squash -t warp10io/warp10:${version}-ci predictible-tokens-for-ci"
-                sh "docker tag warp10io/warp10:${version} warp10io/warp10"
+                sh "DOCKER_BUILD_KIT=1 DOCKER_CLI_EXPERIMENTAL=enabled docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v7 -t warp10io/warp10:${version} --build-arg WARP10_VERSION=${version} ."
+                sh "DOCKER_BUILD_KIT=1 DOCKER_CLI_EXPERIMENTAL=enabled docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v7 -t warp10io/warp10:latest --build-arg WARP10_VERSION=${version} ."
+                sh "DOCKER_BUILD_KIT=1 DOCKER_CLI_EXPERIMENTAL=enabled docker buildx build --load -t warp10io/warp10:${version}-ci predictible-tokens-for-ci"
             }
         }
         stage('Deploy') {
@@ -57,9 +58,10 @@ pipeline {
                         message 'Should we deploy to DockerHub?'
                     }
                     steps {
-                        sh "docker push warp10io/warp10:${version}"
-                        sh "docker push warp10io/warp10:${version}-ci"
-                        sh "docker push warp10io/warp10:latest"
+                        sh 'DOCKER_BUILD_KIT=1 DOCKER_CLI_EXPERIMENTAL=enabled docker buildx use multiarch'
+                        sh "DOCKER_BUILD_KIT=1 DOCKER_CLI_EXPERIMENTAL=enabled docker buildx build --push --platform linux/amd64,linux/arm64,linux/arm/v7 -t warp10io/warp10:${version} --build-arg WARP10_VERSION=${version} ."
+                        sh "DOCKER_BUILD_KIT=1 DOCKER_CLI_EXPERIMENTAL=enabled docker buildx build --push --platform linux/amd64,linux/arm64,linux/arm/v7 -t warp10io/warp10:latest --build-arg WARP10_VERSION=${version} ."
+                        sh "DOCKER_BUILD_KIT=1 DOCKER_CLI_EXPERIMENTAL=enabled docker buildx build --push -t warp10io/warp10:${version}-ci predictible-tokens-for-ci"
                         sh "docker system prune --force --all --volumes --filter 'label=maintainer=contact@senx.io'"
                         this.notifyBuild('PUBLISHED', version)
                     }
