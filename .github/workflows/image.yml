@@ -30,7 +30,7 @@ jobs:
       - name: Build the image
         run: |
           docker buildx build --push \
-            --tag stevengueguen/warp10:$TAG \
+            --tag stevengueguen/warp10:latest \
             --platform linux/amd64,linux/arm/v7,linux/arm64 .
         env:
           TAG: ${{ steps.latest-tag.outputs.TAG }}
