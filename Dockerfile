@@ -33,9 +33,11 @@ ENV JAVA_HOME=/usr \
 
 ARG WARP10_VERSION=2.6.0
 ARG WARP10_URL=https://dl.bintray.com/senx/generic/io/warp10/warp10/${WARP10_VERSION}
+ENV WARP10_VERSION=${WARP10_VERSION}
 
 ARG WARPSTUDIO_VERSION=1.0.32
 ARG WARPSTUDIO_URL=https://dl.bintray.com/senx/maven/io/warp10/warp10-plugin-warpstudio/${WARPSTUDIO_VERSION}
+ENV WARPSTUDIO_VERSION=${WARPSTUDIO_VERSION}
 
 # Getting Warp 10
 RUN mkdir -p /opt \
@@ -50,6 +52,7 @@ RUN mkdir -p /opt \
 
 ARG SENSISION_VERSION=1.0.21
 ARG SENSISION_URL=https://dl.bintray.com/senx/generic/io/warp10/sensision-service/${SENSISION_VERSION}
+ENV SENSISION_VERSION=${SENSISION_VERSION}
 
 # Getting Sensision
 RUN cd /opt \
