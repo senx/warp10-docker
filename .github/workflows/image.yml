@@ -29,7 +29,7 @@ jobs:
       - name: Build the main image
         run: |
           for ARCH in amd64 arm/v7 arm64; do
-            docker buildx build
+            docker buildx build \
               --load \
               --tag ${{ secrets.DOCKER_USERNAME }}/warp10:${TAG} \
               --platform linux/${ARCH} .
@@ -38,7 +38,7 @@ jobs:
       - name: Build the ci image
         run: |
           for ARCH in amd64 arm/v7 arm64; do
-            docker buildx build
+            docker buildx build \
               --load \
               --tag ${{ secrets.DOCKER_USERNAME }}/warp10:${TAG}-ci \
               --platform linux/${ARCH} predictible-tokens-for-ci
