@@ -45,7 +45,7 @@ jobs:
           done
 
       - name: Tag image
-        run: docker tag warp10io/warp10:${TAG} warp10io/warp10; echo $(docker images)
+        run: docker tag ${{ secrets.DOCKER_USERNAME }}/warp10:${TAG} ${{ secrets.DOCKER_USERNAME }}/warp10; echo $(docker images)
 
       - name: Push image if new tag
         if: startsWith(github.ref, 'refs/tags/')
