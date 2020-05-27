@@ -1,4 +1,4 @@
-name: build Warp 10 docker image
+name: Build Warp 10 docker image
 
 on:
   push:
@@ -8,17 +8,26 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: checkout code
+      - name: Checkout code
         uses: actions/checkout@v2
-      - name: install buildx
+
+      - name: Install docker buildx
         id: buildx
         uses: crazy-max/ghaction-docker-buildx@v1
         with:
           version: latest
-      - name: login to docker hub
+
+      - name: Get the tag version
+        id: get_version
+        run: echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/}
+
+      - name: Login to docker hub
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
       - name: build the image
         run: |
           docker buildx build --push \
-            --tag stevengueguen/warp10:latest \
+            --tag stevengueguen/warp10:$VERSION \
             --platform linux/amd64,linux/arm/v7,linux/arm64 .
+        env:
+          VERSION: ${{ steps.get_version.outputs.VERSION }}
