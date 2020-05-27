@@ -28,19 +28,23 @@ jobs:
 
       - name: Build the main image
         run: |
-          docker buildx build \
-            --load \
-            --tag ${{ secrets.DOCKER_USERNAME }}/warp10:${TAG} \
-            --platform linux/amd64,linux/arm/v7,linux/arm64 .
-
+          for ARCH in amd64 arm/v7 arm64; do
+            docker buildx build
+              --load
+              --tag ${{ secrets.DOCKER_USERNAME }}/warp10:${TAG} \
+              --platform linux/${ARCH} .
+          done
+          
       - name: Build the ci image
         run: |
           docker buildx build \
-            --load \
             --tag ${{ secrets.DOCKER_USERNAME }}/warp10:${TAG}-ci \
             --platform linux/amd64,linux/arm/v7,linux/arm64 predictible-tokens-for-ci
+
+      - name: Tag image
+        run: docker tag warp10io/warp10:${TAG} warp10io/warp10; echo $(docker images)
 
       - name: Push image if new tag
         if: startsWith(github.ref, 'refs/tags/')
         run: |
-          echo "Push on new tag"
+          echo "Push on new tag";
