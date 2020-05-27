@@ -41,6 +41,6 @@ jobs:
             --platform linux/amd64,linux/arm/v7,linux/arm64 predictible-tokens-for-ci
 
       - name: Push image if new tag
-        if: startWith(github.ref, 'refs/tags/')
+        if: startsWith(github.ref, 'refs/tags/')
         run: |
           echo "Push on new tag"
