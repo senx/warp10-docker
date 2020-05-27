@@ -11,12 +11,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@master
         with:
-          fetch-depth: 0
+          fetch-depth: 0 # Fetch all branches and tags so we can find the latest tag
 
       - name: Get latest tag
         run: echo "::set-env name=TAG::$(git describe --abbrev=0 --tags)"
 
-      - name: Set up Docker Buildx
+      - name: Set up Docker Buildx for multiarch build
         id: buildx
         uses: crazy-max/ghaction-docker-buildx@v1
         with:
@@ -28,15 +28,19 @@ jobs:
 
       - name: Build the main image
         run: |
-          echo ${TAG}
           docker buildx build \
+            --load \
             --tag ${{ secrets.DOCKER_USERNAME }}/warp10:${TAG} \
             --platform linux/amd64,linux/arm/v7,linux/arm64 .
 
       - name: Build the ci image
         run: |
-          TAG=$(git describe --abbrev=0 --tags)
-          echo $TAG
           docker buildx build \
+            --load \
             --tag ${{ secrets.DOCKER_USERNAME }}/warp10:${TAG}-ci \
             --platform linux/amd64,linux/arm/v7,linux/arm64 predictible-tokens-for-ci
+
+      - name: Push image if new tag
+        if: startWith(github.ref, 'refs/tags/')
+        run: |
+          echo "Push on new tag"
