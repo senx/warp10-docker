@@ -20,9 +20,7 @@ jobs:
 
       - name: Get Latest tag
         id: latest_tag
-        uses: WyriHaximus/github-action-get-previous-tag@master
-        env:
-          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+        run: echo ::set-output name=TAG::$(git describe --abbrev=0 --tags)
 
       - name: Login to docker hub
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
@@ -33,4 +31,4 @@ jobs:
             --tag stevengueguen/warp10:$TAG \
             --platform linux/amd64,linux/arm/v7,linux/arm64 .
         env:
-          TAG: ${{ steps.lastest_tag.outputs.tag }}
+          TAG: ${{ steps.latest_tag.outputs.tag }}
