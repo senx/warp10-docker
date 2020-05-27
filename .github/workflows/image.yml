@@ -13,6 +13,9 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Get latest tag
+        run: echo '::set-env name=TAG::$(git describe --abbrev=0 --tags)'
+
       - name: Set up Docker Buildx
         id: buildx
         uses: crazy-max/ghaction-docker-buildx@v1
@@ -23,10 +26,16 @@ jobs:
       - name: Login to docker hub
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
-      - name: Build the image
+      - name: Build the main image
+        run: |
+          docker buildx build \
+            --tag ${{ secrets.DOCKER_USERNAME }}/warp10:${TAG} \
+            --platform linux/amd64,linux/arm/v7,linux/arm64 .
+
+      - name: Build the ci image
         run: |
           TAG=$(git describe --abbrev=0 --tags)
           echo $TAG
-          docker buildx build --push \
-            --tag ${{ secrets.DOCKER_USERNAME }}/warp10:${TAG} \
-            --platform linux/amd64,linux/arm/v7,linux/arm64 .
+          docker buildx build \
+            --tag ${{ secrets.DOCKER_USERNAME }}/warp10:${TAG}-ci \
+            --platform linux/amd64,linux/arm/v7,linux/arm64 predictible-tokens-for-ci
