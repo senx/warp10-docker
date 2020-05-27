@@ -2,7 +2,11 @@ name: Build Warp 10 docker image
 
 on:
   push:
-    branches: master
+    branches:
+      - master
+  release:
+    branches:
+      - master
 
 jobs:
   build:
