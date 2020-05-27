@@ -33,4 +33,4 @@ jobs:
             --tag stevengueguen/warp10:$TAG \
             --platform linux/amd64,linux/arm/v7,linux/arm64 .
         env:
-          TAG: ${{ steps.latest-tag.outputs.tag }}
+          TAG: ${{ steps.latest-tag.outputs.TAG }}
