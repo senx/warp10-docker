@@ -18,9 +18,11 @@ jobs:
           buildx-version: latest
           qemu-version: latest
 
-      - name: Get the tag version
-        id: get_version
-        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+      - name: Get Latest tag
+        id: latest_tag
+        uses: WyriHaximus/github-action-get-previous-tag@master
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
 
       - name: Login to docker hub
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
@@ -28,7 +30,7 @@ jobs:
       - name: Build the image
         run: |
           docker buildx build --push \
-            --tag stevengueguen/warp10:$VERSION \
+            --tag stevengueguen/warp10:$TAG \
             --platform linux/amd64,linux/arm/v7,linux/arm64 .
         env:
-          VERSION: ${{ steps.get_version.outputs.VERSION }}
+          TAG: ${{ steps.lastest_tag.outputs.tag }}
