@@ -9,8 +9,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
-        run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
+        - uses: actions/checkout@v2
+        - run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
 
       - name: Set up Docker Buildx
         id: buildx
