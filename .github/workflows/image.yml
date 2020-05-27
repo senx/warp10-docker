@@ -44,10 +44,10 @@ jobs:
               --platform linux/${ARCH} predictible-tokens-for-ci
           done
 
-      - name: Tag image
-        run: docker tag ${{ secrets.DOCKER_USERNAME }}/warp10:${TAG} ${{ secrets.DOCKER_USERNAME }}/warp10; echo $(docker images)
-
       - name: Push image if new tag
         if: startsWith(github.ref, 'refs/tags/')
         run: |
-          echo "Push on new tag";
+          docker tag ${{ secrets.DOCKER_USERNAME }}/warp10:${TAG} ${{ secrets.DOCKER_USERNAME }}/warp10
+          docker push ${{ secrets.DOCKER_USERNAME }}/warp10:${TAG}
+          docker push ${{ secrets.DOCKER_USERNAME }}/warp10:latest
+          docker push ${{ secrets.DOCKER_USERNAME }}/warp10:${TAG}-ci
