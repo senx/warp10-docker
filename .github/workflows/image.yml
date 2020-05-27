@@ -30,16 +30,19 @@ jobs:
         run: |
           for ARCH in amd64 arm/v7 arm64; do
             docker buildx build
-              --load
+              --load \
               --tag ${{ secrets.DOCKER_USERNAME }}/warp10:${TAG} \
               --platform linux/${ARCH} .
           done
-          
+
       - name: Build the ci image
         run: |
-          docker buildx build \
-            --tag ${{ secrets.DOCKER_USERNAME }}/warp10:${TAG}-ci \
-            --platform linux/amd64,linux/arm/v7,linux/arm64 predictible-tokens-for-ci
+          for ARCH in amd64 arm/v7 arm64; do
+            docker buildx build
+              --load \
+              --tag ${{ secrets.DOCKER_USERNAME }}/warp10:${TAG}-ci \
+              --platform linux/${ARCH} predictible-tokens-for-ci
+          done
 
       - name: Tag image
         run: docker tag warp10io/warp10:${TAG} warp10io/warp10; echo $(docker images)
