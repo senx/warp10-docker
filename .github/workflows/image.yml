@@ -38,6 +38,7 @@ jobs:
         run: |
           docker buildx build \
             ${PUSH} \
+            --tag ${{ secrets.DOCKER_USERNAME }}/warp10:latest \
             --tag ${{ secrets.DOCKER_USERNAME }}/warp10:${TAG} \
             --platform linux/amd64,linux/arm/v7,linux/arm64 .
 
