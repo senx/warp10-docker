@@ -18,7 +18,7 @@ jobs:
         id: slack # IMPORTANT: reference this step ID value in future Slack steps
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-        uses: voxmedia/github-action-slack-notify-build@v1
+        uses: voxmedia/github-action-slack-notify-build@master
         with:
           channel: app-alerts
           status: STARTING
@@ -65,7 +65,7 @@ jobs:
         if: success()
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-        uses: voxmedia/github-action-slack-notify-build@v1
+        uses: voxmedia/github-action-slack-notify-build@master
         with:
           channel: app-alerts
           status: SUCCESS
@@ -75,7 +75,7 @@ jobs:
         if: failure()
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-        uses: voxmedia/github-action-slack-notify-build@v1
+        uses: voxmedia/github-action-slack-notify-build@master
         with:
           channel: app-alerts
           status: FAILED
