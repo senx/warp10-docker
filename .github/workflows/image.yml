@@ -48,3 +48,10 @@ jobs:
             ${PUSH} \
             --tag ${{ secrets.DOCKER_USERNAME }}/warp10:${TAG}-ci \
             --platform linux/amd64,linux/arm/v7,linux/arm64 predictible-tokens-for-ci
+
+      - name: Notify slack
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+        uses: pullreminders/slack-action@master
+        with:
+          args: '{\"channel\":\"DD0AM67T\",\"text\":\"Hello world\"}'
