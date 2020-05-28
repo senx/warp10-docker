@@ -12,6 +12,18 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+
+      - name: Notify start
+        if: success()
+        id: slack # IMPORTANT: reference this step ID value in future Slack steps
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+        uses: voxmedia/github-action-slack-notify-build@v1
+        with:
+          channel: app-alerts
+          status: STARTING
+          color: warning
+
       - name: Checkout code
         uses: actions/checkout@master
         with:
@@ -49,9 +61,22 @@ jobs:
             --tag ${{ secrets.DOCKER_USERNAME }}/warp10:${TAG}-ci \
             --platform linux/amd64,linux/arm/v7,linux/arm64 predictible-tokens-for-ci
 
-      - name: Notify slack
+      - name: Notify success
+        if: success()
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-        uses: pullreminders/slack-action@master
+        uses: voxmedia/github-action-slack-notify-build@v1
         with:
-          args: '{\"channel\":\"G014ER7ARGA\",\"text\":\"Hello world\"}'
+          channel: app-alerts
+          status: SUCCESS
+          color: good
+
+      - name: Notify failure
+        if: failure()
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+        uses: voxmedia/github-action-slack-notify-build@v1
+        with:
+          channel: app-alerts
+          status: FAILED
+          color: danger
