@@ -44,6 +44,6 @@ jobs:
       - name: Build the ci image
         run: |
           docker buildx build \
-            ${PUSH}
+            ${PUSH} \
             --tag ${{ secrets.DOCKER_USERNAME }}/warp10:${TAG}-ci \
             --platform linux/amd64,linux/arm/v7,linux/arm64 predictible-tokens-for-ci
