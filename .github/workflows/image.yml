@@ -22,7 +22,7 @@ jobs:
 
       - name: Is new tag
         if: startsWith(github.ref, 'refs/tags/')
-        run: echo "::set-env name=PUSH::--load"
+        run: echo "::set-env name=PUSH::--push"
 
       - name: Set up Docker Buildx for multiarch build
         id: buildx
