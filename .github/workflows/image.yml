@@ -13,16 +13,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-      - name: Notify start
-        if: success()
-        id: slack # IMPORTANT: reference this step ID value in future Slack steps
+      - name: Slack Notification
+        uses: rtCamp/action-slack-notify@v2.0.2
         env:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-        uses: voxmedia/github-action-slack-notify-build@v1
-        with:
-          channel: github-alerts
-          status: STARTING
-          color: warning
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
 
       - name: Checkout code
         uses: actions/checkout@master
@@ -61,22 +55,12 @@ jobs:
             --tag ${{ secrets.DOCKER_USERNAME }}/warp10:${TAG}-ci \
             --platform linux/amd64,linux/arm/v7,linux/arm64 predictible-tokens-for-ci
 
-      - name: Notify success
-        if: success()
-        env:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-        uses: voxmedia/github-action-slack-notify-build@v1
-        with:
-          channel: github-alerts
-          status: SUCCESS
-          color: good
-
-      - name: Notify failure
-        if: failure()
-        env:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-        uses: voxmedia/github-action-slack-notify-build@v1
-        with:
-          channel: github-alerts
-          status: FAILED
-          color: danger
+      # - name: Notify success
+      #   if: success()
+      #   env:
+      #     SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+      #   uses: voxmedia/github-action-slack-notify-build@v1
+      #   with:
+      #     channel: github-alerts
+      #     status: SUCCESS
+      #     color: good
