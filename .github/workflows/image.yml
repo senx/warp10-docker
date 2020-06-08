@@ -55,8 +55,14 @@ jobs:
           READ_TOKEN=$(docker exec -it $(docker ps -q --filter "name=testing-${TAG}") tail -n 1 /opt/warp10/etc/initial.tokens | sed -e 's/{"read":{"token":"//' -e 's/".*//')
           WRITE_TOKEN=$(docker exec -it $(docker ps -q --filter "name=testing-${TAG}") tail -n 1 /opt/warp10/etc/initial.tokens | sed -e 's/.*,"write":{"token":"//' -e 's/".*//')
 
+          echo "READ_TOKEN: ${READ_TOKEN}"
+          echo "WRITE_TOKEN: ${WRITE_TOKEN}"
+
+          echo "Write data"
           curl -H "X-Warp10-Token: ${WRITE_TOKEN}" http://0.0.0.0:8080/api/v0/update --data-binary '// test{} 42'
-          res=$(curl "http://0.0.0.0:8080/api/v0/fetch?token=${READ_TOKEN}&selector=~.*\{\}&now=now&timespan=-1" | cut -d ' ' -f3)
+
+          echo "Read data"
+          res=$(curl -s "http://0.0.0.0:8080/api/v0/fetch?token=${READ_TOKEN}&selector=~.*\{\}&now=now&timespan=-1" | cut -d ' ' -f3)
           echo ${res}
           if [[ "${res}" -ne "42" ]]; then
             exit 1
