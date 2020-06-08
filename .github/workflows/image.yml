@@ -49,9 +49,17 @@ jobs:
             --load \
             --tag ${{ secrets.DOCKER_USERNAME }}/warp10:${TAG}-test \
             --platform linux/amd64 .
+          echo "Run docker image"
           docker run --name testing-${TAG} -d -p 8080:8080 -p 8081:8081 ${{ secrets.DOCKER_USERNAME }}/warp10:${TAG}-test
+
+          echo "get write cmd"
           write_cmd=$(docker logs $(docker ps -q --filter "name=testing-${TAG}")  2>/dev/null | grep 'curl ' | sed -e 's/##   //g' | head -1)
+          echo ${write_cmd}
+
+          echo "get read cmd"
           read_cmd=$(docker logs $(docker ps -q --filter "name=testing-${TAG}")  2>/dev/null | grep 'curl ' | sed -e 's/##   //g' | head -2 | tail -1 | sed -e 's/=-1/=-10\&format=fulltext/g')
+          echo ${read_cmd}
+
           for i in {0..5}
           do
             eval ${write_cmd}
