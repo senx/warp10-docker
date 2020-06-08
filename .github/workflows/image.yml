@@ -52,25 +52,13 @@ jobs:
           echo "Run docker image"
           docker run --name testing-${TAG} -d -p 8080:8080 -p 8081:8081 ${{ secrets.DOCKER_USERNAME }}/warp10:${TAG}-test
 
-          docker ps -a
-          echo "get write cmd"
-          docker ps -q --filter "name=testing-${TAG}"
-          docker logs $(docker ps -q --filter "name=testing-${TAG}")
-          docker logs $(docker ps -q --filter "name=testing-${TAG}") 2>/dev/null
-          write_cmd=$(docker logs $(docker ps -q --filter "name=testing-${TAG}")  2>/dev/null | grep 'curl ' | sed -e 's/##   //g' | head -1)
-          echo ${write_cmd}
+          READ_TOKEN=$(docker exec -it $(docker ps -q --filter "name=testing-${TAG}") tail -n 1 /opt/warp10/etc/initial.tokens | sed -e 's/{"read":{"token":"//' -e 's/".*//')
+          WRITE_TOKEN=$(docker exec -it $(docker ps -q --filter "name=testing-${TAG}") tail -n 1 /opt/warp10/etc/initial.tokens | sed -e 's/.*,"write":{"token":"//' -e 's/".*//')
 
-          echo "get read cmd"
-          read_cmd=$(docker logs $(docker ps -q --filter "name=testing-${TAG}")  2>/dev/null | grep 'curl ' | sed -e 's/##   //g' | head -2 | tail -1 | sed -e 's/=-1/=-10\&format=fulltext/g')
-          echo ${read_cmd}
-
-          for i in {0..5}
-          do
-            eval ${write_cmd}
-          done
-          res=$(eval ${read_cmd} 2>/dev/null | cut -d ' ' -f3 | tr -d '\n')
+          curl -H "X-Warp10-Token: ${WRITE_TOKEN}" http://0.0.0.0:8080/api/v0/update --data-binary '// test{} 42'
+          res=$(curl "http://0.0.0.0:8080/api/v0/fetch?token=${READ_TOKEN}&selector=~.*\{\}&now=now&timespan=-1" | cut -d ' ' -f3)
           echo ${res}
-          if [[ "${res}" -ne "424242424242" ]]; then
+          if [[ "${res}" -ne "42" ]]; then
             exit 1
           fi
 
