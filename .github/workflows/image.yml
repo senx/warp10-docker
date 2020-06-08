@@ -54,6 +54,9 @@ jobs:
 
           docker ps -a
           echo "get write cmd"
+          docker ps -q --filter "name=testing-${TAG}"
+          docker logs $(docker ps -q --filter "name=testing-${TAG}")
+          docker logs $(docker ps -q --filter "name=testing-${TAG}") 2>/dev/null
           write_cmd=$(docker logs $(docker ps -q --filter "name=testing-${TAG}")  2>/dev/null | grep 'curl ' | sed -e 's/##   //g' | head -1)
           echo ${write_cmd}
 
