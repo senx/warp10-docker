@@ -56,8 +56,8 @@ jobs:
           do
             eval ${write_cmd}
           done
-          res=$(eval ${read_cmd} 2>/dev/null | cut -d ' ' -f3)
-          if [[ "${res}"" -ne "41 42 42 42 42 42" ]] then
+          res=$(eval ${read_cmd} 2>/dev/null | cut -d ' ' -f3 | tr -d '\n')
+          if [[ "${res}" -ne "1424242424242" ]]; then
             exit 1
           fi
 
