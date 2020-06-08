@@ -52,6 +52,7 @@ jobs:
           echo "Run docker image"
           docker run --name testing-${TAG} -d -p 8080:8080 -p 8081:8081 ${{ secrets.DOCKER_USERNAME }}/warp10:${TAG}-test
 
+          docker ps -a
           echo "get write cmd"
           write_cmd=$(docker logs $(docker ps -q --filter "name=testing-${TAG}")  2>/dev/null | grep 'curl ' | sed -e 's/##   //g' | head -1)
           echo ${write_cmd}
