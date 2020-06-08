@@ -53,10 +53,10 @@ jobs:
           docker run --name testing-${TAG} -d -p 8080:8080 -p 8081:8081 ${{ secrets.DOCKER_USERNAME }}/warp10:${TAG}-test
 
 
-          docker exec (docker ps -q --filter "name=testing-${TAG}") ls
-          docker exec (docker ps -q --filter "name=testing-${TAG}") ls /opt
-          docker exec (docker ps -q --filter "name=testing-${TAG}") ls /opt/warp10
-          docker exec (docker ps -q --filter "name=testing-${TAG}") ls /opt/warp10/etc
+          docker exec $(docker ps -q --filter "name=testing-${TAG}") ls
+          docker exec $(docker ps -q --filter "name=testing-${TAG}") ls /opt
+          docker exec $(docker ps -q --filter "name=testing-${TAG}") ls /opt/warp10
+          docker exec $(docker ps -q --filter "name=testing-${TAG}") ls /opt/warp10/etc
           READ_TOKEN=$(docker exec -i $(docker ps -q --filter "name=testing-${TAG}") tail -n 1 /opt/warp10/etc/initial.tokens | sed -e 's/{"read":{"token":"//' -e 's/".*//')
           WRITE_TOKEN=$(docker exec -i $(docker ps -q --filter "name=testing-${TAG}") tail -n 1 /opt/warp10/etc/initial.tokens | sed -e 's/.*,"write":{"token":"//' -e 's/".*//')
 
