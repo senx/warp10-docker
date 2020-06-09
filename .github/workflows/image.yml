@@ -13,24 +13,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-      - name: Send Start Notification
-        uses: bayssmekanique/action-simple-slack-notifier@v1
-        if: always()
-        with:
-          token: ${{ secrets.SLACK_BOT_TOKEN }}
-          status: ${{ job.status }}
-          channel: '#app-alerts'
-          version: ${{ steps.check.outputs.version }}
-          action: Start
-
-      - name: Slack Notification
-        uses: rtCamp/action-slack-notify@v2.0.2
-        env:
-          SLACK_TITLE: 'Start build'
-          SLACK_COLOR: warning
-          SLACK_ICON: ''
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-
       - name: Checkout code
         uses: actions/checkout@master
         with:
@@ -92,22 +74,6 @@ jobs:
             ${PUSH} \
             --tag ${{ secrets.DOCKER_USERNAME }}/warp10:${TAG}-ci \
             --platform linux/amd64,linux/arm/v7,linux/arm64 predictible-tokens-for-ci
-
-      - name: Notify success
-        if: success()
-        uses: rtCamp/action-slack-notify@v2.0.2
-        env:
-          SLACK_TITLE: 'Build successful'
-          SLACK_COLOR: good
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-
-      - name: Notify failure
-        if: failure()
-        uses: rtCamp/action-slack-notify@v2.0.2
-        env:
-          SLACK_TITLE: 'Build failure'
-          SLACK_COLOR: danger
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
 
       - name: Send Notification
         uses: bayssmekanique/action-simple-slack-notifier@v1
