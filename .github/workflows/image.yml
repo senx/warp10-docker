@@ -51,6 +51,7 @@ jobs:
             --platform linux/amd64 .
           echo "Run docker image"
           docker run --name testing-${TAG} -d -p 8080:8080 -p 8081:8081 ${{ secrets.DOCKER_USERNAME }}/warp10:${TAG}-test
+          sleep 10
 
 
           docker exec $(docker ps -q --filter "name=testing-${TAG}") ls /opt/warp10/etc
