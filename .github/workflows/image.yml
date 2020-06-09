@@ -105,4 +105,5 @@ jobs:
         with:
           token: ${{ secrets.SLACK_BOT_TOKEN }}
           status: ${{ job.status }}
+          channel: '#app-alerts'
           version: ${{ steps.check.outputs.version }}
