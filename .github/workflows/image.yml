@@ -63,7 +63,7 @@ jobs:
           echo "Read data"
           res=$(curl -s "http://0.0.0.0:8080/api/v0/fetch?token=${READ_TOKEN}&selector=~.*\{\}&now=now&timespan=-1" | cut -d ' ' -f3)
           echo ${res}
-          if [[ "${res}" -ne "42I" ]]; then
+          if [[ "${res}" != "42I" ]]; then
             exit 1
           fi
 
