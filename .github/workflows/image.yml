@@ -98,3 +98,11 @@ jobs:
           SLACK_TITLE: 'Build failure'
           SLACK_COLOR: danger
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+
+      - name: Send Notification
+        uses: bayssmekanique/action-simple-slack-notifier@v1
+        if: always()
+        with:
+          token: ${{ secrets.SLACK_BOT_TOKEN }}
+          status: ${{ job.status }}
+          version: ${{ steps.check.outputs.version }}
