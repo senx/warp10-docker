@@ -18,9 +18,10 @@ jobs:
         if: always()
         with:
           token: ${{ secrets.SLACK_BOT_TOKEN }}
-          status: 'Start'
+          status: ${{ job.status }}
           channel: '#app-alerts'
           version: ${{ steps.check.outputs.version }}
+          action: Start
 
       - name: Slack Notification
         uses: rtCamp/action-slack-notify@v2.0.2
