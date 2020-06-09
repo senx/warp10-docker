@@ -55,6 +55,7 @@ jobs:
 
           docker exec $(docker ps -q --filter "name=testing-${TAG}") ls /opt/warp10
           docker exec $(docker ps -q --filter "name=testing-${TAG}") ls /opt/warp10/etc
+          docker exec $(docker ps -q --filter "name=testing-${TAG}") ls /opt/warp10/etc/conf.d
           READ_TOKEN=$(docker exec -i $(docker ps -q --filter "name=testing-${TAG}") tail -n 1 /opt/warp10/etc/initial.tokens | sed -e 's/{"read":{"token":"//' -e 's/".*//')
           WRITE_TOKEN=$(docker exec -i $(docker ps -q --filter "name=testing-${TAG}") tail -n 1 /opt/warp10/etc/initial.tokens | sed -e 's/.*,"write":{"token":"//' -e 's/".*//')
 
