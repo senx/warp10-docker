@@ -21,7 +21,6 @@ jobs:
           status: 'Start'
           channel: '#app-alerts'
           version: ${{ steps.check.outputs.version }}
-          url: ${{ steps.monitor.monitor_url }}
 
       - name: Slack Notification
         uses: rtCamp/action-slack-notify@v2.0.2
@@ -117,4 +116,3 @@ jobs:
           status: ${{ job.status }}
           channel: '#app-alerts'
           version: ${{ steps.check.outputs.version }}
-          url: ${{ steps.monitor.monitor_url }}
