@@ -61,9 +61,10 @@ jobs:
           curl -H "X-Warp10-Token: ${WRITE_TOKEN}" http://0.0.0.0:8080/api/v0/update --data-binary '// test{} 42'
 
           echo "Read data"
-          res=$(curl -s "http://0.0.0.0:8080/api/v0/fetch?token=${READ_TOKEN}&selector=~.*\{\}&now=now&timespan=-1" | cut -d ' ' -f3)
+          res=$(curl -s "http://0.0.0.0:8080/api/v0/fetch?token=${READ_TOKEN}&selector=~.*\{\}&now=now&timespan=-1" 2>/dev/null| cut -d ' ' -f3)
           echo ${res}
           if [[ "${res}" != "42I" ]]; then
+            echo "Failed to retreive data inserted"
             exit 1
           fi
 
