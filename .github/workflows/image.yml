@@ -18,12 +18,11 @@ jobs:
         if: always()
         with:
           token: ${{ secrets.SLACK_BOT_TOKEN }}
-          status: ${{ job.status }}
+          status: 'Start'
           channel: '#app-alerts'
           version: ${{ steps.check.outputs.version }}
           url: ${{ steps.monitor.monitor_url }}
-          status: 'Start'
-          
+
       - name: Slack Notification
         uses: rtCamp/action-slack-notify@v2.0.2
         env:
