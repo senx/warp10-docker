@@ -21,7 +21,7 @@ LABEL maintainer="contact@senx.io"
 
 
 # Installing utils need by Warp 10 and build-dependencies
-RUN apk --no-cache add bash curl python fontconfig unifont \
+RUN apk --no-cache add bash curl python2 fontconfig unifont \
   && apk --no-cache add --virtual=build-dependencies ca-certificates wget
 
 ENV JAVA_HOME=/usr \
