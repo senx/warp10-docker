@@ -24,8 +24,7 @@ LABEL maintainer="contact@senx.io"
 RUN apk --no-cache add bash curl python2 fontconfig unifont \
   && apk --no-cache add --virtual=build-dependencies ca-certificates wget
 
-ENV JAVA_HOME=/usr \
-  WARP10_VOLUME=/data \
+ENV WARP10_VOLUME=/data \
   WARP10_HOME=/opt/warp10 \
   WARP10_DATA_DIR=/data/warp10 \
   SENSISION_HOME=/opt/sensision \
