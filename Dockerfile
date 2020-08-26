@@ -14,14 +14,14 @@
 #   limitations under the License.
 #
 
-FROM adoptopenjdk/openjdk8:alpine-slim
+FROM openjdk:8-jre-alpine
 
 LABEL author="SenX S.A.S."
 LABEL maintainer="contact@senx.io"
 
 
 # Installing utils need by Warp 10 and build-dependencies
-RUN apk --no-cache add bash curl python2 fontconfig unifont \
+RUN apk --no-cache add bash curl python fontconfig unifont \
   && apk --no-cache add --virtual=build-dependencies ca-certificates wget
 
 ENV WARP10_VOLUME=/data \
