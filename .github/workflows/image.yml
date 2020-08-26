@@ -81,5 +81,5 @@ jobs:
         with:
           token: ${{ secrets.SLACK_BOT_TOKEN }}
           status: ${{ job.status }}
-          channel: '#app-alerts'
+          channel: '#jenkins'
           version: ${{ steps.check.outputs.version }}
