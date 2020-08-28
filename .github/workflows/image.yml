@@ -50,13 +50,22 @@ jobs:
           WRITE_TOKEN=$(docker exec -i $(docker ps -q --filter "name=testing-${TAG}") tail -n 1 /opt/warp10/etc/initial.tokens | sed -e 's/.*,"write":{"token":"//' -e 's/".*//')
 
           echo "Write data"
-          curl -s -H "X-Warp10-Token: ${WRITE_TOKEN}" http://0.0.0.0:8080/api/v0/update --data-binary '// test{} 42'
+          curl -s -H "X-Warp10-Token: ${WRITE_TOKEN}" http://127.0.0.1:8080/api/v0/update --data-binary '// test{} 42'
 
           echo "Read data"
-          res=$(curl -s "http://0.0.0.0:8080/api/v0/fetch?token=${READ_TOKEN}&selector=~.*\{\}&now=now&timespan=-1" | cut -d ' ' -f3)
+          res=$(curl -s "http://127.0.0.1:8080/api/v0/fetch?token=${READ_TOKEN}&selector=~.*\{\}&now=now&timespan=-1" | cut -d ' ' -f3)
           echo ${res}
           if [[ "${res}" != "42" ]]; then
             echo "Failed to compare write data with read data"
+            exit 1
+          fi
+
+          echo "Test WarpStudio"
+          res=$(curl -Is http://127.0.0.1:8081/ | head -1)
+          if [[ "${res%?}" != "HTTP/1.1 200 OK" ]]; then
+            echo "Failed to test WarpStudio URL"
+            echo "Curl result: ${res}"
+            echo $(docker ps -a)
             exit 1
           fi
 
