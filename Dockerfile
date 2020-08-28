@@ -49,7 +49,7 @@ RUN mkdir -p /opt \
   && chown -h warp10:warp10 ${WARP10_HOME} \
   && wget -q -P ${WARP10_HOME}/lib ${WARPSTUDIO_URL}/warp10-plugin-warpstudio-${WARPSTUDIO_VERSION}.jar
 
-ARG SENSISION_VERSION=1.0.21
+ARG SENSISION_VERSION=1.0.22
 ARG SENSISION_URL=https://dl.bintray.com/senx/generic/io/warp10/sensision-service/${SENSISION_VERSION}
 ENV SENSISION_VERSION=${SENSISION_VERSION}
 
