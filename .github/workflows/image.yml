@@ -61,7 +61,7 @@ jobs:
           fi
 
           echo "Test WarpStudio"
-          res=$(curl -Is http://127.0.0.1:8081/ | head -1)
+          res=$(curl -Is http://0.0.0.0:8081/ | head -1)
           if [[ "${res}" != "HTTP/1.1 200 OK" ]]; then
             echo "Failed to test WarpStudio URL"
             exit 1
