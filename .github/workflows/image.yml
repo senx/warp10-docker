@@ -19,9 +19,9 @@ jobs:
       - name: Set env
         run: |
           if [[ ${GITHUB_REF} == refs/tags/* ]]; then
-            echo ::set-env name=TAG::${GITHUB_REF#refs/tags/}
+            echo "::set-env name=TAG::${GITHUB_REF#refs/tags/}"
           elif
-            echo ::set-env name=TAG::default
+            echo "::set-env name=TAG::default"
           fi
 
       - name: Set up QEMU
