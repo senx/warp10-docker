@@ -22,7 +22,7 @@ jobs:
 
       - name: Set fake tag
         if: startsWith(github.ref, 'refs/tags/') == false
-        run: echo "::set-env name=TAG::github.run_id"
+        run: echo "::set-env name=TAG::${GITHUB_RUN_ID}"
 
       - name: Test tag
         run: |
@@ -49,9 +49,7 @@ jobs:
           file: ./Dockerfile
           platforms: linux/amd64
           load: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/warp10:${TAG}-test
-        env:
-          TAG: ${TAG}
+          tags: ${{ secrets.DOCKER_USERNAME }}/warp10:${{ TAG }}-test
 
       - name: Test the new image
         run: |
