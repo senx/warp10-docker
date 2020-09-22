@@ -14,33 +14,38 @@ jobs:
     steps:
 
       - name: Checkout code
-        uses: actions/checkout@master
+        uses: actions/checkout@v2
+
+      - name: Set env
+        run: |
+          if [[ ${GITHUB_REF} == refs/tags/* ]]; then
+            echo ::set-env name=TAG::${GITHUB_REF#refs/tags/}
+          elif
+            echo ::set-env name=TAG::default
+          fi
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
         with:
-          fetch-depth: 0 # Fetch all branches and tags so we can find the latest tag
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Get latest tag
-        run: echo "::set-env name=TAG::$(git describe --abbrev=0 --tags)"
-
-      - name: Is new tag
-        if: startsWith(github.ref, 'refs/tags/')
-        run: echo "::set-env name=PUSH::--push"
-
-      - name: Set up Docker Buildx for multiarch build
-        id: buildx
-        uses: crazy-max/ghaction-docker-buildx@v1
+      - name: Build the test image
+        uses: docker/build-push-action@v2
         with:
-          buildx-version: latest
-          qemu-version: latest
-
-      - name: Login to docker hub
-        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+          context: .
+          file: ./Dockerfile
+          platforms: linux/amd64
+          tags: ${{ secrets.DOCKER_USERNAME }}/warp10:${TAG}-test
 
       - name: Test the new image
         run: |
-          docker buildx build \
-            --load \
-            --tag ${{ secrets.DOCKER_USERNAME }}/warp10:${TAG}-test \
-            --platform linux/amd64 .
           echo "Run docker image"
           docker run --name testing-${TAG} -d -p 8080:8080 -p 8081:8081 ${{ secrets.DOCKER_USERNAME }}/warp10:${TAG}-test
           sleep 10
@@ -70,19 +75,26 @@ jobs:
           fi
 
       - name: Build the main image
-        run: |
-          docker buildx build \
-            ${PUSH} \
-            --tag ${{ secrets.DOCKER_USERNAME }}/warp10:latest \
-            --tag ${{ secrets.DOCKER_USERNAME }}/warp10:${TAG} \
-            --platform linux/amd64,linux/arm/v7,linux/arm64 .
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./Dockerfile
+          platforms: linux/amd64,linux/arm/v7,linux/arm64
+          push: startsWith(github.ref, 'refs/tags/')
+          tags: |
+            ${{ secrets.DOCKER_USERNAME }}/warp10:latest
+            ${{ secrets.DOCKER_USERNAME }}/warp10:${TAG}
 
       - name: Build the ci image
-        run: |
-          docker buildx build \
-            ${PUSH} \
-            --tag ${{ secrets.DOCKER_USERNAME }}/warp10:${TAG}-ci \
-            --platform linux/amd64,linux/arm/v7,linux/arm64 predictible-tokens-for-ci
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./predictible-tokens-for-ci/Dockerfile
+          platforms: linux/amd64,linux/arm/v7,linux/arm64
+          push: startsWith(github.ref, 'refs/tags/')
+          tags: |
+            ${{ secrets.DOCKER_USERNAME }}/warp10:${TAG}-ci
+
 
       - name: Send Notification
         uses: bayssmekanique/action-simple-slack-notifier@v1
@@ -90,5 +102,5 @@ jobs:
         with:
           token: ${{ secrets.SLACK_BOT_TOKEN }}
           status: ${{ job.status }}
-          channel: '#jenkins'
+          channel: '#app-alerts'
           version: ${{ steps.check.outputs.version }}
