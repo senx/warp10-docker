@@ -24,6 +24,12 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/') == false
         run: echo "::set-env name=TAG::github.run_id"
 
+      - name: Test tag
+        run: |
+          echo "=============="
+          echo ${TAG}
+          echo "=============="
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
 
