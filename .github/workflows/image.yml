@@ -79,7 +79,7 @@ jobs:
         with:
           file: ./Dockerfile
           platforms: linux/amd64,linux/arm/v7,linux/arm64
-          push: startsWith(github.ref, 'refs/tags/')
+          push: ${{ startsWith(github.ref, 'refs/tags/') }}
           tags: |
             ${{ secrets.DOCKER_USERNAME }}/warp10:latest
             ${{ secrets.DOCKER_USERNAME }}/warp10:${{ env.TAG }}
@@ -90,7 +90,7 @@ jobs:
           context: ./predictible-tokens-for-ci
           file: ./predictible-tokens-for-ci/Dockerfile
           platforms: linux/amd64,linux/arm/v7,linux/arm64
-          push: startsWith(github.ref, 'refs/tags/')
+          push: ${{ startsWith(github.ref, 'refs/tags/') }}
           tags: |
             ${{ secrets.DOCKER_USERNAME }}/warp10:${{ env.TAG }}-ci
 
