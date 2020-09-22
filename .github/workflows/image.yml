@@ -16,13 +16,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Set env
-        run: |
-          if [[ ${GITHUB_REF} == refs/tags/* ]]; then
-            echo "::set-env name=TAG::${GITHUB_REF#refs/tags/}"
-          elif
-            echo "::set-env name=TAG::default"
-          fi
+      - name: Set tag
+        if: startsWith(github.ref, 'refs/tags/')
+        run: echo "::set-env name=TAG::${GITHUB_REF#refs/tags/}"
+
+      - name: Set fake tag
+        if: startsWith(github.ref, 'refs/tags/') == false
+        run: echo "::set-env name=TAG::github.run_id"
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
