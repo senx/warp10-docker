@@ -44,6 +44,8 @@ jobs:
           platforms: linux/amd64
           load: true
           tags: ${{ secrets.DOCKER_USERNAME }}/warp10:${TAG}-test
+        env:
+          TAG: ${TAG}
 
       - name: Test the new image
         run: |
