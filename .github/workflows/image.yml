@@ -49,7 +49,7 @@ jobs:
           file: ./Dockerfile
           platforms: linux/amd64
           load: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/warp10:${{ TAG }}-test
+          tags: ${{ secrets.DOCKER_USERNAME }}/warp10:${{ env.TAG }}-test
 
       - name: Test the new image
         run: |
