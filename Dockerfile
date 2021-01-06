@@ -1,5 +1,5 @@
 #
-#   Copyright 2020  SenX S.A.S.
+#   Copyright 2016-2021  SenX S.A.S.
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ ENV WARP10_VOLUME=/data \
   SENSISION_HOME=/opt/sensision \
   SENSISION_DATA_DIR=/data/sensision
 
-ARG WARP10_VERSION=2.7.1
+ARG WARP10_VERSION=2.7.2
 ARG WARP10_URL=https://dl.bintray.com/senx/generic/io/warp10/warp10/${WARP10_VERSION}
 ENV WARP10_VERSION=${WARP10_VERSION}
 
