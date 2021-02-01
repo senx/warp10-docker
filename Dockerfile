@@ -14,15 +14,14 @@
 #   limitations under the License.
 #
 
-#FROM openjdk:8-jre-alpine
-FROM adoptopenjdk/openjdk8:alpine-jre
+FROM openjdk:8-jre-alpine
 
 LABEL author="SenX S.A.S."
 LABEL maintainer="contact@senx.io"
 
 
 # Installing utils need by Warp 10 and build-dependencies
-RUN apk --no-cache add bash curl python3 fontconfig unifont \
+RUN apk --no-cache add bash curl fontconfig unifont \
   && apk --no-cache add --virtual=build-dependencies ca-certificates wget
 
 ENV WARP10_VOLUME=/data \
@@ -31,7 +30,7 @@ ENV WARP10_VOLUME=/data \
   SENSISION_HOME=/opt/sensision \
   SENSISION_DATA_DIR=/data/sensision
 
-ARG WARP10_VERSION=2.7.2
+ARG WARP10_VERSION=2.7.3
 ARG WARP10_URL=https://dl.bintray.com/senx/generic/io/warp10/warp10/${WARP10_VERSION}
 ENV WARP10_VERSION=${WARP10_VERSION}
 

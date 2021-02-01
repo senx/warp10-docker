@@ -40,15 +40,15 @@ if [[ "${res}" != "42" ]]; then
   exit 1
 fi
 
-#echo "Delete data"
-#res=$(curl -s -H "X-Warp10-Token:${WRITE_TOKEN}" "http://127.0.0.1:8080/api/v0/delete?selector=test%7B%7D&start=0&end=1611332350722909")
-#if [[ "${res::-1}" != "test{.app=io.warp10.bootstrap}{}" ]]; then
-#  echo "Failed to delete data"
-#  echo "Result: ${res::-1}"
-#  docker stop ${id}
-#  exit 1
-#fi
-#
+echo "Delete data"
+res=$(curl -s -H "X-Warp10-Token:${WRITE_TOKEN}" "http://127.0.0.1:8080/api/v0/delete?selector=test%7B%7D&start=0&end=1611332350722909")
+if [[ "${res::-1}" != "test{.app=io.warp10.bootstrap}{}" ]]; then
+  echo "Failed to delete data"
+  echo "Result: ${res::-1}"
+  docker stop ${id}
+  exit 1
+fi
+
 echo "Test WarpStudio"
 res=$(curl -Is http://127.0.0.1:8081/ | head -1)
 if [[ "${res%?}" != "HTTP/1.1 200 OK" ]]; then
