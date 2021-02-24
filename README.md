@@ -140,7 +140,7 @@ You should receive a HTTP 200 OK with your datapoint in JSON format.
 A full [getting started](https://www.warp10.io/content/02_Getting_started) is available to guide your first steps into Warp&nbsp;10™.
 
 # Using WarpStudio
-<p align="center"><img src="https://blog.senx.io/wp-content/uploads/2019/03/warpStudio.png" alt="WarpStudio" width="50%"></p>
+<p align="center"><img src="https://studio.senx.io/assets/img/logo.png" alt="WarpStudio" width="50%"></p>
 
 [Warp&nbsp;10's WarpStudio](http://studio.senx.io/) is a web application aiming to allow users to interact with the platform in an user-friendly way, offering an alternative to command-line interaction.
 
