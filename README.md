@@ -19,7 +19,7 @@
 The Warp&nbsp;10 Platform is designed to collect, store and manipulate sensor data. Sensor data are ingested as sequences of measurements (also called time series). The Warp&nbsp;10 Platform offers the possibility for each measurement to also have spatial metadata specifying the geographic coordinates and/or the elevation of the sensor at the time of the reading. Those augmented measurements form what we call Geo Time Series™ (GTS).
 > [warp10.io](https://warp10.io)
 
-<p align="center"><img src="https://blog.senx.io/wp-content/uploads/2018/10/warp10bySenx.png" alt="Warp 10 Logo" width="50%"></p>
+<p align="center"><img src="https://warp10.io/assets/img/warp10_bySenx.png" alt="Warp 10 Logo" width="50%"></p>
 
 The easiest way to setup the Warp&nbsp;10™ platform is to use [Docker](https://www.docker.com/). Officials builds are available on [Docker Hub](https://hub.docker.com/r/warp10io/warp10) containing:
 
