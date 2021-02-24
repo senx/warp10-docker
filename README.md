@@ -19,7 +19,7 @@
 The Warp&nbsp;10 Platform is designed to collect, store and manipulate sensor data. Sensor data are ingested as sequences of measurements (also called time series). The Warp&nbsp;10 Platform offers the possibility for each measurement to also have spatial metadata specifying the geographic coordinates and/or the elevation of the sensor at the time of the reading. Those augmented measurements form what we call Geo Time Series™ (GTS).
 > [warp10.io](https://warp10.io)
 
-<p align="center"><img src="https://warp10.io/assets/img/warp10_bySenx.png" alt="Warp 10 Logo" width="50%"></p>
+<p align="center"><img src="https://warp10.io/assets/img/warp10_bySenx_dark.png" alt="Warp 10 Logo" width="50%"></p>
 
 The easiest way to setup the Warp&nbsp;10™ platform is to use [Docker](https://www.docker.com/). Officials builds are available on [Docker Hub](https://hub.docker.com/r/warp10io/warp10) containing:
 
@@ -73,7 +73,7 @@ docker run -d -p 8080:8080 -p 8081:8081 -e WARP10_HEAP=8g -e WARP10_HEAP_MAX=8g 
 
 A 'Continuous Integration' version is available on DockerHub with the 'ci' suffix.
 
-This version embeds a pair of READ/WRITE tokens, respectively 'readTokenCI', 'writeTokenCI'.
+This version embeds a pair of READ/WRITE tokens named respectively 'readTokenCI', 'writeTokenCI'.
 
 Examples:
 
@@ -107,13 +107,13 @@ Then run `docker exec` to run Worf on that container id:
 docker exec -u warp10 -it dc6e541e79d8 warp10-standalone.sh worf appName ttl(ms)
 ```
 
-Where `appName` is the choosen application name and `ttl(ms)` the time-of-live of the token in milliseconds.
+Where `appName` is the chosen application name and `ttl(ms)` the time-of-live of the token in milliseconds.
 
 For example, generate a pair of tokens for an application called `test`, with one year of livespan:
 
 ```bash
 $ docker exec -u warp10 -it dc6e541e79d8 warp10-standalone.sh worf test 31536000000
-default options loaded from file:/opt/warp10/etc/.conf-standalone.conf.worf
+default options loaded from file:/opt/warp10/etc/conf.d/.00-secrets.conf.worf
 {"read":{"token":"1Uol41cpikTrY5IGUgtwHG4kZ0puh5clethlBuq2Qjs5kWaRhvQOsHKHXsnpH5.lU7GePUIZowFTblA5lkeuDeqFZGgzrmVp1RTWghrA.f5ahLbUVO0S2.","tokenIdent":"ef8cd2a9e3e15fd9","ttl":31536000000,"application":"test","owner":"d7d310cf-254e-4065-87ae-47e83a050ab3","producer":"d7d310cf-254e-4065-87ae-47e83a050ab3"},"write":{"token":"yCY6J7jKJTWgQVrNJpsgPav7ubqiZIlx0jtDibNYO5cJNzq8EziSGOszoXGmFgXFnXbI_Yq3WXg53ry4qXkWU4vkjK9tmE3cWccPbzWvo9c","tokenIdent":"cc3a63e7b7d5ca1b","ttl":31536000000,"application":"test","owner":"d7d310cf-254e-4065-87ae-47e83a050ab3","producer":"d7d310cf-254e-4065-87ae-47e83a050ab3"}}
 ```
 
