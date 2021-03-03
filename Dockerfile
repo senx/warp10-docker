@@ -30,7 +30,7 @@ ENV WARP10_VOLUME=/data \
   SENSISION_HOME=/opt/sensision \
   SENSISION_DATA_DIR=/data/sensision
 
-ARG WARP10_VERSION=2.7.4
+ARG WARP10_VERSION=2.7.5
 ARG WARP10_URL=https://dl.bintray.com/senx/generic/io/warp10/warp10/${WARP10_VERSION}
 ENV WARP10_VERSION=${WARP10_VERSION}
 
