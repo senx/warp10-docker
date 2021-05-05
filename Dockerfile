@@ -30,12 +30,12 @@ ENV WARP10_VOLUME=/data \
   SENSISION_HOME=/opt/sensision \
   SENSISION_DATA_DIR=/data/sensision
 
-ARG WARP10_VERSION=2.7.5
-ARG WARP10_URL=https://dl.bintray.com/senx/generic/io/warp10/warp10/${WARP10_VERSION}
+ARG WARP10_VERSION=2.8.0
+ARG WARP10_URL=https://github.com/senx/warp10-platform/releases/download/${WARP10_VERSION}
 ENV WARP10_VERSION=${WARP10_VERSION}
 
 ARG WARPSTUDIO_VERSION=1.0.42
-ARG WARPSTUDIO_URL=https://dl.bintray.com/senx/maven/io/warp10/warp10-plugin-warpstudio/${WARPSTUDIO_VERSION}
+ARG WARPSTUDIO_URL=https://repo1.maven.org/maven2/io/warp10/warp10-plugin-warpstudio/${WARPSTUDIO_VERSION}
 ENV WARPSTUDIO_VERSION=${WARPSTUDIO_VERSION}
 
 # Getting Warp 10
@@ -49,8 +49,8 @@ RUN mkdir -p /opt \
   && chown -h warp10:warp10 ${WARP10_HOME} \
   && wget -q -P ${WARP10_HOME}/lib ${WARPSTUDIO_URL}/warp10-plugin-warpstudio-${WARPSTUDIO_VERSION}.jar
 
-ARG SENSISION_VERSION=1.0.23
-ARG SENSISION_URL=https://dl.bintray.com/senx/generic/io/warp10/sensision-service/${SENSISION_VERSION}
+ARG SENSISION_VERSION=1.0.24
+ARG SENSISION_URL=https://github.com/senx/sensision/releases/download/${SENSISION_VERSION}
 ENV SENSISION_VERSION=${SENSISION_VERSION}
 
 # Getting Sensision
