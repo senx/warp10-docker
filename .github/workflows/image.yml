@@ -90,7 +90,7 @@ jobs:
 
 
       - name: Send Notification
-        uses: bayssmekanique/action-simple-slack-notifier@v1
+        uses: bayssmekanique/action-simple-slack-notifier@v1.2.6
         if: always()
         with:
           token: ${{ secrets.SLACK_BOT_TOKEN }}
