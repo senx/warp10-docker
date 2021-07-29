@@ -33,15 +33,12 @@ RUN set -eux; \
   git checkout ${WARP10_VERSION}; \
   ./gradlew -Djava.security.egd=file:/dev/urandom createTarArchive;
 
-
-
-
+############################################################################
 
 FROM openjdk:8-jre-alpine
 
 LABEL author="SenX S.A.S."
 LABEL maintainer="contact@senx.io"
-
 
 # Installing utils need by Warp 10
 RUN set -eux; \
