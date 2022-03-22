@@ -1,6 +1,6 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 #
-#   Copyright 2021  SenX S.A.S.
+#   Copyright 2021-2022  SenX S.A.S.
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -25,41 +25,50 @@ echo "Wait for container to start-up"
 sleep 10
 
 echo "Get tokens"
-READ_TOKEN=$(docker exec -i ${id} tail -n 1 /opt/warp10/etc/initial.tokens | sed -e 's/{"read":{"token":"//' -e 's/".*//')
-WRITE_TOKEN=$(docker exec -i ${id} tail -n 1 /opt/warp10/etc/initial.tokens | sed -e 's/.*,"write":{"token":"//' -e 's/".*//')
+READ_TOKEN=$(docker exec -i "${id}" tail -n 1 /opt/warp10/etc/initial.tokens | sed -e 's/{"read":{"token":"//' -e 's/".*//')
+WRITE_TOKEN=$(docker exec -i "${id}" tail -n 1 /opt/warp10/etc/initial.tokens | sed -e 's/.*,"write":{"token":"//' -e 's/".*//')
 
 echo "Write data"
 curl -s -H "X-Warp10-Token: ${WRITE_TOKEN}" http://127.0.0.1:8080/api/v0/update --data-binary '// test{} 42'
 
 echo "Read data"
 res=$(curl -s "http://127.0.0.1:8080/api/v0/fetch?token=${READ_TOKEN}&selector=~.*\{\}&now=now&timespan=-1" | cut -d ' ' -f3)
-if [[ "${res}" != "42" ]]; then
+if [ "${res}" != "42" ]; then
   echo "Failed to compare write data with read data"
   echo "Value read: ${res}"
-  docker stop ${id}
+  docker stop "${id}"
   exit 1
 fi
 
 echo "Delete data"
-res=$(curl -s -H "X-Warp10-Token:${WRITE_TOKEN}" "http://127.0.0.1:8080/api/v0/delete?selector=test%7B%7D&start=0&end=1611332350722909")
-if [[ "${res::-1}" != "test{.app=io.warp10.bootstrap}{}" ]]; then
+res=$(curl -s -H "X-Warp10-Token:${WRITE_TOKEN}" "http://127.0.0.1:8080/api/v0/delete?selector=test%7B%7D&deleteall" | cut -c -32)
+if [ "${res}" != "test{.app=io.warp10.bootstrap}{}" ]; then
   echo "Failed to delete data"
-  echo "Result: ${res::-1}"
-  docker stop ${id}
+  echo "Result: ${res}"
+  docker stop "${id}"
+  exit 1
+fi
+
+echo "Check if data was deleted"
+res=$(curl -s "http://127.0.0.1:8080/api/v0/fetch?token=${READ_TOKEN}&selector=~.*\{\}&now=now&timespan=-1" | cut -d ' ' -f3)
+if [ "${res}" != "" ]; then
+  echo "Data is still present"
+  echo "Value read: ${res}"
+  docker stop "${id}"
   exit 1
 fi
 
 echo "Test WarpStudio"
 res=$(curl -Is http://127.0.0.1:8081/ | head -1)
-if [[ "${res%?}" != "HTTP/1.1 200 OK" ]]; then
+if [ "${res%?}" != "HTTP/1.1 200 OK" ]; then
   echo "Failed to test WarpStudio URL"
   echo "Curl result: ${res}"
-  echo $(docker ps -a)
-  docker stop ${id}
+  docker ps -a
+  docker stop "${id}"
   exit 1
 fi
 
 echo "Stop container"
-docker stop ${id}
+docker stop "${id}"
 
 echo "Test successful"
