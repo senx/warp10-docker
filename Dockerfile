@@ -64,7 +64,7 @@ ARG WARPSTUDIO_VERSION=2.0.6
 ARG WARPSTUDIO_URL=https://repo1.maven.org/maven2/io/warp10/warp10-plugin-warpstudio/${WARPSTUDIO_VERSION}
 ENV WARPSTUDIO_VERSION=${WARPSTUDIO_VERSION}
 
-ARG HFSTORE_VERSION=1.3.0
+ARG HFSTORE_VERSION=1.6.0
 ARG HFSTORE_URL=https://maven.senx.io/repository/senx-public/io/senx/warp10-ext-hfstore/${HFSTORE_VERSION}/warp10-ext-hfstore-${HFSTORE_VERSION}.jar
 
 # Getting Warp 10
