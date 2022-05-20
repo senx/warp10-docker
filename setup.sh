@@ -80,5 +80,7 @@ else
   ln -s ${SENSISION_DATA_DIR}/queued ${SENSISION_HOME}/queued
 fi
 
+# Disable failing as the chown could fail, for example when hfiles contains volumes mounted read only
+set +e
 chown -Rf warp10:warp10 ${WARP10_DATA_DIR}
 chown -Rf sensision:sensision ${SENSISION_DATA_DIR}
