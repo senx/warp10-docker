@@ -51,7 +51,10 @@ else
   rm -rf ${WARP10_HOME}/datalog_done
   ln -s ${WARP10_DATA_DIR}/datalog_done ${WARP10_HOME}/datalog_done
 
-  ln -s ${WARP10_DATA_DIR}/hfiles ${WARP10_HOME}/hfiles
+  if [ -d ${WARP10_DATA_DIR}/hfiles ]
+  then
+    ln -s ${WARP10_DATA_DIR}/hfiles ${WARP10_HOME}/hfiles
+  fi
 fi
 
 # HFiles
