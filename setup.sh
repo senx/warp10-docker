@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-#   Copyright 2020  SenX S.A.S.
+#   Copyright 2020-2022  SenX S.A.S.
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -19,10 +19,10 @@ set -euo pipefail
 
 # WARP10 - install and manage upgrade
 if [ ! -d ${WARP10_DATA_DIR} ]; then
-  echo "Install Warp 10™"
+  echo "Install Warp 10"
   ${WARP10_HOME}/bin/warp10-standalone.init bootstrap
 else
-  echo "Warp 10™ already installed"
+  echo "Warp 10 already installed"
 
   rm -rf ${WARP10_HOME}/etc
   ln -s ${WARP10_DATA_DIR}/etc ${WARP10_HOME}/etc
@@ -50,6 +50,19 @@ else
 
   rm -rf ${WARP10_HOME}/datalog_done
   ln -s ${WARP10_DATA_DIR}/datalog_done ${WARP10_HOME}/datalog_done
+
+  if [ -d ${WARP10_DATA_DIR}/hfiles ]
+  then
+    ln -s ${WARP10_DATA_DIR}/hfiles ${WARP10_HOME}/hfiles
+  fi
+fi
+
+# HFiles
+if [ ! -d ${WARP10_DATA_DIR}/hfiles ]
+then
+  echo "Creating HFiles directory"
+  mkdir ${WARP10_DATA_DIR}/hfiles
+  ln -s ${WARP10_DATA_DIR}/hfiles ${WARP10_HOME}/hfiles
 fi
 
 # Sensision install
@@ -70,5 +83,7 @@ else
   ln -s ${SENSISION_DATA_DIR}/queued ${SENSISION_HOME}/queued
 fi
 
+# Disable failing as the chown could fail, for example when hfiles contains volumes mounted read only
+set +e
 chown -Rf warp10:warp10 ${WARP10_DATA_DIR}
 chown -Rf sensision:sensision ${SENSISION_DATA_DIR}

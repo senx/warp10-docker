@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-#   Copyright 2020  SenX S.A.S.
+#   Copyright 2020-2022  SenX S.A.S.
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -93,16 +93,16 @@ if [ ${#files[@]} -gt 0 ]; then
   chown -R warp10:warp10 ${WARP10_CONFIG_DIR}
 
 
-  echo "Launch Warp 10™"
+  echo "Launching Warp 10"
   sed -i -e 's|^standalone\.host.*|standalone.host = 0.0.0.0|g' ${WARP10_CONFIG_DIR}/*
   ${WARP10_HOME}/bin/warp10-standalone.init start
   warp10_pid=`cat ${WARP10_HOME}/logs/warp10.pid`
-  echo "Warp10 running, pid=${warp10_pid}"
+  echo "Warp 10 is running, pid=${warp10_pid}"
 
   # Launching sensision
   ${SENSISION_HOME}/bin/sensision.init start
   sensision_pid=`cat ${SENSISION_HOME}/logs/sensision.pid`
-  echo "Sensision running, pid=${sensision_pid}"
+  echo "Sensision is running, pid=${sensision_pid}"
 
   # TODO ends this script if warp10 is not running properly
   echo "All process are running"
@@ -111,9 +111,8 @@ if [ ${#files[@]} -gt 0 ]; then
 
   # wait indefinitely
   tail -f /dev/null & wait ${!}
-
 else
-  echo "ERROR: Unable to launch Warp 10™, configuration missing"
-  echo "WARNING: Since version 2.1.0, Warp 10™ can use multiple configuration files. The files have to be present in ${WARP10_CONFIG_DIR}"
+  echo "ERROR: Unable to launch Warp 10, configuration missing"
+  echo "WARNING: Since version 2.1.0, Warp 10 can use multiple configuration files. The files have to be present in ${WARP10_CONFIG_DIR}"
   exit -1
 fi
