@@ -54,12 +54,12 @@ res=$(curl -Is http://127.0.0.1:8081/ | head -1)
 if [[ "${res%?}" != "HTTP/1.1 200 OK" ]]; then
   echo "Failed to test WarpStudio URL"
   echo "Curl result: ${res}"
-  echo $(docker ps -a)
-  docker stop ${id}
+  echo "$(docker ps -a)"
+  docker stop "${id}"
   exit 1
 fi
 
 echo "Stop container"
-docker stop ${id}
+docker stop "${id}"
 
 echo "Test successful"
