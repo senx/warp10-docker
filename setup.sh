@@ -51,15 +51,13 @@ else
   rm -rf "${WARP10_HOME}/datalog_done"
   ln -s "${WARP10_DATA_DIR}/datalog_done" "${WARP10_HOME}/datalog_done"
 
-  if [ -d "${WARP10_DATA_DIR}/hfiles" ]
-  then
+  if [ -d "${WARP10_DATA_DIR}/hfiles" ]; then
     ln -s "${WARP10_DATA_DIR}/hfiles" "${WARP10_HOME}/hfiles"
   fi
 fi
 
 # HFiles
-if [ ! -d "${WARP10_DATA_DIR}/hfiles" ]
-then
+if [ ! -d "${WARP10_DATA_DIR}/hfiles" ]; then
   echo "Creating HFiles directory"
   mkdir "${WARP10_DATA_DIR}/hfiles"
   ln -s "${WARP10_DATA_DIR}/hfiles" "${WARP10_HOME}/hfiles"
