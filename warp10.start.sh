@@ -73,7 +73,7 @@ if [ ${#files[@]} -gt 0 ]; then
     sed -i -e "s~.*in.memory.dump =.*~in.memory.dump = ${WARP10_DATA_DIR}/memory.dump~g" "${WARP10_CONFIG_DIR}/*"
   else
     echo "'IN MEMORY' mode is disabled"
-    sed -i -e 's~.*leveldb.home =.*~leveldb.home = \${standalone.home}/leveldb~g' "${WARP10_CONFIG_DIR}/*"
+    sed -i -e "s~.*leveldb.home =.*~leveldb.home = \${standalone.home}/leveldb~g" "${WARP10_CONFIG_DIR}/*"
     sed -i -e 's/.*in.memory = .*/in.memory = false/g' "${WARP10_CONFIG_DIR}/*"
   fi
 
