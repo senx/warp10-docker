@@ -32,7 +32,7 @@ term_handler() {
     kill -SIGTERM "$warp10_pid"
   fi
 
-  if [ -z ${NO_SENSISION+x} ] || [ "${NO_SENSISION:-}" != "true"  ]; then
+  if [ -z ${NO_SENSISION+x} ] || [ "${NO_SENSISION:-}" != "true" ]; then
     echo "Stopping Sensision"
     if [ "$sensision_pid" -ne 0 ]; then
       kill -SIGTERM "$sensision_pid"
@@ -40,21 +40,17 @@ term_handler() {
     #
     # Wait for non child process to finish
     #
-    while [ -e /proc/"${warp10_pid}" ] || [ -e "/proc/${sensision_pid}" ]
-    do
+    while [ -e /proc/"${warp10_pid}" ] || [ -e "/proc/${sensision_pid}" ]; do
       sleep 0.1
     done
   else
-    while [ -e "/proc/${warp10_pid}" ]
-    do
+    while [ -e "/proc/${warp10_pid}" ]; do
       sleep 0.1
     done
   fi
 
-
-
   echo "All process are stopped"
-  exit 143; # 128 + 15 -- SIGTERM
+  exit 143 # 128 + 15 -- SIGTERM
 }
 
 #
@@ -91,26 +87,25 @@ if [ ${#files[@]} -gt 0 ]; then
   #
   # Set configuration for WarpStudio
   #
-  echo "warp10.plugin.warpstudio = io.warp10.plugins.warpstudio.WarpStudioPlugin" > "${WARPSTUDIO_CONFIG}"
-  echo "warpstudio.port = 8081" >> "${WARPSTUDIO_CONFIG}"
-  echo "warpstudio.host = \${standalone.host}" >> "${WARPSTUDIO_CONFIG}"
+  echo "warp10.plugin.warpstudio = io.warp10.plugins.warpstudio.WarpStudioPlugin" >"${WARPSTUDIO_CONFIG}"
+  echo "warpstudio.port = 8081" >>"${WARPSTUDIO_CONFIG}"
+  echo "warpstudio.host = \${standalone.host}" >>"${WARPSTUDIO_CONFIG}"
 
   #
   # Fix owner for configuration files
   #
   chown -R warp10:warp10 "${WARP10_CONFIG_DIR}"
 
-
   echo "Launching Warp 10"
   sed -i -e 's|^standalone\.host.*|standalone.host = 0.0.0.0|g' "${WARP10_CONFIG_DIR}/*"
   "${WARP10_HOME}"/bin/warp10-standalone.init start
-  warp10_pid=`cat "${WARP10_HOME}/logs/warp10.pid"`
+  warp10_pid=$(cat "${WARP10_HOME}/logs/warp10.pid")
   echo "Warp 10 is running, pid=${warp10_pid}"
-  if [ -z ${NO_SENSISION+x} ] || [ "${NO_SENSISION:-}" != "true"  ]; then
+  if [ -z ${NO_SENSISION+x} ] || [ "${NO_SENSISION:-}" != "true" ]; then
     # Launching sensision
     echo "Launching sensision"
     "${SENSISION_HOME}/bin/sensision.init" start
-    sensision_pid=`cat "${SENSISION_HOME}/logs/sensision.pid"`
+    sensision_pid=$(cat "${SENSISION_HOME}/logs/sensision.pid")
     echo "Sensision is running, pid=${sensision_pid}"
   fi
   # TODO ends this script if warp10 is not running properly
@@ -119,9 +114,10 @@ if [ ${#files[@]} -gt 0 ]; then
   trap 'kill ${!}; term_handler' SIGTERM SIGINT
 
   # wait indefinitely
-  tail -f /dev/null & wait ${!}
+  tail -f /dev/null &
+  wait ${!}
 else
   echo "ERROR: Unable to launch Warp 10, configuration missing" >&2
-  echo "WARNING: Since version 2.1.0, Warp 10 can use multiple configuration files. The files have to be present in ${WARP10_CONFIG_DIR}">&2
+  echo "WARNING: Since version 2.1.0, Warp 10 can use multiple configuration files. The files have to be present in ${WARP10_CONFIG_DIR}" >&2
   exit 1
 fi
