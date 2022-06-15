@@ -21,31 +21,31 @@ WARPSTUDIO_CONFIG=${WARP10_CONFIG_DIR}/80-warpstudio-plugin.conf
 warp10_pid=
 sensision_pid=
 
-source ${WARP10_HOME}/bin/setup.sh
+source "${WARP10_HOME}/bin/setup.sh"
 
 #
 # SIGTERM-handler
 #
 term_handler() {
   echo "Stopping Warp 10"
-  if [ $warp10_pid -ne 0 ]; then
+  if [ "$warp10_pid" -ne 0 ]; then
     kill -SIGTERM "$warp10_pid"
   fi
 
   if [ -z ${NO_SENSISION+x} ] || [ "${NO_SENSISION:-}" != "true"  ]; then
     echo "Stopping Sensision"
-    if [ $sensision_pid -ne 0 ]; then
+    if [ "$sensision_pid" -ne 0 ]; then
       kill -SIGTERM "$sensision_pid"
     fi
     #
     # Wait for non child process to finish
     #
-    while [ -e /proc/${warp10_pid} ] || [ -e /proc/${sensision_pid} ]
+    while [ -e /proc/"${warp10_pid}" ] || [ -e "/proc/${sensision_pid}" ]
     do
       sleep 0.1
     done
   else
-    while [ -e /proc/${warp10_pid} ]
+    while [ -e "/proc/${warp10_pid}" ]
     do
       sleep 0.1
     done
@@ -60,7 +60,7 @@ term_handler() {
 #
 # Configuration file present launch Warp 10, Sensision and WarpStudio
 #
-files=(${WARP10_CONFIG_DIR}/*)
+files=("${WARP10_CONFIG_DIR}/*")
 if [ ${#files[@]} -gt 0 ]; then
 
   #
@@ -68,17 +68,17 @@ if [ ${#files[@]} -gt 0 ]; then
   #
   if [ "${IN_MEMORY:-}" = "true" ]; then
     echo "'IN MEMORY' mode is enabled"
-    sed -i -e 's/.*leveldb.home =.*/leveldb.home = \/dev\/null/g' ${WARP10_CONFIG_DIR}/*
-    sed -i -e 's/.*in.memory =.*/in.memory = true/g' ${WARP10_CONFIG_DIR}/*
-    sed -i -e 's/.*in.memory.chunked =.*/in.memory.chunked = true/g' ${WARP10_CONFIG_DIR}/*
-    sed -i -e 's/.*in.memory.chunk.count =.*/in.memory.chunk.count = 2/g' ${WARP10_CONFIG_DIR}/*
-    sed -i -e 's/.*in.memory.chunk.length =.*/in.memory.chunk.length = 86400000000/g' ${WARP10_CONFIG_DIR}/*
-    sed -i -e "s~.*in.memory.load =.*~in.memory.load = ${WARP10_DATA_DIR}/memory.dump~g" ${WARP10_CONFIG_DIR}/*
-    sed -i -e "s~.*in.memory.dump =.*~in.memory.dump = ${WARP10_DATA_DIR}/memory.dump~g" ${WARP10_CONFIG_DIR}/*
+    sed -i -e 's/.*leveldb.home =.*/leveldb.home = \/dev\/null/g' "${WARP10_CONFIG_DIR}/*"
+    sed -i -e 's/.*in.memory =.*/in.memory = true/g' "${WARP10_CONFIG_DIR}/*"
+    sed -i -e 's/.*in.memory.chunked =.*/in.memory.chunked = true/g' "${WARP10_CONFIG_DIR}/*"
+    sed -i -e 's/.*in.memory.chunk.count =.*/in.memory.chunk.count = 2/g' "${WARP10_CONFIG_DIR}/*"
+    sed -i -e 's/.*in.memory.chunk.length =.*/in.memory.chunk.length = 86400000000/g' "${WARP10_CONFIG_DIR}/*"
+    sed -i -e "s~.*in.memory.load =.*~in.memory.load = ${WARP10_DATA_DIR}/memory.dump~g" "${WARP10_CONFIG_DIR}/*"
+    sed -i -e "s~.*in.memory.dump =.*~in.memory.dump = ${WARP10_DATA_DIR}/memory.dump~g" "${WARP10_CONFIG_DIR}/*"
   else
     echo "'IN MEMORY' mode is disabled"
-    sed -i -e 's~.*leveldb.home =.*~leveldb.home = \${standalone.home}/leveldb~g' ${WARP10_CONFIG_DIR}/*
-    sed -i -e 's/.*in.memory = .*/in.memory = false/g' ${WARP10_CONFIG_DIR}/*
+    sed -i -e 's~.*leveldb.home =.*~leveldb.home = \${standalone.home}/leveldb~g' "${WARP10_CONFIG_DIR}/*"
+    sed -i -e 's/.*in.memory = .*/in.memory = false/g' "${WARP10_CONFIG_DIR}/*"
   fi
 
   # # Custom macro mode
@@ -91,26 +91,26 @@ if [ ${#files[@]} -gt 0 ]; then
   #
   # Set configuration for WarpStudio
   #
-  echo "warp10.plugin.warpstudio = io.warp10.plugins.warpstudio.WarpStudioPlugin" > ${WARPSTUDIO_CONFIG}
-  echo "warpstudio.port = 8081" >> ${WARPSTUDIO_CONFIG}
-  echo "warpstudio.host = \${standalone.host}" >> ${WARPSTUDIO_CONFIG}
+  echo "warp10.plugin.warpstudio = io.warp10.plugins.warpstudio.WarpStudioPlugin" > "${WARPSTUDIO_CONFIG}"
+  echo "warpstudio.port = 8081" >> "${WARPSTUDIO_CONFIG}"
+  echo "warpstudio.host = \${standalone.host}" >> "${WARPSTUDIO_CONFIG}"
 
   #
   # Fix owner for configuration files
   #
-  chown -R warp10:warp10 ${WARP10_CONFIG_DIR}
+  chown -R warp10:warp10 "${WARP10_CONFIG_DIR}"
 
 
   echo "Launching Warp 10"
-  sed -i -e 's|^standalone\.host.*|standalone.host = 0.0.0.0|g' ${WARP10_CONFIG_DIR}/*
-  ${WARP10_HOME}/bin/warp10-standalone.init start
-  warp10_pid=`cat ${WARP10_HOME}/logs/warp10.pid`
+  sed -i -e 's|^standalone\.host.*|standalone.host = 0.0.0.0|g' "${WARP10_CONFIG_DIR}/*"
+  "${WARP10_HOME}"/bin/warp10-standalone.init start
+  warp10_pid=`cat "${WARP10_HOME}/logs/warp10.pid"`
   echo "Warp 10 is running, pid=${warp10_pid}"
   if [ -z ${NO_SENSISION+x} ] || [ "${NO_SENSISION:-}" != "true"  ]; then
     # Launching sensision
     echo "Launching sensision"
-    ${SENSISION_HOME}/bin/sensision.init start
-    sensision_pid=`cat ${SENSISION_HOME}/logs/sensision.pid`
+    "${SENSISION_HOME}/bin/sensision.init" start
+    sensision_pid=`cat "${SENSISION_HOME}/logs/sensision.pid"`
     echo "Sensision is running, pid=${sensision_pid}"
   fi
   # TODO ends this script if warp10 is not running properly
