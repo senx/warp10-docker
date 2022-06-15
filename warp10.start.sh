@@ -121,7 +121,7 @@ if [ ${#files[@]} -gt 0 ]; then
   # wait indefinitely
   tail -f /dev/null & wait ${!}
 else
-  echo "ERROR: Unable to launch Warp 10, configuration missing"
-  echo "WARNING: Since version 2.1.0, Warp 10 can use multiple configuration files. The files have to be present in ${WARP10_CONFIG_DIR}"
-  exit -1
+  echo "ERROR: Unable to launch Warp 10, configuration missing" >&2
+  echo "WARNING: Since version 2.1.0, Warp 10 can use multiple configuration files. The files have to be present in ${WARP10_CONFIG_DIR}">&2
+  exit 1
 fi
