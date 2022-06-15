@@ -24,6 +24,7 @@ if [ ! -d "${WARP10_DATA_DIR}" ]; then
 else
   echo "Warp 10 already installed"
 
+  # shellcheck disable=SC2115
   rm -rf "${WARP10_HOME}/etc"
   ln -s "${WARP10_DATA_DIR}/etc" "${WARP10_HOME}/etc"
 
@@ -42,6 +43,7 @@ else
   rm -rf "${WARP10_HOME}/jars"
   ln -s "${WARP10_DATA_DIR}/jars" "${WARP10_HOME}/jars"
 
+  # shellcheck disable=SC2115
   rm -rf "${WARP10_HOME}/lib"
   ln -s "${WARP10_DATA_DIR}/lib" "${WARP10_HOME}/lib"
 
@@ -71,6 +73,7 @@ if [ ! -d "${SENSISION_DATA_DIR}" ]; then
 else
   echo "Sensision already installed"
   #clean
+  # shellcheck disable=SC2115
   rm -rf "${SENSISION_HOME}/etc" "${SENSISION_HOME}/scripts" "${SENSISION_HOME}/logs" "${SENSISION_HOME}/metrics" "${SENSISION_HOME}/targets" "${SENSISION_HOME}/queued"
   # link sensision
   ln -s "${SENSISION_DATA_DIR}/etc" "${SENSISION_HOME}/etc"
