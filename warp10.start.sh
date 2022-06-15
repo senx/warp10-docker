@@ -116,7 +116,7 @@ if [ ${#files[@]} -gt 0 ]; then
   # TODO ends this script if warp10 is not running properly
   echo "All process are running"
 
-  trap 'kill ${!}; term_handler' SIGTERM SIGKILL SIGINT
+  trap 'kill ${!}; term_handler' SIGTERM SIGINT
 
   # wait indefinitely
   tail -f /dev/null & wait ${!}
