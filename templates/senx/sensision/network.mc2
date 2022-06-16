@@ -1,0 +1,50 @@
+0 MACROTTL
+{
+  'name' '@senx/sensision/network'
+  'desc' 
+  <'
+ Get the network data from the Sensision.
+  '>
+  'sig' [ [ [ 'token:STRING' 'period:STRING' 'iface:STRING' ] [ 'result:LIST<GTS>'  ] ] ] // Signature
+  'params' {
+    'token' 'The sensision read token'
+    'iface' 'Network interface (ie: eth0)'
+    'period' 'The period to query (h: hour, d: day, w: week, m: month, y: year)'
+    'result' 'List of GTS to return'
+  }
+  'examples' [
+    <'
+
+    '>
+  ]
+} 'info' STORE
+
+<%
+  !$info INFO
+  SAVE 'context' STORE
+  <%
+    @senx/sensision/utils/periodMappings
+    [ 'token' 'period' 'iface' ] STORE
+    [
+        $token
+        '~linux.proc.net.dev.(receive|transmit).bytes'
+        { 'iface' $iface } NOW $periods $period GET
+    ] FETCH false RESETS 'gts' STORE
+    [
+    [ $gts [] 'linux.proc.net.dev.receive.bytes' filter.byclass ] FILTER
+    [ $gts [] 'linux.proc.net.dev.transmit.bytes' filter.byclass ] FILTER
+    ] FLATTEN [ SWAP bucketizer.mean NOW 0 $buckets  $period GET ] BUCKETIZE
+    [ SWAP mapper.delta 1 0 0 ] MAP      
+  %>
+  <% // catch any exception
+    RETHROW
+  %>
+  <% // finally, restore the context
+    $context RESTORE
+  %> TRY
+%>
+'macro' STORE
+
+// Unit tests
+
+$macro

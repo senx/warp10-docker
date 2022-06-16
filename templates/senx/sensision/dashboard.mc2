@@ -1,0 +1,311 @@
+// @endpoint http://localhost:8080/api/v0/exec
+// @theme chalk
+@senx/sensision/token
+$token @senx/sensision/summary 'summary' STORE
+'h' 'period' STORE
+{
+    'title' 'Localhost monitoring'
+    'cellHeight' 40
+    'options' {
+        'scheme' 'CHALK'
+        'customStyles' {
+            '.discovery-tile h2'
+            <'
+                text-align: left !important;
+                padding-bottom: 0;
+                margin-left: 5px !important;
+            '>
+            '.display-container .value small' 'margin-left: 10px !important;'
+        }
+    }
+    'vars' {
+        'token' $token
+        'summary' $summary
+        'period' $period
+    }
+    'tiles' [
+        {
+            'type' 'hidden'
+            'x' 0 'y' 0 'w' 1 'h' 2
+            'options' {
+                'autoRefresh' 10
+                'mutedVars' [ 'period' ]
+                }
+            'macro' <%
+                $token @senx/sensision/summary 'summary' STORE
+                {
+                    'data' $summary
+                    'events' [
+                        {
+                            'type' 'variable'
+                            'tags' [ 'summary' ]
+                            'selector' 'summary'
+                            'value' { 'summary'  $summary  }
+                        }
+                    ]
+                }
+            %>
+        }
+
+        {
+            'type' 'display'
+            'title' 'Network Activity ↑↓'
+            'x' 0 'y' 0 'w' 4 'h' 2
+            'options' { 'eventHandler' 'type=variable,tag=summary' 'mutedVars' [ 'period' ] }
+            'macro' <%
+                $summary 'traffic' GET @senx/sensision/utils/bytesToHuman ' ' SPLIT 'd' STORE
+                { 'data' $d 0 GET 'globalParams' { 'unit' $d 1 GET '/s' + }  }
+            %>
+        }
+        {
+            'type' 'display'
+            'title' 'Total Outgoing ↑'
+            'x' 4 'y' 0 'w' 4 'h' 2
+            'options' { 'eventHandler' 'type=variable,tag=summary' 'mutedVars' [ 'period' ] }
+            'macro' <%
+                $summary 'net.dev.transmit.bytes' GET @senx/sensision/utils/bytesToHuman ' ' SPLIT 'd' STORE
+                { 'data' $d 0 GET 'globalParams' { 'unit' $d 1 GET } }
+            %>
+        }
+        {
+            'type' 'display'
+            'title' 'Total Incoming ↓'
+            'x' 8 'y' 0 'w' 4 'h' 2
+            'options' { 'eventHandler' 'type=variable,tag=summary' 'mutedVars' [ 'period' ] }
+            'macro' <%
+                $summary 'net.dev.receive.bytes' GET @senx/sensision/utils/bytesToHuman ' ' SPLIT 'd' STORE
+                { 'data' $d 0 GET 'globalParams' { 'unit' $d 1 GET }  }
+            %>
+        }
+
+        {
+            'type' 'linear-gauge'
+            'title' 'Average system load'
+            'x' 0 'y' 2 'w' 4 'h' 2
+            'options' {
+                'eventHandler' 'type=variable,tag=summary'
+                'gauge' { 'horizontal' true }
+                'unit' '%25'
+                'showLegend' false
+                'mutedVars' [ 'period' ]
+            }
+            'macro' <%
+                 $summary 'avg' GET 'v' STORE
+                { 'data' $v 'params' [
+                    {
+                        'maxValue' 100
+                        'datasetColor'
+                            <% $v 33 < %> <% '#77BE69' %>
+                            <% $v 66 < %> <% '#FF9830' %>
+                            <% '#F24865' %> 2 SWITCH
+                    }
+                ] }
+            %>
+        }
+
+        {
+            'type' 'linear-gauge'
+            'title' 'Current RAM usage'
+            'x' 4 'y' 2 'w' 4 'h' 2
+            'options' {
+                'eventHandler' 'type=variable,tag=summary'
+                'gauge' { 'horizontal' true }
+                'showLegend' false
+                'mutedVars' [ 'period' ]
+            }
+            'macro' <%
+                 $summary 'MemUsage' GET 'MemUsage' STORE
+                 $summary 'MemTotal' GET 'MemTotal' STORE
+                 $MemTotal @senx/sensision/utils/bytesToHuman ' ' SPLIT 'd' STORE
+                 $d 1 GET 'unit' STORE
+                 $MemTotal $d 0 GET TODOUBLE / 'divider' STORE
+                 $MemUsage $divider / 100.0 * ROUND 100.0 / 'MemUsage' STORE
+                 $MemTotal $divider / 100.0 * ROUND 100.0 / 'MemTotal' STORE
+                 $MemUsage $MemTotal TODOUBLE / 100 * 'p' STORE
+                {
+                    'data' $MemUsage
+                    'params' [
+                        {
+                            'maxValue' $MemTotal
+                            'datasetColor'
+                                <% $p 33 < %> <% '#77BE69' %>
+                                <% $p  66 < %> <% '#FF9830' %>
+                                <% '#F24865' %> 2 SWITCH
+                        }
+                    ]
+                    'globalParams' { 'unit' $unit }
+                }
+            %>
+        }
+
+        {
+            'type' 'linear-gauge'
+            'title' 'Overall disk usage'
+            'x' 8 'y' 2 'w' 4 'h' 2
+            'options' {
+                'eventHandler' 'type=variable,tag=summary'
+                'gauge' { 'horizontal' true }
+                'showLegend' false
+                'mutedVars' [ 'period' ]
+            }
+            'macro' <%
+                $summary 'free' GET 'free' STORE
+                $summary 'capacity' GET 'capacity' STORE
+                $capacity @senx/sensision/utils/bytesToHuman ' ' SPLIT 'd' STORE
+                $d 1 GET 'unit' STORE
+                $capacity $d 0 GET TODOUBLE / 'divider' STORE
+                $free $divider / 100.0 * ROUND 100.0 / 'free' STORE
+                $capacity $divider / 100.0 * ROUND 100.0 / 'capacity' STORE
+                $capacity $free  - 'used' STORE
+                $used $capacity TODOUBLE / 100 * 'p' STORE
+                {
+                    'data' $used
+                    'params' [
+                        {
+                            'maxValue' $capacity
+                            'datasetColor'
+                                <% $p 33 < %> <% '#77BE69' %>
+                                <% $p  66 < %> <% '#FF9830' %>
+                                <% '#F24865' %> 2 SWITCH
+                        }
+                    ]
+                    'globalParams' { 'unit' $unit }
+                }
+            %>
+        }
+
+        {
+            'type' 'button:radio'
+            'x' 0 'y' 4 'w' 12 'h' 1
+            'options' {
+                'mutedVars' [ 'summary' ]
+            }
+            'macro' <%
+                {
+                    'data'  [
+                        { 'label' 'Hour' 'value' 'h'  'active' $period 'h' == }
+                        { 'label' 'Day' 'value' 'd'  'active' $period 'd' == }
+                        { 'label' 'Week' 'value' 'w' 'active' $period 'w' ==  }
+                        { 'label' 'Month' 'value' 'm' 'active' $period 'm' ==  }
+                        { 'label' 'Year' 'value' 'y' 'active' $period 'y' == }
+                    ]
+                    'events' [ { 'type' 'variable' 'tags' 'period' 'selector' 'period' } ]
+                }
+            %>
+        }
+        {
+            'type' 'area'
+            'title' 'Ingress activity'
+            'x' 0 'y' 5 'w' 12 'h' 3
+            'options' {
+                'eventHandler' 'type=(zoom|focus|variable),tag=(period|chart[2345])'
+                'mutedVars' [ 'summary' ]
+                'autoRefresh' 10
+            }
+            'macro' <%
+                {
+                    'data' $token $period @senx/sensision/ingress
+                    'events' [
+                        { 'tags' [ 'chart1' ] 'type' 'zoom' }
+                        { 'tags' [ 'chart1' ] 'type' 'focus' }
+                    ]
+                    'params' [ { 'key' 'raw updates' }  ]
+                }
+            %>
+        }
+        {
+            'type' 'area'
+            'title' 'Network usage on eth0'
+            'x' 0 'y' 8 'w' 6 'h' 6
+            'options' {
+                'eventHandler' 'type=(zoom|focus|variable),tag=(period|chart[1345])'
+                'mutedVars' [ 'summary' ]
+                'autoRefresh' 10
+            }
+            'macro' <%
+                {
+                    'data'  $token $period 'eth0' @senx/sensision/network
+                    'events' [
+                        { 'tags' [ 'chart2' ] 'type' 'zoom' }
+                        { 'tags' [ 'chart2' ] 'type' 'focus' }
+                    ]
+                    'params' [ { 'key' 'RX' } { 'key' 'TX' } ]
+                }
+            %>
+        }
+        {
+            'type' 'area'
+            'title' 'Load average'
+            'x' 6 'y' 8 'w' 6 'h' 6
+            'options' {
+                'eventHandler' 'type=(zoom|focus|variable),tag=(period|chart[1245])'
+                'mutedVars' [ 'summary' ]
+                'unit' '%25'
+                'autoRefresh' 10
+            }
+            'macro' <%
+                {
+                    'data'  $token $period @senx/sensision/loadAvg
+                    'events' [
+                        { 'tags' [ 'chart3' ] 'type' 'zoom' }
+                        { 'tags' [ 'chart3' ] 'type' 'focus' }
+                    ]
+                    'params' [ { 'key' 'CPU' } { 'key' 'Disk IO' } { 'key' 'System' } ]
+                }
+            %>
+        }
+        {
+            'type' 'area'
+            'title' 'RAM/Swap usage'
+            'x' 0 'y' 14 'w' 6 'h' 6
+            'options' {
+                'eventHandler' 'type=(zoom|focus|variable),tag=(period|chart[1235])'
+                'mutedVars' [ 'summary' ]
+                'unit' 'Gb'
+                'autoRefresh' 10
+            }
+            'macro' <%
+                $token $period @senx/sensision/ramSwap 'data' STORE
+                {
+                    'data'  $data 'data' GET FLATTEN
+                    'params' [ { 'key' 'RAM' } { 'key' 'Swap' } ]
+                    'events' [
+                        { 'tags' [ 'chart4' ] 'type' 'zoom' }
+                        { 'tags' [ 'chart4' ] 'type' 'focus' }
+                    ]
+                    'globalParams' {
+                        'thresholds' [ { 'value' $data 'max' GET 100 * ROUND 100.0 / } ]
+                        'bounds' { 'yRanges' [ 0 $data 'max' GET 1.1 * 100 * ROUND 100.0 / ] }
+                    }
+                }
+            %>
+        }
+        {
+            'type' 'area'
+            'title' 'Disk usage'
+            'x' 6 'y' 14 'w' 6 'h' 6
+            'options' {
+                'eventHandler' 'type=(zoom|focus|variable),tag=(period|chart[12134])'
+                'mutedVars' [ 'summary' ]
+                'unit' 'Gb'
+                'autoRefresh' 10
+            }
+            'macro' <%
+                $token $period @senx/sensision/disks 'data' STORE
+                {
+                    'data'  $data 'data' GET FLATTEN
+                    'params' [ { 'key' 'Disks' } ]
+                    'events' [
+                        { 'tags' [ 'chart5' ] 'type' 'zoom' }
+                        { 'tags' [ 'chart5' ] 'type' 'focus' }
+                    ]
+                    'globalParams' {
+                        'thresholds' [ { 'value' $data 'max' GET 100 * ROUND 100.0 / } ]
+                        'bounds' { 'yRanges' [ 0 $data 'max' GET 1.1 * 100 * ROUND 100.0 / ] }
+                    }
+                }
+            %>
+        }
+    ]
+}
+{ 'url' 'http://localhost:8080/api/v0/exec' } @senx/discovery2/render

@@ -1,0 +1,108 @@
+0 MACROTTL
+
+{
+  'name' '@senx/sensision/summary'
+  'desc' 
+  <'
+ Get server basic statistics.
+  '>
+  'sig' [ [ [ 'token:STRING' ] [ 'result:MAP'  ] ] ] // Signature
+  'params' {
+    'token' 'Sensision read token'
+    'result' 'Result map'
+  }
+  'examples' [
+    <'
+
+    '>
+  ]
+} 'info' STORE
+
+<%
+  !$info INFO
+  SAVE 'context' STORE
+  <%
+    // Code of the actual macro
+    [ 'token' ] STORE
+    [ $token '~linux.proc.net.dev.receive.bytes' {} ] FINDSETS STACKTOLIST 1 GET 'iface' GET
+    <% '^(docker|lo).*' MATCH SIZE 0 ==  %> FILTERBY <% %> SORTBY 'ifaces' STORE
+    [
+    $token
+    '~linux.proc.(stat.btime|net.dev.receive.bytes|net.dev.transmit.bytes|net.sockstat.inuse)'
+    { 'iface' $ifaces REOPTALT '~' SWAP + } NOW -2 
+] FETCH false RESETS 'netData' STORE
+[ $netData bucketizer.last NOW 0 1 ] BUCKETIZE 'gts' STORE
+[
+    [ $gts [] 'linux.proc.net.dev.receive.bytes' filter.byclass ] FILTER [ SWAP [] reducer.sum ] REDUCE
+    [ $gts [] 'linux.proc.net.dev.transmit.bytes' filter.byclass ] FILTER [ SWAP [] reducer.sum ] REDUCE
+    [ $gts [] 'linux.proc.stat.btime' filter.byclass ] FILTER [ SWAP [] reducer.sum ] REDUCE
+    [ $gts [] 'linux.proc.net.sockstat.inuse' filter.byclass ] FILTER [ SWAP [] reducer.sum ] REDUCE
+] FLATTEN 'gts' STORE
+{
+    $gts <%
+        'g' STORE
+        $g NAME 'linux.proc.' '' REPLACE $g VALUES 0 GET
+    %> FOREACH
+    [ $netData [] 'linux.proc.net.dev.transmit.bytes' filter.byclass ] FILTER
+    [ SWAP [] reducer.sum ] REDUCE [ SWAP mapper.delta 1 0 0 ] MAP 'traffic' STORE
+    'traffic'
+    $traffic SIZE 0 >
+    <%
+        $traffic 0 GET 'traffic' STORE
+        $traffic VALUES 1 GET $traffic TICKLIST LIST-> DROP SWAP  - STU / /
+    %>
+    <% 0 %>
+    IFTE
+
+    // Memory
+    [ $token '~linux.proc.meminfo.(MemFree|MemTotal|Cached|Buffers|SwapFree|SwapTotal)' {} NOW -1 ] FETCH 'gts' STORE
+    [ $gts [] '~linux.proc.meminfo.(MemFree|Cached|Buffers)' filter.byclass ] FILTER [ SWAP [] reducer.sum ] REDUCE 0 GET 'MemUsage' STORE
+    [ $gts [] 'linux.proc.meminfo.MemTotal' filter.byclass ] FILTER  0 GET 'MemTotal' STORE
+    [ [ $MemTotal [ $MemUsage -1 mapper.mul 0 0 0 ] MAP 0 GET ] [] reducer.sum ] REDUCE 0 GET 'MemUsage' RENAME  'MemUsage' STORE
+    [ $MemUsage $gts ] FLATTEN <%
+        'g' STORE
+        $g NAME 'linux.proc.meminfo.' '' REPLACE $g VALUES 0 GET
+    %> FOREACH
+
+    // Disks
+    [ $token '~linux.df.bytes.(free|capacity)' { 'device' '~/dev/.*' } NOW -1 ] FETCH
+    [ SWAP bucketizer.last NOW 0 1 ] BUCKETIZE 'gts' STORE
+    [
+        [ $gts [] 'linux.df.bytes.free' filter.byclass ] FILTER [ SWAP [] reducer.sum ] REDUCE
+        [ $gts [] 'linux.df.bytes.capacity' filter.byclass ] FILTER [ SWAP [] reducer.sum ] REDUCE
+    ] FLATTEN 'gts' STORE
+    $gts <%
+        'g' STORE
+        $g NAME 'linux.df.bytes.' '' REPLACE $g VALUES 0 GET
+    %> FOREACH
+
+    // Proc
+    [ $token  '~linux.proc.stat.userhz.*' { 'cpu' 'cpu' } NOW -1 ] FETCH  'gts' STORE
+    {  $gts <%
+            'g' STORE
+            $g NAME 'linux.proc.stat.userhz.' '' REPLACE $g VALUES 0 GET
+        %> FOREACH
+    } 'userhz' STORE
+    $userhz 'user' GET $userhz 'system' GET + 100 *
+    $userhz 'user' GET $userhz 'system' GET + $userhz 'idle' GET + / 'avg' STORE
+    [ $token '~linux.proc.loadavg.*' {} NOW -1 ] FETCH 'gts' STORE
+    $gts <%
+        'g' STORE
+        $g NAME 'linux.proc.loadavg.' '' REPLACE $g VALUES 0 GET
+    %> FOREACH
+    'avg' $avg
+}
+
+  %>
+  <% // catch any exception
+    RETHROW
+  %>
+  <% // finally, restore the context
+    $context RESTORE
+  %> TRY
+%>
+'macro' STORE
+
+// Unit tests
+
+$macro

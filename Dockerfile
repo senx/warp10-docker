@@ -106,6 +106,7 @@ RUN cd ${WARP10_HOME}/conf.templates/standalone \
 
 COPY warp10.start.sh ${WARP10_HOME}/bin/warp10.start.sh
 COPY setup.sh ${WARP10_HOME}/bin/setup.sh
+ADD templates macro-templates
 
 ENV PATH=$PATH:${WARP10_HOME}/bin
 

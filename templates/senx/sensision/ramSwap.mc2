@@ -1,0 +1,52 @@
+0 MACROTTL
+{
+  'name' '@senx/sensision/ramSwap'
+  'desc' 
+  <'
+ Get the RAM / Swap data from the Sensision.
+  '>
+  'sig' [ [ [ 'token:STRING' 'period:STRING' ] [ 'result:MAP'  ] ] ] // Signature
+  'params' {
+    'token' 'The sensision read token'
+    'period' 'The period to query (h: hour, d: day, w: week, m: month, y: year)'
+    'result' 'The result map'
+  }
+  'examples' [
+    <'
+
+    '>
+  ]
+} 'info' STORE
+
+<%
+  !$info INFO
+  SAVE 'context' STORE
+  <%
+    @senx/sensision/utils/periodMappings
+    [ 'token' 'period' ] STORE
+    [ $token '~linux.proc.meminfo.(MemFree|SwapFree|SwapTotal|MemTotal)' {} NOW $periods $period GET ] FETCH
+    [ SWAP bucketizer.mean NOW 0 $buckets $period GET ] BUCKETIZE
+    [ SWAP 1.0 1024.0 1024.0 * 1024.0 * / mapper.mul 0 0 0 ] MAP 'gts' STORE
+    [ $gts [] '~.*SwapTotal' filter.byclass ] FILTER [ SWAP [] reducer.sum ] REDUCE 0 GET 'SwapTotal' STORE
+    [ $gts [] '~.*SwapFree' filter.byclass ] FILTER [ SWAP [] reducer.sum ] REDUCE 0 GET 'SwapFree' STORE
+    [ $gts [] '~.*MemTotal' filter.byclass ] FILTER [ SWAP [] reducer.sum ] REDUCE 0 GET 'MemTotal' STORE
+    [ $gts [] '~.*MemFree' filter.byclass ] FILTER [ SWAP [] reducer.sum ] REDUCE 0 GET 'MemFree' STORE
+    $MemTotal $MemFree - 'memory' RENAME 'memory' STORE
+    $SwapTotal $SwapFree - 'swap' RENAME 'swap' STORE
+    {
+        'data' [ $memory $swap ]
+        'max' $MemTotal VALUES MAX
+    }
+  %>
+  <% // catch any exception
+    RETHROW
+  %>
+  <% // finally, restore the context
+    $context RESTORE
+  %> TRY
+%>
+'macro' STORE
+
+// Unit tests
+
+$macro

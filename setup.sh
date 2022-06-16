@@ -70,6 +70,13 @@ if [ ! -d "${SENSISION_DATA_DIR}" ]; then
   echo "Install Sensision"
   # Stop/start to init config
   "${SENSISION_HOME}/bin/sensision.init" bootstrap
+  SENSISION_TOKENS="${SENSISION_HOME}/etc/sensision.tokens"
+  TOKEN_TYPE="read"
+  READ_TOKEN="$(cat "${SENSISION_TOKENS}" | sed 's/\\\\\//\//g' | sed 's/[{}]//g' | awk -v k="text" '{n=split($0,a,","); for (i=1; i<=n; i++) print a[i]}' | sed 's/\"\:\"/\|/g' | sed 's/[\,]/ /g' | sed 's/\"//g' | grep -w "${TOKEN_TYPE}" | cut -d'|' -f 3 | tr -d '\n\r')"
+  MACRO_SECRET="$(date | md5sum | cut -d'-' -f 1)"
+  echo "warpscript.macroconfig.secret = ${MACRO_SECRET}" >> "${WARP10_DATA_DIR}/etc/conf.d/20-sensision.conf"
+  echo "token@senx/sensision/token = ${READ_TOKEN}" >> "${WARP10_DATA_DIR}/etc/conf.d/20-sensision.conf"
+  \cp -R macro-templates/* "${WARP10_DATA_DIR}/macros/."
 else
   echo "Sensision already installed"
   #clean

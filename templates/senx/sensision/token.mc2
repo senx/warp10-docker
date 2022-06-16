@@ -1,0 +1,4 @@
+0 MACROTTL
+<%
+    'token' MACROCONFIG 'token' STORE
+%>
