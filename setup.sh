@@ -76,7 +76,6 @@ if [ ! -d "${SENSISION_DATA_DIR}" ]; then
   MACRO_SECRET="$(date | md5sum | cut -d'-' -f 1)"
   echo "warpscript.macroconfig.secret = ${MACRO_SECRET}" >> "${WARP10_DATA_DIR}/etc/conf.d/20-sensision.conf"
   echo "token@senx/sensision/token = ${READ_TOKEN}" >> "${WARP10_DATA_DIR}/etc/conf.d/20-sensision.conf"
-  sed -i -e 's/warpscript.maxops =.*/warpscript.maxops = 2000/g' "${WARP10_CONFIG_DIR}"/*
 else
   echo "Sensision already installed"
   #clean
