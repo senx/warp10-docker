@@ -56,7 +56,7 @@ term_handler() {
 #
 # Configuration file present launch Warp 10, Sensision and WarpStudio
 #
-files=("${WARP10_CONFIG_DIR}/*")
+files=("${WARP10_CONFIG_DIR}"/*)
 if [ ${#files[@]} -gt 0 ]; then
 
   #
