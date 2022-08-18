@@ -53,7 +53,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build the test image
-        uses: docker/build-push-action@v3.0.0
+        uses: docker/build-push-action@v3.1.1
         with:
           file: ./Dockerfile
           platforms: linux/amd64
@@ -70,7 +70,7 @@ jobs:
           ./test.sh "docker run -d -p 8080:8080 -p 8081:8081 -e IN_MEMORY=true ${{ secrets.DOCKER_USERNAME }}/warp10:${TAG}-test"
 
       - name: Build the main image
-        uses: docker/build-push-action@v3.0.0
+        uses: docker/build-push-action@v3.1.1
         with:
           file: ./Dockerfile
           platforms: linux/amd64,linux/arm/v7,linux/arm64
@@ -81,7 +81,7 @@ jobs:
             ${{ secrets.DOCKER_USERNAME }}/warp10:${{ env.TAG }}
 
       - name: Build the ci image
-        uses: docker/build-push-action@v3.0.0
+        uses: docker/build-push-action@v3.1.1
         with:
           context: ./predictible-tokens-for-ci
           file: ./predictible-tokens-for-ci/Dockerfile
