@@ -21,6 +21,8 @@ set -euo pipefail
 if [ ! -d "${WARP10_DATA_DIR}" ]; then
   echo "Install Warp 10"
   "${WARP10_HOME}/bin/warp10-standalone.init" bootstrap
+  touch "${WARP10_HOME}/logs/warpscript.out"
+  touch "${WARP10_HOME}/logs/warp10.log"
 else
   echo "Warp 10 already installed"
 
@@ -53,7 +55,7 @@ else
   rm -rf "${WARP10_HOME}/datalog_done"
   ln -s "${WARP10_DATA_DIR}/datalog_done" "${WARP10_HOME}/datalog_done"
 
-  if [ -d "${WARP10_DATA_DIR}/hfiles" ]; then
+  if [ -L "${WARP10_HOME}/hfiles" ]; then
     ln -s "${WARP10_DATA_DIR}/hfiles" "${WARP10_HOME}/hfiles"
   fi
 fi
