@@ -15,6 +15,8 @@
 #   limitations under the License.
 #
 
+set -eu
+
 #CMD=docker run -d -p 8080:8080 -p 8081:8081 ${{ secrets.DOCKER_USERNAME }}/warp10:${TAG}-test
 CMD=$1
 
@@ -29,7 +31,11 @@ READ_TOKEN=$(docker exec -i "${id}" tail -n 1 /opt/warp10/etc/initial.tokens | s
 WRITE_TOKEN=$(docker exec -i "${id}" tail -n 1 /opt/warp10/etc/initial.tokens | sed -e 's/.*,"write":{"token":"//' -e 's/".*//')
 
 echo "Write data"
-curl -s -H "X-Warp10-Token: ${WRITE_TOKEN}" http://127.0.0.1:8080/api/v0/update --data-binary '// test{} 42'
+if ! curl -s -H "X-Warp10-Token: ${WRITE_TOKEN}" http://127.0.0.1:8080/api/v0/update --data-binary '// test{} 42'; then
+  echo "Failed to write data"
+  docker stop "${id}"
+  exit 1
+fi
 
 echo "Read data"
 res=$(curl -s "http://127.0.0.1:8080/api/v0/fetch?token=${READ_TOKEN}&selector=~.*\{\}&now=now&timespan=-1" | cut -d ' ' -f3)
