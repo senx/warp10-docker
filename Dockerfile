@@ -14,27 +14,6 @@
 #   limitations under the License.
 #
 
-
-FROM adoptopenjdk:8-jdk-hotspot-bionic AS builder
-
-ARG WARP10_VERSION=${WARP10_VERSION}
-
-RUN set -eux; \
-  apt-get update; \
-  apt-get install -y --no-install-recommends \
-    git \
-    thrift-compiler \
-  ; \
-  rm -rf /var/lib/apt/lists/*;
-
-RUN set -eux; \
-  git clone https://github.com/senx/warp10-platform.git; \
-  cd warp10-platform; \
-  git checkout ${WARP10_VERSION}; \
-  ./gradlew -Djava.security.egd=file:/dev/urandom createTarArchive;
-
-############################################################################
-
 FROM openjdk:8-jre-alpine
 
 LABEL author="SenX S.A.S."
@@ -57,40 +36,48 @@ ENV WARP10_VOLUME=/data \
   SENSISION_HOME=/opt/sensision \
   SENSISION_DATA_DIR=/data/sensision
 
-ARG WARP10_VERSION=${WARP10_VERSION}
+ARG WARP10_VERSION=2.11.1
+ARG WARP10_URL=https://github.com/senx/warp10-platform/releases/download/${WARP10_VERSION}/warp10-${WARP10_VERSION}.tar.gz
 ENV WARP10_VERSION=${WARP10_VERSION}
 
-ARG WARPSTUDIO_VERSION=2.0.6
-ARG WARPSTUDIO_URL=https://repo1.maven.org/maven2/io/warp10/warp10-plugin-warpstudio/${WARPSTUDIO_VERSION}
-ENV WARPSTUDIO_VERSION=${WARPSTUDIO_VERSION}
-
-ARG HFSTORE_VERSION=1.7.0
-ARG HFSTORE_URL=https://maven.senx.io/repository/senx-public/io/senx/warp10-ext-hfstore/${HFSTORE_VERSION}/warp10-ext-hfstore-${HFSTORE_VERSION}.jar
-
-# Getting Warp 10
-COPY --from=builder /warp10-platform/warp10/build/libs/warp10-*.tar.gz /opt
-RUN cd /opt \
-  && tar xzf warp10-*.tar.gz \
-  && rm warp10-*.tar.gz \
-  && ln -s /opt/warp10-* ${WARP10_HOME} \
-  && adduser -D -s -H -h ${WARP10_HOME} -s /bin/bash warp10 \
-  && chown -h warp10:warp10 ${WARP10_HOME} \
-  && wget -q -P ${WARP10_HOME}/lib ${WARPSTUDIO_URL}/warp10-plugin-warpstudio-${WARPSTUDIO_VERSION}.jar \
-  && wget -q -P ${WARP10_HOME}/lib ${HFSTORE_URL}
-
 ARG SENSISION_VERSION=1.0.24
-ARG SENSISION_URL=https://github.com/senx/sensision/releases/download/${SENSISION_VERSION}
+ARG SENSISION_URL=https://github.com/senx/sensision/releases/download/${SENSISION_VERSION}/sensision-service-${SENSISION_VERSION}.tar.gz
 ENV SENSISION_VERSION=${SENSISION_VERSION}
 
+ARG WARPSTUDIO_VERSION=2.0.6
+ARG WARPSTUDIO_URL=https://repo1.maven.org/maven2/io/warp10/warp10-plugin-warpstudio/${WARPSTUDIO_VERSION}/warp10-plugin-warpstudio-${WARPSTUDIO_VERSION}.jar
+ENV WARPSTUDIO_VERSION=${WARPSTUDIO_VERSION}
+
+ARG HFSTORE_VERSION=2.0.0
+ARG HFSTORE_URL=https://maven.senx.io/repository/senx-public/io/senx/warp10-ext-hfstore/${HFSTORE_VERSION}/warp10-ext-hfstore-${HFSTORE_VERSION}.jar
+
+# Set up Warp 10
+RUN set -eux; \
+  mkdir -p /opt; \
+  cd /opt; \
+  wget -q ${WARP10_URL}; \
+  tar xzf warp10-${WARP10_VERSION}.tar.gz; \
+  rm warp10-${WARP10_VERSION}.tar.gz; \
+  ln -s /opt/warp10-${WARP10_VERSION} ${WARP10_HOME}; \
+  wget -q -P ${WARP10_HOME}/lib ${WARPSTUDIO_URL}; \
+  wget -q -P ${WARP10_HOME}/lib ${HFSTORE_URL}; \
+  adduser -D -s -H -h ${WARP10_HOME} -s /bin/bash warp10; \
+  chown -h warp10:warp10 ${WARP10_HOME}; \
+  chown -RH warp10:warp10 ${WARP10_HOME}
+
+
+
 # Getting Sensision
-RUN cd /opt \
-  && wget -q $SENSISION_URL/sensision-service-${SENSISION_VERSION}.tar.gz \
-  && tar xzf sensision-service-${SENSISION_VERSION}.tar.gz \
-  && rm sensision-service-${SENSISION_VERSION}.tar.gz \
-  && ln -s /opt/sensision-${SENSISION_VERSION} ${SENSISION_HOME} \
-  && adduser -D -s -H -h ${SENSISION_HOME} -s /bin/bash sensision \
-  && addgroup sensision warp10 \
-  && chown -h sensision:sensision ${SENSISION_HOME}
+RUN set -eux; \
+  cd /opt; \
+  wget -q ${SENSISION_URL}; \
+  tar xzf sensision-service-${SENSISION_VERSION}.tar.gz; \
+  rm sensision-service-${SENSISION_VERSION}.tar.gz; \
+  ln -s /opt/sensision-${SENSISION_VERSION} ${SENSISION_HOME}; \
+  adduser -D -s -H -h ${SENSISION_HOME} -s /bin/bash sensision; \
+  addgroup sensision warp10; \
+  chown -h sensision:sensision ${SENSISION_HOME}; \
+  chown -RH sensision:sensision ${SENSISION_HOME}
 
 ENV WARP10_JAR=${WARP10_HOME}/bin/warp10-${WARP10_VERSION}.jar \
   WARP10_CONFIG_DIR=${WARP10_HOME}/etc/conf.d \
@@ -111,7 +98,7 @@ ENV PATH=$PATH:${WARP10_HOME}/bin
 
 VOLUME ${WARP10_VOLUME}
 
-# Exposing port
+# Exposing port for Warp 10, Warp Studio, and HFStore
 EXPOSE 8080 8081 4378
 
 CMD ${WARP10_HOME}/bin/warp10.start.sh
