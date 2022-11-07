@@ -18,13 +18,17 @@
 set -eu
 
 #CMD=docker run -d -p 8080:8080 -p 8081:8081 ${{ secrets.DOCKER_USERNAME }}/warp10:${TAG}-test
-CMD=$1
+CMD=$@
 
 echo "Run docker image"
 id=$(${CMD})
 
 echo "Wait for container to start-up"
-sleep 10
+if ! timeout 60s sh -c "while ! curl -s --fail http://localhost:8080/api/v0/check; do sleep 1; done";
+then
+   echo "Failed to start container"
+   exit 1
+fi
 
 echo "Get tokens"
 READ_TOKEN=$(docker exec -i "${id}" tail -n 1 /opt/warp10/etc/initial.tokens | sed -e 's/{"read":{"token":"//' -e 's/".*//')
