@@ -50,7 +50,7 @@ pipeline {
         stage('Build Docker image') {
             steps {
                 sh "docker system prune --force --all --volumes --filter 'label=maintainer=contact@senx.io'"
-                sh "echo ${GITLAB_REGISTRY_CREDS_PSW} | docker login --username ${GITLAB_REGISTRY_CREDS_USR} --password-stdin"
+                sh 'echo ${GITLAB_REGISTRY_CREDS_PSW} | docker login --username ${GITLAB_REGISTRY_CREDS_USR} --password-stdin registry.gitlab.com'
                 sh "docker buildx build --pull --push --platform ${PLATFORM} -t ${params.GITLAB_REPO}/warp10:${env.version}-ubuntu -t ${params.GITLAB_REPO}/warp10:latest ."
                 sh "docker buildx build --pull --push --platform ${PLATFORM} -t ${params.GITLAB_REPO}/warp10:${env.version}-ubuntu-ci predictible-tokens-for-ci"
             }
@@ -79,7 +79,7 @@ pipeline {
                 message "Should we deploy image to Docker Hub?"
             }
             steps {
-                sh "echo ${DOCKER_HUB_CREDS_PSW} | docker login --username ${DOCKER_HUB_CREDS_USR} --password-stdin"
+                sh 'echo ${DOCKER_HUB_CREDS_PSW} | docker login --username ${DOCKER_HUB_CREDS_USR} --password-stdin'
                 sh "docker buildx build --pull --push --platform ${PLATFORM} -t ${DOCKER_HUB_CREDS_USR}/warp10:${env.version}-ubuntu -t ${DOCKER_HUB_CREDS_USR}/warp10:latest ."
                 sh "docker buildx build --pull --push --platform ${PLATFORM} -t ${DOCKER_HUB_CREDS_USR}/warp10:${env.version}-ubuntu-ci predictible-tokens-for-ci"
                 sh "docker system prune --force --all --volumes --filter 'label=maintainer=contact@senx.io'"
