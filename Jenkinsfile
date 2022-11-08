@@ -27,7 +27,7 @@ pipeline {
     environment {
         DOCKER_HUB_CREDS = credentials('dockerhub')
         GITLAB_REGISTRY_CREDS = credentials('gitlabregistry')
-        PLATFORM="linux/amd64"
+        PLATFORM = 'linux/amd64'
     }
 
     parameters {
@@ -51,22 +51,22 @@ pipeline {
             steps {
                 sh "docker system prune --force --all --volumes --filter 'label=maintainer=contact@senx.io'"
                 sh "echo ${GITLAB_REGISTRY_CREDS_PSW} | docker login --username ${GITLAB_REGISTRY_CREDS_USR} --password-stdin"
-                sh "docker buildx build --pull --push --platform ${PLATFORM} -t ${params.GITLAB_REPO}/warp10:${version}-ubuntu -t ${params.GITLAB_REPO}/warp10:latest ."
-                sh "docker buildx build --pull --push --platform ${PLATFORM} -t ${params.GITLAB_REPO}/warp10:${version}-ubuntu-ci predictible-tokens-for-ci"
+                sh "docker buildx build --pull --push --platform ${PLATFORM} -t ${params.GITLAB_REPO}/warp10:${env.version}-ubuntu -t ${params.GITLAB_REPO}/warp10:latest ."
+                sh "docker buildx build --pull --push --platform ${PLATFORM} -t ${params.GITLAB_REPO}/warp10:${env.version}-ubuntu-ci predictible-tokens-for-ci"
             }
         }
 
         stage('Test image - Standard mode') {
             steps {
-                sh "./test.sh docker run --platform linux/amd64 -d -p 8080:8080 -p 8081:8081 ${params.GITLAB_REPO}/warp10:${version}-ubuntu"
-                // sh "./test.sh docker run --platform linux/arm64 -d -p 8080:8080 -p 8081:8081 ${params.GITLAB_REPO}/warp10:${version}-ubuntu"
+                sh "./test.sh docker run --platform linux/amd64 -d -p 8080:8080 -p 8081:8081 ${params.GITLAB_REPO}/warp10:${env.version}-ubuntu"
+                // sh "./test.sh docker run --platform linux/arm64 -d -p 8080:8080 -p 8081:8081 ${params.GITLAB_REPO}/warp10:${env.version}-ubuntu"
             }
         }
 
         stage('Test image - In memory mode') {
             steps {
-                sh "./test.sh docker run --platform linux/amd64 -d -p 8080:8080 -p 8081:8081 -e IN_MEMORY=true ${params.GITLAB_REPO}/warp10:${version}-ubuntu"
-                // sh "./test.sh docker run --platform linux/arm64 -d -p 8080:8080 -p 8081:8081 -e IN_MEMORY=true ${params.GITLAB_REPO}/warp10:${version}-ubuntu"
+                sh "./test.sh docker run --platform linux/amd64 -d -p 8080:8080 -p 8081:8081 -e IN_MEMORY=true ${params.GITLAB_REPO}/warp10:${env.version}-ubuntu"
+                // sh "./test.sh docker run --platform linux/arm64 -d -p 8080:8080 -p 8081:8081 -e IN_MEMORY=true ${params.GITLAB_REPO}/warp10:${env.version}-ubuntu"
             }
         }
 
@@ -83,8 +83,8 @@ pipeline {
             }
             steps {
                 sh "echo ${DOCKER_HUB_CREDS_PSW} | docker login --username ${DOCKER_HUB_CREDS_USR} --password-stdin"
-                sh "docker buildx build --pull --push --platform ${PLATFORM} -t ${DOCKER_HUB_CREDS_USR}/warp10:${version}-ubuntu -t ${DOCKER_HUB_CREDS_USR}/warp10:latest ."
-                sh "docker buildx build --pull --push --platform ${PLATFORM} -t ${DOCKER_HUB_CREDS_USR}/warp10:${version}-ubuntu-ci predictible-tokens-for-ci"
+                sh "docker buildx build --pull --push --platform ${PLATFORM} -t ${DOCKER_HUB_CREDS_USR}/warp10:${env.version}-ubuntu -t ${DOCKER_HUB_CREDS_USR}/warp10:latest ."
+                sh "docker buildx build --pull --push --platform ${PLATFORM} -t ${DOCKER_HUB_CREDS_USR}/warp10:${env.version}-ubuntu-ci predictible-tokens-for-ci"
                 sh "docker system prune --force --all --volumes --filter 'label=maintainer=contact@senx.io'"
                 notify.slack('PUBLISHED')
             }
