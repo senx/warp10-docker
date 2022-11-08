@@ -86,7 +86,9 @@ pipeline {
                 sh "docker buildx build --pull --push --platform ${PLATFORM} -t ${DOCKER_HUB_CREDS_USR}/warp10:${env.version}-ubuntu -t ${DOCKER_HUB_CREDS_USR}/warp10:latest ."
                 sh "docker buildx build --pull --push --platform ${PLATFORM} -t ${DOCKER_HUB_CREDS_USR}/warp10:${env.version}-ubuntu-ci predictible-tokens-for-ci"
                 sh "docker system prune --force --all --volumes --filter 'label=maintainer=contact@senx.io'"
-                notify.slack('PUBLISHED')
+                script {
+                    notify.slack('PUBLISHED')
+                }
             }
         }
     }
