@@ -23,13 +23,14 @@ pipeline {
         buildDiscarder(logRotator(numToKeepStr: '3'))
         timestamps()
     }
-
+    triggers {
+        cron('H/15 * * * 1-5')
+    }
     environment {
         DOCKER_HUB_CREDS = credentials('dockerhub')
         GITLAB_REGISTRY_CREDS = credentials('gitlabregistry')
         PLATFORM = 'linux/amd64'
     }
-
     parameters {
         string(name: 'GITLAB_REPO', defaultValue: 'registry.gitlab.com/steven.gueguen/warp10-docker', description: 'Container registry')
     }
@@ -40,13 +41,12 @@ pipeline {
                     env.version = ""
                     notify.slack('STARTED')
                 }
-                git url: pipelineParams.scmUrl
+                checkout scm
                 script {
                     env.version = gitUtils.getVersion()
                 }
             }
         }
-
         stage('Build Docker image') {
             steps {
                 sh "docker system prune --force --all --volumes --filter 'label=maintainer=contact@senx.io'"
@@ -55,21 +55,18 @@ pipeline {
                 sh "docker buildx build --pull --push --platform ${PLATFORM} -t ${params.GITLAB_REPO}/warp10:${env.version}-ubuntu-ci predictible-tokens-for-ci"
             }
         }
-
         stage('Test image - Standard mode') {
             steps {
                 sh "./test.sh docker run --platform linux/amd64 -d -p 8080:8080 -p 8081:8081 ${params.GITLAB_REPO}/warp10:${env.version}-ubuntu"
                 // sh "./test.sh docker run --platform linux/arm64 -d -p 8080:8080 -p 8081:8081 ${params.GITLAB_REPO}/warp10:${env.version}-ubuntu"
             }
         }
-
         stage('Test image - In memory mode') {
             steps {
                 sh "./test.sh docker run --platform linux/amd64 -d -p 8080:8080 -p 8081:8081 -e IN_MEMORY=true ${params.GITLAB_REPO}/warp10:${env.version}-ubuntu"
                 // sh "./test.sh docker run --platform linux/arm64 -d -p 8080:8080 -p 8081:8081 -e IN_MEMORY=true ${params.GITLAB_REPO}/warp10:${env.version}-ubuntu"
             }
         }
-
         stage('Deploy to Docker Hub') {
             when {
                 beforeInput true
