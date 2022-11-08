@@ -57,14 +57,14 @@ pipeline {
         }
         stage('Test image - Standard mode') {
             steps {
-                sh "./test.sh docker run --platform linux/amd64 -d -p 8080:8080 -p 8081:8081 ${params.GITLAB_REPO}/warp10:${env.version}-ubuntu"
-                // sh "./test.sh docker run --platform linux/arm64 -d -p 8080:8080 -p 8081:8081 ${params.GITLAB_REPO}/warp10:${env.version}-ubuntu"
+                sh "./test.sh docker run --platform linux/amd64 -d -P ${params.GITLAB_REPO}/warp10:${env.version}-ubuntu"
+                // sh "./test.sh docker run --platform linux/arm64 -d -P ${params.GITLAB_REPO}/warp10:${env.version}-ubuntu"
             }
         }
         stage('Test image - In memory mode') {
             steps {
-                sh "./test.sh docker run --platform linux/amd64 -d -p 8080:8080 -p 8081:8081 -e IN_MEMORY=true ${params.GITLAB_REPO}/warp10:${env.version}-ubuntu"
-                // sh "./test.sh docker run --platform linux/arm64 -d -p 8080:8080 -p 8081:8081 -e IN_MEMORY=true ${params.GITLAB_REPO}/warp10:${env.version}-ubuntu"
+                sh "./test.sh docker run --platform linux/amd64 -d -P -e IN_MEMORY=true ${params.GITLAB_REPO}/warp10:${env.version}-ubuntu"
+                // sh "./test.sh docker run --platform linux/arm64 -d -P -e IN_MEMORY=true ${params.GITLAB_REPO}/warp10:${env.version}-ubuntu"
             }
         }
         stage('Deploy to Docker Hub') {
