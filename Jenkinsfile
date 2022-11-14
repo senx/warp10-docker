@@ -30,6 +30,7 @@ pipeline {
         DOCKER_HUB_CREDS = credentials('dockerhub')
         GITLAB_REGISTRY_CREDS = credentials('gitlabregistry')
         PLATFORM = 'linux/amd64'
+        PLATFORM_ALPINE = 'linux/amd64'
     }
     parameters {
         string(name: 'GITLAB_REPO', defaultValue: 'registry.gitlab.com/steven.gueguen/warp10-docker', description: 'Container registry')
@@ -47,24 +48,31 @@ pipeline {
                 }
             }
         }
+        stage('Setting up Docker env') {
+            steps {
+                sh 'docker buildx prune --force --all'
+                sh 'docker buildx use multiarch'
+            }
+        }
         stage('Build Docker image') {
             steps {
-                sh "docker buildx prune --force --all --filter 'label=maintainer=contact@senx.io'"
                 sh 'echo ${GITLAB_REGISTRY_CREDS_PSW} | docker login --username ${GITLAB_REGISTRY_CREDS_USR} --password-stdin registry.gitlab.com'
-                sh "docker buildx build --pull --push --platform ${PLATFORM} -t ${params.GITLAB_REPO}/warp10:${env.version}-ubuntu -t ${params.GITLAB_REPO}/warp10:latest ."
-                sh "docker buildx build --pull --push --platform ${PLATFORM} -t ${params.GITLAB_REPO}/warp10:${env.version}-ubuntu-ci predictible-tokens-for-ci"
+                sh "docker buildx build --pull --push --platform ${PLATFORM} -t ${params.GITLAB_REPO}/warp10:${env.version}-ubuntu ubuntu"
+                sh "docker buildx build --pull --push --platform ${PLATFORM_ALPINE} -t ${params.GITLAB_REPO}/warp10:${env.version}-alpine alpine"
             }
         }
         stage('Test image - Standard mode') {
             steps {
-                sh "./test.sh docker run --platform linux/amd64 -d -P ${params.GITLAB_REPO}/warp10:${env.version}-ubuntu"
-                // sh "./test.sh docker run --platform linux/arm64 -d -P ${params.GITLAB_REPO}/warp10:${env.version}-ubuntu"
+                sh "./test.sh docker run --rm --platform linux/amd64 -d -P ${params.GITLAB_REPO}/warp10:${env.version}-ubuntu"
+                // sh "./test.sh docker run --rm --platform linux/arm64 -d -P ${params.GITLAB_REPO}/warp10:${env.version}-ubuntu"
+                sh "./test.sh docker run --rm --platform linux/amd64 -d -P ${params.GITLAB_REPO}/warp10:${env.version}-alpine"
             }
         }
         stage('Test image - In memory mode') {
             steps {
-                sh "./test.sh docker run --platform linux/amd64 -d -P -e IN_MEMORY=true ${params.GITLAB_REPO}/warp10:${env.version}-ubuntu"
-                // sh "./test.sh docker run --platform linux/arm64 -d -P -e IN_MEMORY=true ${params.GITLAB_REPO}/warp10:${env.version}-ubuntu"
+                sh "./test.sh docker run --rm --platform linux/amd64 -d -P -e IN_MEMORY=true ${params.GITLAB_REPO}/warp10:${env.version}-ubuntu"
+                // sh "./test.sh docker run --rm --platform linux/arm64 -d -P -e IN_MEMORY=true ${params.GITLAB_REPO}/warp10:${env.version}-ubuntu"
+                sh "./test.sh docker run --rm --platform linux/amd64 -d -P -e IN_MEMORY=true ${params.GITLAB_REPO}/warp10:${env.version}-alpine"
             }
         }
         stage('Deploy to Docker Hub') {
@@ -80,9 +88,9 @@ pipeline {
             }
             steps {
                 sh 'echo ${DOCKER_HUB_CREDS_PSW} | docker login --username ${DOCKER_HUB_CREDS_USR} --password-stdin'
-                sh "docker buildx build --pull --push --platform ${PLATFORM} -t ${DOCKER_HUB_CREDS_USR}/warp10:${env.version}-ubuntu -t ${DOCKER_HUB_CREDS_USR}/warp10:latest ."
+                sh "docker buildx build --pull --push --platform ${PLATFORM} -t ${DOCKER_HUB_CREDS_USR}/warp10:${env.version}-ubuntu ubuntu"
                 sh "docker buildx build --pull --push --platform ${PLATFORM} -t ${DOCKER_HUB_CREDS_USR}/warp10:${env.version}-ubuntu-ci predictible-tokens-for-ci"
-                sh "docker buildx prune --force --all --filter 'label=maintainer=contact@senx.io'"
+                sh "docker buildx build --pull --push --platform ${PLATFORM_ALPINE} -t ${DOCKER_HUB_CREDS_USR}/warp10:${env.version}-alpine alpine"
                 script {
                     notify.slack('PUBLISHED')
                 }

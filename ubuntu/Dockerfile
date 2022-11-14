@@ -43,12 +43,10 @@ ARG HFSTORE_SHA512=8ae3ec2effd42a3730ed8c9f591fe22039568fe450f89bfdf304504bc4049
 
 RUN set -eux; \
   apt-get update; \
-  apt-get install -y --no-install-recommends --no-install-suggests \
+  apt-get install -y --no-install-recommends \
     dirmngr \
     gnupg \
     gosu \
-    # fontconfig \
-    # unifont \
     unzip \
   ; \
   rm -rf /var/lib/apt/lists/*;
@@ -96,7 +94,7 @@ RUN set -eux; \
   wget -q ${WARPSTUDIO_URL}/${WARPSTUDIO_JAR}.asc; \
   gpg --batch --verify ${WARPSTUDIO_JAR}.asc ${WARPSTUDIO_JAR}; \
   rm ${WARPSTUDIO_JAR}.asc; \
-  echo "${WARPSTUDIO_SHA512} ${WARPSTUDIO_JAR}" | sha512sum --strict --check; \
+  echo "${WARPSTUDIO_SHA512}  ${WARPSTUDIO_JAR}" | sha512sum --strict --check; \
 ##
 ## Set configuration for WarpStudio
 ##
@@ -109,7 +107,7 @@ RUN set -eux; \
   wget -q ${HFSTORE_URL}/${HFSTORE_JAR}; \
   # wget -q ${HFSTORE_URL}/${HFSTORE_JAR}.asc; \
   # gpg --batch --verify ${HFSTORE_JAR}.asc ${HFSTORE_JAR}; \
-  echo "${HFSTORE_SHA512} ${HFSTORE_JAR}" | sha512sum --strict --check; \
+  echo "${HFSTORE_SHA512}  ${HFSTORE_JAR}" | sha512sum --strict --check; \
   unzip ${WARP10_HOME}/lib/warp10-ext-hfstore-${HFSTORE_VERSION}.jar hfstore -d ${WARP10_HOME}/bin; \
   unzip ${WARP10_HOME}/lib/warp10-ext-hfstore-${HFSTORE_VERSION}.jar warp10-ext-hfstore.conf; \
   mv warp10-ext-hfstore.conf ${HFSTORE_CONFIG}; \
