@@ -64,7 +64,7 @@ pipeline {
         stage('Test image - Standard mode') {
             steps {
                 sh "./test.sh docker run --rm --platform linux/amd64 -d -P ${params.GITLAB_REPO}/warp10:${env.version}-ubuntu"
-                sh "./test.sh docker run --rm --platform linux/arm/v7 -d -P ${params.GITLAB_REPO}/warp10:${env.version}-ubuntu"
+                // sh "./test.sh docker run --rm --platform linux/arm/v7 -d -P ${params.GITLAB_REPO}/warp10:${env.version}-ubuntu"
                 sh "./test.sh docker run --rm --platform linux/arm64/v8 -d -P ${params.GITLAB_REPO}/warp10:${env.version}-ubuntu"
                 sh "./test.sh docker run --rm --platform linux/amd64 -d -P ${params.GITLAB_REPO}/warp10:${env.version}-alpine"
             }
@@ -72,7 +72,7 @@ pipeline {
         stage('Test image - In memory mode') {
             steps {
                 sh "./test.sh docker run --rm --platform linux/amd64 -d -P -e IN_MEMORY=true ${params.GITLAB_REPO}/warp10:${env.version}-ubuntu"
-                sh "./test.sh docker run --rm --platform linux/arm/v7 -d -P -e IN_MEMORY=true ${params.GITLAB_REPO}/warp10:${env.version}-ubuntu"
+                // sh "./test.sh docker run --rm --platform linux/arm/v7 -d -P -e IN_MEMORY=true ${params.GITLAB_REPO}/warp10:${env.version}-ubuntu"
                 sh "./test.sh docker run --rm --platform linux/arm64/v8 -d -P -e IN_MEMORY=true ${params.GITLAB_REPO}/warp10:${env.version}-ubuntu"
                 sh "./test.sh docker run --rm --platform linux/amd64 -d -P -e IN_MEMORY=true ${params.GITLAB_REPO}/warp10:${env.version}-alpine"
             }
