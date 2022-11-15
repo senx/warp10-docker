@@ -14,7 +14,11 @@
 #   limitations under the License.
 #
 
-FROM eclipse-temurin:8-jre
+##
+## Use focal image because there is a segfault with jammy on our build platform
+##   => qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+##
+FROM eclipse-temurin:8-jre-focal
 
 LABEL author="SenX S.A.S."
 LABEL maintainer="contact@senx.io"

@@ -29,7 +29,7 @@ pipeline {
     environment {
         DOCKER_HUB_CREDS = credentials('dockerhub')
         GITLAB_REGISTRY_CREDS = credentials('gitlabregistry')
-        PLATFORM = 'linux/amd64'
+        PLATFORM = 'linux/amd64,linux/arm/v7,linux/arm64/v8'
         PLATFORM_ALPINE = 'linux/amd64'
     }
     parameters {
