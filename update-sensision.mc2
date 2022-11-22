@@ -1,0 +1,9 @@
+true SENSISION.DUMP
+PARSE
+<%
+  '+' RENAME
+%> F LMAP
+
+// TODO: generate appropriate token
+$WT
+UPDATE
