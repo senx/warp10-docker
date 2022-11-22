@@ -120,6 +120,10 @@ RUN set -eux; \
   mv warp10-ext-hfstore.conf ${HFSTORE_CONFIG}; \
   mkdir ${WARP10_DATA_DIR}/hfiles; \
 ##
+## Create Sensision runner directory
+##
+  mkdir -p ${SENSISION_RUNNER}; \
+##
 ## Fix permissions
 ##
   chown -RHh warp10:warp10 ${WARP10_HOME} ${WARP10_VOLUME}; \
@@ -128,10 +132,6 @@ RUN set -eux; \
 ##
   mv ${WARP10_HOME}/logs/.firstinit ${WARP10_HOME}; \
   mv ${WARP10_VOLUME} ${WARP10_VOLUME}.bak; \
-##
-## Create Sensision runner directory
-##
-  mkdir -p ${SENSISION_RUNNER}; \
 ##
 ## Clean GPG
 ##
