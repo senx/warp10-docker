@@ -57,8 +57,8 @@ pipeline {
         stage('Build Docker image') {
             steps {
                 sh 'echo ${GITLAB_REGISTRY_CREDS_PSW} | docker login --username ${GITLAB_REGISTRY_CREDS_USR} --password-stdin registry.gitlab.com'
-                sh "docker buildx build --pull --push --platform ${PLATFORM} -t ${params.GITLAB_REPO}/warp10:${env.version}-ubuntu ubuntu"
-                sh "docker buildx build --pull --push --platform ${PLATFORM_ALPINE} -t ${params.GITLAB_REPO}/warp10:${env.version}-alpine alpine"
+                sh "docker buildx build --pull --push --platform ${PLATFORM} -t ${params.GITLAB_REPO}/warp10:${env.version}-ubuntu -f ubuntu/Dockerfile ."
+                sh "docker buildx build --pull --push --platform ${PLATFORM_ALPINE} -t ${params.GITLAB_REPO}/warp10:${env.version}-alpine -f alpine/Dockerfile ."
             }
         }
         stage('Test image - Standard mode') {
@@ -90,9 +90,9 @@ pipeline {
             }
             steps {
                 sh 'echo ${DOCKER_HUB_CREDS_PSW} | docker login --username ${DOCKER_HUB_CREDS_USR} --password-stdin'
-                sh "docker buildx build --pull --push --platform ${PLATFORM} -t ${DOCKER_HUB_CREDS_USR}/warp10:${env.version}-ubuntu ubuntu"
+                sh "docker buildx build --pull --push --platform ${PLATFORM} -t ${DOCKER_HUB_CREDS_USR}/warp10:${env.version}-ubuntu -f ubuntu/Dockerfile ."
                 sh "docker buildx build --pull --push --platform ${PLATFORM} -t ${DOCKER_HUB_CREDS_USR}/warp10:${env.version}-ubuntu-ci predictible-tokens-for-ci"
-                sh "docker buildx build --pull --push --platform ${PLATFORM_ALPINE} -t ${DOCKER_HUB_CREDS_USR}/warp10:${env.version}-alpine alpine"
+                sh "docker buildx build --pull --push --platform ${PLATFORM_ALPINE} -t ${DOCKER_HUB_CREDS_USR}/warp10:${env.version}-alpine -f alpine/Dockerfile ."
                 script {
                     notify.slack('PUBLISHED')
                 }
