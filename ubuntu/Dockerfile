@@ -44,7 +44,7 @@ ARG HFSTORE_JAR=warp10-ext-hfstore-${HFSTORE_VERSION}.jar
 ARG HFSTORE_URL=https://maven.senx.io/repository/senx-public/io/senx/warp10-ext-hfstore/${HFSTORE_VERSION}
 ARG HFSTORE_SHA512=a6201a5115b1b7b787a1b345dc620fa5b3cfa5424ce659f5d21c8b19d1b301a5baf4cd3331c0a8d82d33f01c299e0c36bafe136916579ed519e1d0745f66f833
 
-ARG SENSISION_RUNNER=${WARP10_HOME}/warpscript/sensision/1000
+ARG SENSISION_RUNNER=${WARP10_HOME}/warpscripts/sensision/1000
 
 RUN set -eux; \
   apt-get update; \
