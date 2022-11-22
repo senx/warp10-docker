@@ -54,6 +54,11 @@ pipeline {
                 sh 'docker buildx use multiarch'
             }
         }
+        stage('Generate files for Alpine') {
+            steps {
+                sh './generate-alpine-files.sh'
+            }
+        }
         stage('Build Docker image') {
             steps {
                 sh 'echo ${GITLAB_REGISTRY_CREDS_PSW} | docker login --username ${GITLAB_REGISTRY_CREDS_USR} --password-stdin registry.gitlab.com'
