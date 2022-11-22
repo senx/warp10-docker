@@ -38,12 +38,13 @@ ARG WARPSTUDIO_URL=https://repo1.maven.org/maven2/io/warp10/warp10-plugin-warpst
 ARG WARPSTUDIO_SHA512=c71e0863af358178f4b61a302f64ccec3ab375df97cd6cb905b413c7722a467198dac514a765d74568049b2d7e5ffcd860d6900ca7dd07e902ab40a61a152acf
 
 
-ARG HFSTORE_VERSION=2.0.0
+ARG HFSTORE_VERSION=2.1.1
 ARG HFSTORE_CONFIG=${WARP10_HOME}/etc/conf.d/99-io.senx-warp10-ext-hfstore.conf
 ARG HFSTORE_JAR=warp10-ext-hfstore-${HFSTORE_VERSION}.jar
 ARG HFSTORE_URL=https://maven.senx.io/repository/senx-public/io/senx/warp10-ext-hfstore/${HFSTORE_VERSION}
-ARG HFSTORE_SHA512=8ae3ec2effd42a3730ed8c9f591fe22039568fe450f89bfdf304504bc4049837f7fcba7f85620aa5cd706f51d573e0f4730e3857b0ba674914ad9e21bad3307b
+ARG HFSTORE_SHA512=a6201a5115b1b7b787a1b345dc620fa5b3cfa5424ce659f5d21c8b19d1b301a5baf4cd3331c0a8d82d33f01c299e0c36bafe136916579ed519e1d0745f66f833
 
+ARG SENSISION_RUNNER=${WARP10_HOME}/warpscript/sensision/1000
 
 RUN set -eux; \
   apt-get update; \
@@ -77,9 +78,11 @@ RUN set -eux; \
   ${WARP10_HOME}/bin/warp10-standalone.init bootstrap; \
 ##
 ## Configure Warp 10
+## Listen to all interface, enable SensisionWarpScriptExtension and TokenWarpScriptExtension
 ##
   sed -i -e 's|^standalone\.host.*|standalone.host = 0.0.0.0|g' ${WARP10_HOME}/etc/conf.d/00-warp.conf; \
-  sed -i -e 's|^#warpscript.extension.token.*|warpscript.extension.token = io.warp10.script.ext.token.TokenWarpScriptExtension|g' ${WARP10_HOME}/etc/conf.d/70--extensions.conf; \
+  sed -i -e 's|^#warpscript.extension.token|warpscript.extension.token|g' ${WARP10_HOME}/etc/conf.d/70--extensions.conf; \
+  sed -i -e 's|^#warpscript.extension.sensision|warpscript.extension.sensision|g' ${WARP10_HOME}/etc/conf.d/70--extensions.conf; \
 ##
 ## Modify start script to run java process in foreground with exec
 ##
@@ -98,7 +101,7 @@ RUN set -eux; \
   wget -q ${WARPSTUDIO_URL}/${WARPSTUDIO_JAR}.asc; \
   gpg --batch --verify ${WARPSTUDIO_JAR}.asc ${WARPSTUDIO_JAR}; \
   rm ${WARPSTUDIO_JAR}.asc; \
-  echo "${WARPSTUDIO_SHA512}  ${WARPSTUDIO_JAR}" | sha512sum --strict --check; \
+  echo "${WARPSTUDIO_SHA512}  ${WARPSTUDIO_JAR}" | sha512sum -c; \
 ##
 ## Set configuration for WarpStudio
 ##
@@ -111,7 +114,7 @@ RUN set -eux; \
   wget -q ${HFSTORE_URL}/${HFSTORE_JAR}; \
   # wget -q ${HFSTORE_URL}/${HFSTORE_JAR}.asc; \
   # gpg --batch --verify ${HFSTORE_JAR}.asc ${HFSTORE_JAR}; \
-  echo "${HFSTORE_SHA512}  ${HFSTORE_JAR}" | sha512sum --strict --check; \
+  echo "${HFSTORE_SHA512}  ${HFSTORE_JAR}" | sha512sum -c; \
   unzip ${WARP10_HOME}/lib/warp10-ext-hfstore-${HFSTORE_VERSION}.jar hfstore -d ${WARP10_HOME}/bin; \
   unzip ${WARP10_HOME}/lib/warp10-ext-hfstore-${HFSTORE_VERSION}.jar warp10-ext-hfstore.conf; \
   mv warp10-ext-hfstore.conf ${HFSTORE_CONFIG}; \
@@ -126,12 +129,16 @@ RUN set -eux; \
   mv ${WARP10_HOME}/logs/.firstinit ${WARP10_HOME}; \
   mv ${WARP10_VOLUME} ${WARP10_VOLUME}.bak; \
 ##
+## Create Sensision runner directory
+##
+  mkdir -p ${SENSISION_RUNNER}; \
+##
 ## Clean GPG
 ##
   gpgconf --kill all; \
   rm -rf "$GNUPGHOME";
 
-
+COPY ./update-sensision.mc2 ${SENSISION_RUNNER}
 ENV PATH=$PATH:${WARP10_HOME}/bin
 
 
