@@ -44,8 +44,6 @@ ARG HFSTORE_JAR=warp10-ext-hfstore-${HFSTORE_VERSION}.jar
 ARG HFSTORE_URL=https://maven.senx.io/repository/senx-public/io/senx/warp10-ext-hfstore/${HFSTORE_VERSION}
 ARG HFSTORE_SHA512=a6201a5115b1b7b787a1b345dc620fa5b3cfa5424ce659f5d21c8b19d1b301a5baf4cd3331c0a8d82d33f01c299e0c36bafe136916579ed519e1d0745f66f833
 
-ARG SENSISION_RUNNER=${WARP10_HOME}/warpscripts/sensision/1000
-
 RUN set -eux; \
   apt-get update; \
   apt-get install -y --no-install-recommends \
@@ -122,7 +120,7 @@ RUN set -eux; \
 ##
 ## Create Sensision runner directory
 ##
-  mkdir -p ${SENSISION_RUNNER}; \
+  mkdir -p ${WARP10_HOME}/warpscripts/sensision/1000; \
 ##
 ## Fix permissions
 ##
@@ -138,9 +136,9 @@ RUN set -eux; \
   gpgconf --kill all; \
   rm -rf "$GNUPGHOME";
 
-COPY ./update-sensision.mc2 ${SENSISION_RUNNER}
-ENV PATH=$PATH:${WARP10_HOME}/bin
+COPY --chown=warp10:warp10 ./update-sensision.mc2 ${WARP10_VOLUME}.bak/warp10/warpscripts/sensision/1000
 
+ENV PATH=$PATH:${WARP10_HOME}/bin
 
 # Exposing port for Warp 10, Warp Studio, and HFStore
 EXPOSE 8080 8081 4378
