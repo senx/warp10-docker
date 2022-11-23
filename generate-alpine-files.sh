@@ -23,6 +23,7 @@ mkdir -p alpine
 ## Generate docker-entrypoint.sh
 ##
 sed 's/gosu/su-exec/g' ./docker-entrypoint.sh > ./alpine/docker-entrypoint.sh
+chmod +x ./alpine/docker-entrypoint.sh
 
 ##
 ## Generate Dockerfile
@@ -34,4 +35,5 @@ sed \
   -e 's/gosu/su-exec/' \
   -e 's/groupadd --system --gid=942 warp10/addgroup -S -g 942 warp10/' \
   -e 's@useradd --system --gid warp10 --uid=942 --home-dir=${WARP10_HOME} --shell=/bin/bash warp10@adduser -S -u 942 -D -G warp10 -H -h ${WARP10_HOME} -s /bin/bash warp10@' \
+  -e 's@\./docker-entrypoint.sh@\./alpine/docker-entrypoint.sh@' \
   ./ubuntu/Dockerfile > ./alpine/Dockerfile
