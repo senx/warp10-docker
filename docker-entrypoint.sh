@@ -25,6 +25,9 @@ FIRSTINIT_FILE=${WARP10_HOME}/.firstinit
 ## Generate secrets and token file
 ##
 if [ -e "${FIRSTINIT_FILE}" ]; then
+  ##
+  ## Populate the volume
+  ##
   if [ ! -e "${WARP10_DATA_DIR}" ]; then
     mv "${WARP10_VOLUME}".bak/* "${WARP10_VOLUME}";
   fi
@@ -32,10 +35,25 @@ if [ -e "${FIRSTINIT_FILE}" ]; then
   echo "Generate secrets"
   java -cp "${WARP10_HOME}"/bin/warp10-*.jar -Dfile.encoding=UTF-8 io.warp10.GenerateCryptoKey "${WARP10_HOME}"/etc/conf.d/*.conf
 
-  # Generate read/write tokens valid for a period of 100 years. We use 'io.warp10.bootstrap' as application name.
+  ##
+  ## Token management
+  ##
   if [ ! -e "${WARP10_HOME}"/etc/initial.tokens ]; then
+    ##
+    ## Generate read/write tokens valid for a period of 100 years. We use 'io.warp10.bootstrap' as application name.
+    ##
     gosu warp10 java -cp "${WARP10_HOME}"/bin/warp10-"${WARP10_VERSION}".jar -Dfile.encoding=UTF-8 io.warp10.worf.TokenGen "${WARP10_HOME}"/etc/conf.d/00-secrets.conf "${WARP10_HOME}"/etc/conf.d/00-warp.conf "${WARP10_HOME}"/templates/warp10-tokengen.mc2 "${WARP10_HOME}"/etc/initial.tokens
     sed -i 's/^.\{1\}//;$ s/.$//' "${WARP10_HOME}"/etc/initial.tokens # Remove first and last character
+
+    ##
+    ## Generate read/write token for sensision for a period of 100 years. We use 'sensisino' as application name.
+    ## Define token as MACROCONFIG key for runner script
+    ##
+    gosu warp10 java -cp "${WARP10_HOME}"/bin/warp10-"${WARP10_VERSION}".jar -Dfile.encoding=UTF-8 io.warp10.worf.TokenGen "${WARP10_HOME}"/etc/conf.d/00-secrets.conf "${WARP10_HOME}"/etc/conf.d/00-warp.conf "${WARP10_HOME}"/templates/sensision-tokengen.mc2 "${WARP10_HOME}"/etc/sensision.tokens
+    SENSISION_READ_TOKEN=$(sed -e 's/.*,"id":"SensisionRead","token":"//' -e 's/".*//' /opt/warp10/etc/sensision.tokens)
+    SENSISION_WRITE_TOKEN=$(sed -e 's/.*,"id":"SensisionWrite","token":"//' -e 's/".*//' /opt/warp10/etc/sensision.tokens)
+    echo "sensisionReadToken@/sensision=${SENSISION_READ_TOKEN}" >> "${WARP10_HOME}"/etc/conf.d/99-sensision.conf
+    echo "sensisionWriteToken@/sensision=${SENSISION_WRITE_TOKEN}" >> "${WARP10_HOME}"/etc/conf.d/99-sensision.conf
   fi
 
   rm -rf "${WARP10_VOLUME}".bak

@@ -17,7 +17,7 @@
 
 set -eu
 
-CMD=$@
+CMD=$*
 
 echo "Run docker image"
 id=$(${CMD})
@@ -38,8 +38,10 @@ then
 fi
 
 echo "Get tokens"
-READ_TOKEN=$(docker exec -i "${id}" tail -n 1 /opt/warp10/etc/initial.tokens | sed -e 's/{"read":{"token":"//' -e 's/".*//')
-WRITE_TOKEN=$(docker exec -i "${id}" tail -n 1 /opt/warp10/etc/initial.tokens | sed -e 's/.*,"write":{"token":"//' -e 's/".*//')
+READ_TOKEN=$(docker exec "${id}" sed -e 's/{"read":{"token":"//' -e 's/".*//' /opt/warp10/etc/initial.tokens)
+WRITE_TOKEN=$(docker exec "${id}" sed -e 's/.*,"write":{"token":"//' -e 's/".*//' /opt/warp10/etc/initial.tokens)
+SENSISION_READ_TOKEN=$(docker exec "${id}" sed -e 's/.*,"id":"SensisionRead","token":"//' -e 's/".*//' /opt/warp10/etc/sensision.tokens)
+SENSISION_WRITE_TOKEN=$(docker exec "${id}" sed -e 's/.*,"id":"SensisionWrite","token":"//' -e 's/".*//' /opt/warp10/etc/sensision.tokens)
 
 echo "Write data"
 if ! curl -s -H "X-Warp10-Token: ${WRITE_TOKEN}" "${warp10_url}"/update --data-binary '// test{} 42'; then
@@ -76,11 +78,27 @@ if [ "${res}" != "" ]; then
 fi
 
 echo "Test WarpStudio"
-res=$(curl -Is ${warpstudio_url} | head -1)
+res=$(curl -Is "${warpstudio_url}" | head -1)
 if [ "${res%?}" != "HTTP/1.1 200 OK" ]; then
   echo "Failed to test WarpStudio URL"
   echo "Curl result: ${res}"
   docker ps -a
+  docker stop "${id}"
+  exit 1
+fi
+
+echo "Write Sensision data"
+if ! curl -s "${warp10_url}"/exec --data-binary "'${SENSISION_WRITE_TOKEN}' CAPADD  [ 'sensision.test' { 'labelName' 'labelValue' } 42 ] SENSISION.SET"; then
+  echo "Failed to write sensision data"
+  docker stop "${id}"
+  exit 1
+fi
+
+echo "Read Sensision data"
+res=$(curl -s "${warp10_url}"/exec --data-binary "'${SENSISION_READ_TOKEN}' CAPADD 'sensision.test{labelName=labelValue}' SENSISION.GET VALUES 0 GET")
+if [ "${res}" != "[42]" ]; then
+  echo "Failed to compare Sensision write data with Sensision read data"
+  echo "Value read: ${res}"
   docker stop "${id}"
   exit 1
 fi

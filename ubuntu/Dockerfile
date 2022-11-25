@@ -81,6 +81,8 @@ RUN set -eux; \
   sed -i -e 's|^standalone\.host.*|standalone.host = 0.0.0.0|g' ${WARP10_HOME}/etc/conf.d/00-warp.conf; \
   sed -i -e 's|^#warpscript.extension.token|warpscript.extension.token|g' ${WARP10_HOME}/etc/conf.d/70--extensions.conf; \
   sed -i -e 's|^#warpscript.extension.sensision|warpscript.extension.sensision|g' ${WARP10_HOME}/etc/conf.d/70--extensions.conf; \
+# TODO: to remove when sensision PR is merged
+  sed -i -e 's|^#sensision.capability = true|sensision.capability = true|g' ${WARP10_HOME}/etc/conf.d/70--extensions.conf; \
 ##
 ## Modify start script to run java process in foreground with exec
 ##
@@ -120,7 +122,7 @@ RUN set -eux; \
 ##
 ## Create Sensision runner directory
 ##
-  mkdir -p ${WARP10_HOME}/warpscripts/sensision/1000; \
+  mkdir -p ${WARP10_HOME}/warpscripts/sensision/60000; \
 ##
 ## Fix permissions
 ##
@@ -136,7 +138,8 @@ RUN set -eux; \
   gpgconf --kill all; \
   rm -rf "$GNUPGHOME";
 
-COPY --chown=warp10:warp10 ./update-sensision.mc2 ${WARP10_VOLUME}.bak/warp10/warpscripts/sensision/1000
+COPY --chown=warp10:warp10 ./update-sensision.mc2 ${WARP10_VOLUME}.bak/warp10/warpscripts/sensision/60000
+COPY --chown=warp10:warp10 ./sensision-tokengen.mc2 ${WARP10_HOME}/templates/
 
 ENV PATH=$PATH:${WARP10_HOME}/bin
 
