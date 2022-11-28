@@ -25,7 +25,10 @@ LABEL maintainer="contact@senx.io"
 
 ENV WARP10_VOLUME=/data \
   WARP10_HOME=/opt/warp10 \
-  WARP10_DATA_DIR=/data/warp10
+  WARP10_DATA_DIR=/data/warp10 \
+  WARP10_EXT_CONFIG_DIR=/config.extra
+ENV WARP10_CONFIG_DIR=${WARP10_HOME}/etc/conf.d \
+  PATH=$PATH:${WARP10_HOME}/bin
 
 ARG WARP10_VERSION=2.11.1
 ARG WARP10_URL=https://github.com/senx/warp10-platform/releases/download/${WARP10_VERSION}/warp10-${WARP10_VERSION}.tar.gz
@@ -138,10 +141,12 @@ RUN set -eux; \
   gpgconf --kill all; \
   rm -rf "$GNUPGHOME";
 
+##
+## Sensision utility files
+##
 COPY --chown=warp10:warp10 ./update-sensision.mc2 ${WARP10_VOLUME}.bak/warp10/warpscripts/sensision/60000
 COPY --chown=warp10:warp10 ./sensision-tokengen.mc2 ${WARP10_HOME}/templates/
 
-ENV PATH=$PATH:${WARP10_HOME}/bin
 
 # Exposing port for Warp 10, Warp Studio, and HFStore
 EXPOSE 8080 8081 4378
