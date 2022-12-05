@@ -122,6 +122,7 @@ RUN set -eux; \
   unzip ${WARP10_HOME}/lib/warp10-ext-hfstore-${HFSTORE_VERSION}.jar warp10-ext-hfstore.conf; \
   mv warp10-ext-hfstore.conf ${HFSTORE_CONFIG}; \
   mkdir ${WARP10_DATA_DIR}/hfiles; \
+  ln -s ${WARP10_DATA_DIR}/hfiles ${WARP10_HOME}/hfiles; \
 ##
 ## Create Sensision runner directory
 ##
