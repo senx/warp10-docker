@@ -27,7 +27,7 @@ pipeline {
         pollSCM('H/15 * * * 1-5')
     }
     environment {
-        DOCKER_HUB_CREDS = credentials(params.DOCKER_CRED)
+        DOCKER_HUB_CREDS = credentials(${params.DOCKER_CRED})
         GITLAB_REGISTRY_CREDS = credentials('gitlabregistry')
         PLATFORM = 'linux/amd64,linux/arm/v7,linux/arm64/v8'
         PLATFORM_ALPINE = 'linux/amd64'
