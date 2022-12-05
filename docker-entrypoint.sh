@@ -1,4 +1,10 @@
 #!/usr/bin/env bash
+
+##
+## Shebang must be bash in order to accept environment variables with dot in the name (ie: accelerator.chunk.length)
+##
+
+
 #
 #   Copyright 2022  SenX S.A.S.
 #
