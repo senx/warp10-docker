@@ -27,13 +27,14 @@ pipeline {
         pollSCM('H/15 * * * 1-5')
     }
     environment {
-        DOCKER_HUB_CREDS = credentials('dockerhub')
+        DOCKER_HUB_CREDS = credentials(params.DOCKER_CRED)
         GITLAB_REGISTRY_CREDS = credentials('gitlabregistry')
         PLATFORM = 'linux/amd64,linux/arm/v7,linux/arm64/v8'
         PLATFORM_ALPINE = 'linux/amd64'
     }
     parameters {
         string(name: 'GITLAB_REPO', defaultValue: 'registry.gitlab.com/steven.gueguen/warp10-docker', description: 'Container registry')
+        string(name: 'DOCKER_CRED', defaultValue: 'dockerhub', description: 'Credential ID')
     }
     stages {
         stage('Checkout') {
@@ -69,7 +70,7 @@ pipeline {
         stage('Test image - Standard mode') {
             steps {
                 sh "./test.sh docker run --pull always --rm --platform linux/amd64 -d -P ${params.GITLAB_REPO}/warp10:${env.version}-ubuntu"
-                sh "./test.sh docker run --pull always --rm --platform linux/arm/v7 -d -P ${params.GITLAB_REPO}/warp10:${env.version}-ubuntu"
+                // sh "./test.sh docker run --pull always --rm --platform linux/arm/v7 -d -P ${params.GITLAB_REPO}/warp10:${env.version}-ubuntu"
                 sh "./test.sh docker run --pull always --rm --platform linux/arm64/v8 -d -P ${params.GITLAB_REPO}/warp10:${env.version}-ubuntu"
                 sh "./test.sh docker run --pull always --rm --platform linux/amd64 -d -P ${params.GITLAB_REPO}/warp10:${env.version}-alpine"
             }
@@ -77,7 +78,7 @@ pipeline {
         stage('Test image - In memory mode') {
             steps {
                 sh "./test.sh docker run --pull always --rm --platform linux/amd64 -d -P -e IN_MEMORY=true ${params.GITLAB_REPO}/warp10:${env.version}-ubuntu"
-                sh "./test.sh docker run --pull always --rm --platform linux/arm/v7 -d -P -e IN_MEMORY=true ${params.GITLAB_REPO}/warp10:${env.version}-ubuntu"
+                // sh "./test.sh docker run --pull always --rm --platform linux/arm/v7 -d -P -e IN_MEMORY=true ${params.GITLAB_REPO}/warp10:${env.version}-ubuntu"
                 sh "./test.sh docker run --pull always --rm --platform linux/arm64/v8 -d -P -e IN_MEMORY=true ${params.GITLAB_REPO}/warp10:${env.version}-ubuntu"
                 sh "./test.sh docker run --pull always --rm --platform linux/amd64 -d -P -e IN_MEMORY=true ${params.GITLAB_REPO}/warp10:${env.version}-alpine"
             }
