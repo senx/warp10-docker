@@ -35,14 +35,14 @@ ARG WARP10_URL=https://github.com/senx/warp10-platform/releases/download/${WARP1
 ENV WARP10_VERSION=${WARP10_VERSION}
 
 ARG WARPSTUDIO_VERSION=2.0.9-uberjar
-ARG WARPSTUDIO_CONFIG=${WARP10_HOME}/etc/conf.d/99-io.warp10-warp10-plugin-warpstudio.conf
+ARG WARPSTUDIO_CONFIG=${WARP10_CONFIG_DIR}/99-io.warp10-warp10-plugin-warpstudio.conf
 ARG WARPSTUDIO_JAR=warp10-plugin-warpstudio-${WARPSTUDIO_VERSION}.jar
 ARG WARPSTUDIO_URL=https://repo1.maven.org/maven2/io/warp10/warp10-plugin-warpstudio/${WARPSTUDIO_VERSION}
 ARG WARPSTUDIO_SHA512=c71e0863af358178f4b61a302f64ccec3ab375df97cd6cb905b413c7722a467198dac514a765d74568049b2d7e5ffcd860d6900ca7dd07e902ab40a61a152acf
 
 
 ARG HFSTORE_VERSION=2.1.1
-ARG HFSTORE_CONFIG=${WARP10_HOME}/etc/conf.d/99-io.senx-warp10-ext-hfstore.conf
+ARG HFSTORE_CONFIG=${WARP10_CONFIG_DIR}/99-io.senx-warp10-ext-hfstore.conf
 ARG HFSTORE_JAR=warp10-ext-hfstore-${HFSTORE_VERSION}.jar
 ARG HFSTORE_URL=https://maven.senx.io/repository/senx-public/io/senx/warp10-ext-hfstore/${HFSTORE_VERSION}
 ARG HFSTORE_SHA512=a6201a5115b1b7b787a1b345dc620fa5b3cfa5424ce659f5d21c8b19d1b301a5baf4cd3331c0a8d82d33f01c299e0c36bafe136916579ed519e1d0745f66f833
@@ -81,11 +81,11 @@ RUN set -eux; \
 ## Configure Warp 10
 ## Listen to all interface, enable SensisionWarpScriptExtension and TokenWarpScriptExtension
 ##
-  sed -i -e 's|^standalone\.host.*|standalone.host = 0.0.0.0|g' ${WARP10_HOME}/etc/conf.d/00-warp.conf; \
-  sed -i -e 's|^#warpscript.extension.token|warpscript.extension.token|g' ${WARP10_HOME}/etc/conf.d/70--extensions.conf; \
-  sed -i -e 's|^#warpscript.extension.sensision|warpscript.extension.sensision|g' ${WARP10_HOME}/etc/conf.d/70--extensions.conf; \
+  sed -i -e 's|^standalone\.host.*|standalone.host = 0.0.0.0|g' ${WARP10_CONFIG_DIR}/00-warp.conf; \
+  sed -i -e 's|^#warpscript.extension.token|warpscript.extension.token|g' ${WARP10_CONFIG_DIR}/70--extensions.conf; \
+  sed -i -e 's|^#warpscript.extension.sensision|warpscript.extension.sensision|g' ${WARP10_CONFIG_DIR}/70--extensions.conf; \
 # TODO: to remove when sensision PR is merged
-  sed -i -e 's|^#sensision.capability = true|sensision.capability = true|g' ${WARP10_HOME}/etc/conf.d/70--extensions.conf; \
+  sed -i -e 's|^#sensision.capability = true|sensision.capability = true|g' ${WARP10_CONFIG_DIR}/70--extensions.conf; \
 ##
 ## Modify start script to run java process in foreground with exec
 ##
@@ -93,7 +93,7 @@ RUN set -eux; \
 ##
 ## Remove secrets and clean
 ##
-  sed -i -e 's/hex:.*/hex:hhh/g' ${WARP10_HOME}/etc/conf.d/*.conf; \
+  sed -i -e 's/hex:.*/hex:hhh/g' ${WARP10_CONFIG_DIR}/*.conf; \
   rm ${WARP10_HOME}/etc/initial.tokens; \
   rm -rf ${WARP10_HOME}/conf.templates; \
 ##

@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 #
 #   Copyright 2022  SenX S.A.S.
 #
@@ -33,7 +33,7 @@ if [ -e "${FIRSTINIT_FILE}" ]; then
   fi
 
   echo "Generate secrets"
-  java -cp "${WARP10_HOME}"/bin/warp10-*.jar -Dfile.encoding=UTF-8 io.warp10.GenerateCryptoKey "${WARP10_HOME}"/etc/conf.d/*.conf
+  java -cp "${WARP10_HOME}"/bin/warp10-*.jar -Dfile.encoding=UTF-8 io.warp10.GenerateCryptoKey "${WARP10_CONFIG_DIR}"/*.conf
 
   ##
   ## Token management
@@ -42,19 +42,20 @@ if [ -e "${FIRSTINIT_FILE}" ]; then
     ##
     ## Generate read/write tokens valid for a period of 100 years. We use 'io.warp10.bootstrap' as application name.
     ##
-    gosu warp10 java -cp "${WARP10_HOME}"/bin/warp10-"${WARP10_VERSION}".jar -Dfile.encoding=UTF-8 io.warp10.worf.TokenGen "${WARP10_HOME}"/etc/conf.d/00-secrets.conf "${WARP10_HOME}"/etc/conf.d/00-warp.conf "${WARP10_HOME}"/templates/warp10-tokengen.mc2 "${WARP10_HOME}"/etc/initial.tokens
+    gosu warp10 java -cp "${WARP10_HOME}"/bin/warp10-"${WARP10_VERSION}".jar -Dfile.encoding=UTF-8 io.warp10.worf.TokenGen "${WARP10_CONFIG_DIR}"/00-secrets.conf "${WARP10_CONFIG_DIR}"/00-warp.conf "${WARP10_HOME}"/templates/warp10-tokengen.mc2 "${WARP10_HOME}"/etc/initial.tokens
     sed -i 's/^.\{1\}//;$ s/.$//' "${WARP10_HOME}"/etc/initial.tokens # Remove first and last character
 
     ##
     ## Generate read/write token for sensision for a period of 100 years. We use 'sensision' as application name.
     ## Define token as MACROCONFIG key for runner script
     ##
-    gosu warp10 java -cp "${WARP10_HOME}"/bin/warp10-"${WARP10_VERSION}".jar -Dfile.encoding=UTF-8 io.warp10.worf.TokenGen "${WARP10_HOME}"/etc/conf.d/00-secrets.conf "${WARP10_HOME}"/etc/conf.d/00-warp.conf "${WARP10_HOME}"/templates/sensision-tokengen.mc2 "${WARP10_HOME}"/etc/sensision.tokens
+    gosu warp10 java -cp "${WARP10_HOME}"/bin/warp10-"${WARP10_VERSION}".jar -Dfile.encoding=UTF-8 io.warp10.worf.TokenGen "${WARP10_CONFIG_DIR}"/00-secrets.conf "${WARP10_CONFIG_DIR}"/00-warp.conf "${WARP10_HOME}"/templates/sensision-tokengen.mc2 "${WARP10_HOME}"/etc/sensision.tokens
     SENSISION_READ_TOKEN=$(sed -e 's/.*,"id":"SensisionRead","token":"//' -e 's/".*//' /opt/warp10/etc/sensision.tokens)
     SENSISION_WRITE_TOKEN=$(sed -e 's/.*,"id":"SensisionWrite","token":"//' -e 's/".*//' /opt/warp10/etc/sensision.tokens)
-    echo "sensisionReadToken@/sensision=${SENSISION_READ_TOKEN}" >> "${WARP10_HOME}"/etc/conf.d/99-sensision-secrets.conf
-    echo "sensisionWriteToken@/sensision=${SENSISION_WRITE_TOKEN}" >> "${WARP10_HOME}"/etc/conf.d/99-sensision-secrets.conf
-    chown warp10:warp10 "${WARP10_HOME}"/etc/conf.d/99-sensision-secrets.conf
+    echo "sensisionReadToken@/sensision=${SENSISION_READ_TOKEN}" >> "${WARP10_CONFIG_DIR}"/99-sensision-secrets.conf
+    echo "sensisionWriteToken@/sensision=${SENSISION_WRITE_TOKEN}" >> "${WARP10_CONFIG_DIR}"/99-sensision-secrets.conf
+    chown warp10:warp10 "${WARP10_CONFIG_DIR}"/99-sensision-secrets.conf
+
   fi
 
   rm -rf "${WARP10_VOLUME}".bak
