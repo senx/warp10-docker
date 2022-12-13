@@ -1,0 +1,7 @@
+'prime192v1'
+ECGEN
+SWAP
+DUP 'curve' GET SWAP 'd' GET 2 ->LIST ':' JOIN
+SWAP
+DUP 'curve' GET SWAP 'Q' GET 2 ->LIST ':' JOIN
+{} SWAP 'public' PUT SWAP 'private' PUT
