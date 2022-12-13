@@ -101,7 +101,7 @@ fi
 ## Disable sensision if asked
 ##
 if [ "true" = "${NO_SENSISION:-}" ] && [ -f "${WARP10_HOME}"/warpscripts/sensision/60000/update-sensision.mc2 ]; then
-  echo "NO_SENSISION' mode is disabled"
+  echo "'NO_SENSISION' mode is disabled"
   mv "${WARP10_HOME}"/warpscripts/sensision/60000/update-sensision.mc2{,.DISABLE}
 fi
 
