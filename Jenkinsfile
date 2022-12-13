@@ -56,7 +56,7 @@ pipeline {
         }
         stage('Generate files for Alpine') {
             steps {
-                sh './generate-alpine-files.sh'
+                sh './utils/generate-alpine-files.sh'
             }
         }
         stage('Build Docker image') {
