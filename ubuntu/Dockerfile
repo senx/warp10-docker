@@ -145,8 +145,8 @@ RUN set -eux; \
 ##
 ## Sensision utility files
 ##
-COPY --chown=warp10:warp10 ./update-sensision.mc2 ${WARP10_VOLUME}.bak/warp10/warpscripts/sensision/60000
-COPY --chown=warp10:warp10 ./sensision-tokengen.mc2 ${WARP10_HOME}/templates/
+COPY --chown=warp10:warp10 ./resources/sensision/update-sensision.mc2 ${WARP10_VOLUME}.bak/warp10/warpscripts/sensision/60000
+COPY --chown=warp10:warp10 ./resources/sensision/sensision-tokengen.mc2 ${WARP10_HOME}/templates/
 
 
 # Exposing port for Warp 10, Warp Studio, and HFStore

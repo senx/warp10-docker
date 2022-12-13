@@ -73,7 +73,7 @@ fi
 ## Standalone IN_MEMORY configuration
 ##
 IN_MEMORY_CONFIG=${WARP10_HOME}/etc/conf.d/30-in-memory.conf
-if [ "${IN_MEMORY:-}" = "true" ]; then
+if [ "true" = "${IN_MEMORY:-}" ]; then
   echo "'IN MEMORY' mode is enabled"
   sed -i -e 's/.*leveldb.home =.*/leveldb.home = \/dev\/null/g' "${IN_MEMORY_CONFIG}"
   sed -i -e 's/.*in.memory =.*/in.memory = true/g' "${IN_MEMORY_CONFIG}"
@@ -86,6 +86,15 @@ else
   echo "'IN MEMORY' mode is disabled"
   sed -i -e "s~.*leveldb.home =.*~leveldb.home = \${standalone.home}/leveldb~g" "${IN_MEMORY_CONFIG}"
   sed -i -e 's/.*in.memory = .*/in.memory = false/g' "${IN_MEMORY_CONFIG}"
+fi
+
+
+##
+## Disable sensision if asked
+##
+if [ "true" = "${NO_SENSISION:-}" ] && [ -f "${WARP10_HOME}"/warpscripts/sensision/60000/update-sensision.mc2 ]; then
+  echo "NO_SENSISION' mode is disabled"
+  mv "${WARP10_HOME}"/warpscripts/sensision/60000/update-sensision.mc2{,.DISABLE}
 fi
 
 
