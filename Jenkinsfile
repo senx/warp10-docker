@@ -27,13 +27,13 @@ pipeline {
         pollSCM('H/15 * * * 1-5')
     }
     environment {
-        DOCKER_HUB_CREDS = credentials('dockerhub_steven')
+        DOCKER_HUB_CREDS = credentials('dockerhub')
         GITLAB_REGISTRY_CREDS = credentials('gitlabregistry')
         PLATFORM = 'linux/amd64,linux/arm/v7,linux/arm64/v8'
         PLATFORM_ALPINE = 'linux/amd64'
     }
     parameters {
-        string(name: 'GITLAB_REPO', defaultValue: 'registry.gitlab.com/steven.gueguen/warp10-docker', description: 'Container registry')
+        string(name: 'GITLAB_REPO', defaultValue: 'registry.gitlab.com/senx/warp10-docker', description: 'Container registry')
     }
     stages {
         stage('Checkout') {
