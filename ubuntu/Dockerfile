@@ -1,5 +1,5 @@
 #
-#   Copyright 2016-2022  SenX S.A.S.
+#   Copyright 2016-2023  SenX S.A.S.
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -31,13 +31,10 @@ ENV WARP10_CONFIG_DIR=${WARP10_HOME}/etc/conf.d \
   PATH=$PATH:${WARP10_HOME}/bin
 
 ARG WARP10_VERSION=2.11.1
-ARG WARP10_VERSION=2.11.1-140-g2635eda9
-ARG WARP10_VERSION=2.11.1-17-g4d99a7ad
-# Datalog NG
-ARG WARP10_VERSION=2.11.1-47-ga932e725
+ARG WARP10_VERSION=2.11.1-48-gbb5ebbb3
 
-ARG RUNNER_DIR=warpscripts
 ARG RUNNER_DIR=runners
+ARG RUNNER_DIR=warpscripts
 
 COPY ./warp10-${WARP10_VERSION}.tar.gz /opt/
 ARG WARP10_URL=https://github.com/senx/warp10-platform/releases/download/${WARP10_VERSION}/warp10-${WARP10_VERSION}.tar.gz
