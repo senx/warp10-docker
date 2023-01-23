@@ -1,6 +1,5 @@
-#!/usr/bin/env groovy
 //
-//   Copyright 2020  SenX S.A.S.
+//   Copyright 2020-2022  SenX S.A.S.
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -15,117 +14,116 @@
 //   limitations under the License.
 //
 
-import hudson.model.*
+@Library('senx-shared-library') _
 
 pipeline {
     agent any
     options {
         disableConcurrentBuilds()
         buildDiscarder(logRotator(numToKeepStr: '3'))
+        timestamps()
+    }
+    triggers {
+        pollSCM('H/15 * * * 1-5')
     }
     environment {
-        version = "${getVersion()}"
+        DOCKER_HUB_CREDS = credentials('dockerhub')
+        GITLAB_REGISTRY_CREDS = credentials('gitlabregistry')
+        PLATFORM = 'linux/amd64,linux/arm/v7,linux/arm64/v8'
+        PLATFORM_ALPINE = 'linux/amd64'
+    }
+    parameters {
+        string(name: 'GITLAB_REPO', defaultValue: 'registry.gitlab.com/senx/warp10-docker', description: 'Container registry')
     }
     stages {
-
         stage('Checkout') {
             steps {
-                this.notifyBuild('STARTED', version)
-                git credentialsId: 'github', poll: false, url: 'git@github.com:senx/warp10-docker.git'
-                echo "Building ${version}"
+                script {
+                    env.version = ""
+                    notify.slack('STARTED')
+                }
+                checkout scm
+                script {
+                    env.version = gitUtils.getVersion()
+                }
             }
         }
-
-        stage('Docker image') {
+        stage('Setting up Docker env') {
             steps {
-                sh 'DOCKER_BUILD_KIT=1 DOCKER_CLI_EXPERIMENTAL=enabled docker buildx use multiarch'
-                sh "docker system prune --force --all --volumes --filter 'label=maintainer=contact@senx.io'"
-                sh "DOCKER_BUILD_KIT=1 DOCKER_CLI_EXPERIMENTAL=enabled docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v7 -t warp10io/warp10:${version} --build-arg WARP10_VERSION=${version} ."
-                sh "DOCKER_BUILD_KIT=1 DOCKER_CLI_EXPERIMENTAL=enabled docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v7 -t warp10io/warp10:latest --build-arg WARP10_VERSION=${version} ."
-                sh "DOCKER_BUILD_KIT=1 DOCKER_CLI_EXPERIMENTAL=enabled docker buildx build --load -t warp10io/warp10:${version}-ci predictible-tokens-for-ci"
+                sh 'docker buildx prune --force --all'
+                sh 'docker buildx use multiarch'
             }
         }
-        stage('Deploy') {
-            when {
-                expression { return isItATagCommit() }
+        stage('Generate files for Alpine') {
+            steps {
+                sh './utils/generate-alpine-files.sh'
             }
-            parallel {
-                stage('Deploy to DockerHub') {
-                    options {
-                        timeout(time: 2, unit: 'HOURS')
-                    }
-                    input {
-                        message 'Should we deploy to DockerHub?'
-                    }
-                    steps {
-                        sh 'DOCKER_BUILD_KIT=1 DOCKER_CLI_EXPERIMENTAL=enabled docker buildx use multiarch'
-                        sh "DOCKER_BUILD_KIT=1 DOCKER_CLI_EXPERIMENTAL=enabled docker buildx build --push --platform linux/amd64,linux/arm64,linux/arm/v7 -t warp10io/warp10:${version} --build-arg WARP10_VERSION=${version} ."
-                        sh "DOCKER_BUILD_KIT=1 DOCKER_CLI_EXPERIMENTAL=enabled docker buildx build --push --platform linux/amd64,linux/arm64,linux/arm/v7 -t warp10io/warp10:latest --build-arg WARP10_VERSION=${version} ."
-                        sh "DOCKER_BUILD_KIT=1 DOCKER_CLI_EXPERIMENTAL=enabled docker buildx build --push -t warp10io/warp10:${version}-ci predictible-tokens-for-ci"
-                        sh "docker system prune --force --all --volumes --filter 'label=maintainer=contact@senx.io'"
-                        this.notifyBuild('PUBLISHED', version)
-                    }
+        }
+        stage('Build Docker image') {
+            steps {
+                sh 'echo ${GITLAB_REGISTRY_CREDS_PSW} | docker login --username ${GITLAB_REGISTRY_CREDS_USR} --password-stdin registry.gitlab.com'
+                sh "docker buildx build --pull --push --platform ${PLATFORM} -t ${params.GITLAB_REPO}/warp10:${env.version}-ubuntu -f ubuntu/Dockerfile ."
+                sh "docker buildx build --pull --push --platform ${PLATFORM_ALPINE} -t ${params.GITLAB_REPO}/warp10:${env.version}-alpine -f alpine/Dockerfile ."
+            }
+        }
+        stage('Test image - Standard mode') {
+            steps {
+                sh "./utils/test.sh docker run --pull always --rm --platform linux/amd64 -d -P ${params.GITLAB_REPO}/warp10:${env.version}-ubuntu"
+                // sh "./utils/test.sh docker run --pull always --rm --platform linux/arm/v7 -d -P ${params.GITLAB_REPO}/warp10:${env.version}-ubuntu"
+                sh "./utils/test.sh docker run --pull always --rm --platform linux/arm64/v8 -d -P ${params.GITLAB_REPO}/warp10:${env.version}-ubuntu"
+                sh "./utils/test.sh docker run --pull always --rm --platform linux/amd64 -d -P ${params.GITLAB_REPO}/warp10:${env.version}-alpine"
+            }
+        }
+        stage('Test image - In memory mode') {
+            steps {
+                sh "./utils/test.sh docker run --pull always --rm --platform linux/amd64 -d -P -e IN_MEMORY=true ${params.GITLAB_REPO}/warp10:${env.version}-ubuntu"
+                // sh "./utils/test.sh docker run --pull always --rm --platform linux/arm/v7 -d -P -e IN_MEMORY=true ${params.GITLAB_REPO}/warp10:${env.version}-ubuntu"
+                sh "./utils/test.sh docker run --pull always --rm --platform linux/arm64/v8 -d -P -e IN_MEMORY=true ${params.GITLAB_REPO}/warp10:${env.version}-ubuntu"
+                sh "./utils/test.sh docker run --pull always --rm --platform linux/amd64 -d -P -e IN_MEMORY=true ${params.GITLAB_REPO}/warp10:${env.version}-alpine"
+            }
+        }
+        stage('Deploy to Docker Hub') {
+            when {
+                beforeInput true
+                expression { gitUtils.isTag() }
+            }
+            options {
+                timeout(time: 4, unit: 'DAYS')
+            }
+            input {
+                message "Should we deploy image to Docker Hub?"
+            }
+            steps {
+                sh 'echo ${DOCKER_HUB_CREDS_PSW} | docker login --username ${DOCKER_HUB_CREDS_USR} --password-stdin'
+                sh "docker buildx build --pull --push --platform ${PLATFORM} -t ${DOCKER_HUB_CREDS_USR}/warp10:${env.version}-ubuntu -f ubuntu/Dockerfile ."
+                sh "docker buildx build --pull --push --platform ${PLATFORM} -t ${DOCKER_HUB_CREDS_USR}/warp10:${env.version}-ubuntu-ci predictible-tokens-for-ci"
+                sh "docker buildx build --pull --push --platform ${PLATFORM_ALPINE} -t ${DOCKER_HUB_CREDS_USR}/warp10:${env.version}-alpine -f alpine/Dockerfile ."
+                script {
+                    notify.slack('PUBLISHED')
                 }
             }
         }
     }
     post {
         success {
-            this.notifyBuild('SUCCESSFUL', version)
+            script {
+                notify.slack('SUCCESSFUL')
+            }
         }
         failure {
-            this.notifyBuild('FAILURE', version)
+            script {
+                notify.slack('FAILURE')
+            }
         }
         aborted {
-            this.notifyBuild('ABORTED', version)
+            script {
+                notify.slack('ABORTED')
+            }
         }
         unstable {
-            this.notifyBuild('UNSTABLE', version)
+            script {
+                notify.slack('UNSTABLE')
+            }
         }
     }
-}
-
-void notifyBuild(String buildStatus, String version) {
-    // build status of null means successful
-    buildStatus = buildStatus ?: 'SUCCESSFUL'
-    String subject = "${buildStatus}: Job ${env.JOB_NAME} [${env.BUILD_DISPLAY_NAME}] | ${version}" as String
-    String summary = "${subject} (${env.BUILD_URL})" as String
-    // Override default values based on build status
-    if (buildStatus == 'STARTED') {
-        color = 'YELLOW'
-        colorCode = '#FFFF00'
-    } else if (buildStatus == 'SUCCESSFUL') {
-        color = 'GREEN'
-        colorCode = '#00FF00'
-    } else if (buildStatus == 'PUBLISHED') {
-        color = 'BLUE'
-        colorCode = '#0000FF'
-    } else {
-        color = 'RED'
-        colorCode = '#FF0000'
-    }
-
-    // Send notifications
-    this.notifySlack(colorCode, summary, buildStatus)
-}
-
-void notifySlack(String color, String message, String buildStatus) {
-    String slackURL = getParam('slackUrl')
-    String payload = "{\"username\": \"${env.JOB_NAME}\",\"attachments\":[{\"title\": \"${env.JOB_NAME} ${buildStatus}\",\"color\": \"${color}\",\"text\": \"${message}\"}]}" as String
-    sh "curl -X POST -H 'Content-type: application/json' --data '${payload}' ${slackURL}" as String
-}
-
-String getParam(String key) {
-    return params.get(key)
-}
-
-String getVersion() {
-    return sh(returnStdout: true, script: 'git describe --abbrev=0 --tags').trim()
-}
-
-
-boolean isItATagCommit() {
-    String lastCommit = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
-    String tag = sh(returnStdout: true, script: "git show-ref --tags -d | grep ^${lastCommit} | sed -e 's,.* refs/tags/,,' -e 's/\\^{}//'").trim()
-    return tag != ''
 }
