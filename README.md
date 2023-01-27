@@ -34,7 +34,7 @@ Start your image binding the external ports `8080` for Warp&nbsp;10 and `8081` f
 ```bash
 docker run -d -p 8080:8080 -p 8081:8081 warp10io/warp10:tag
 ```
-... where tag is the tag specifying the Warp&nbsp;10 version you want. See the tab above for relevant tags.
+... where tag is the tag specifying the Warp&nbsp;10 version you want.
 
 ## Mapping volume for persistence
 
@@ -190,7 +190,42 @@ A full [getting started](https://www.warp10.io/content/02_Getting_started) is av
 
 > A standalone version of WarpStudio is packaged in the Docker image you have just installed, listening on the port 8081. In a Linux system (with binding between Warp&nbsp;10 API address and the host) you can access WarpStudio at `127.0.0.1:8081`. In macOS or Windows, there is no binding between Warp&nbsp;10 API address and the host, you need to replace 127.0.0.1 by the real IP address of the container as explained in the precedent section.
 
+## Configure Warp 10
+They are many ways to configure Warp 10 in docker. Each of the following methods allows you to add or replace existing configuration.
 
+- Using extra configuration file:
+
+Use the `/config.extra` folder to add your additional configuration file, you can add multiple files.
+```
+docker run --rm -p 8080:8080 -p 8081:8081 -v 99-custom.conf:/config.extra/99-custom.conf
+```
+- Using environment variables:
+```bash
+docker run -d -p 8080:8080 -p 8081:8081 -e warpscript.maxops=100000 -e warpscript.maxfetch=1000000 warp10io/warp10:tag
+ ```
+- Using environment file:
+ ```bash
+docker run -d -p 8080:8080 -p 8081:8081 --env-file=./myconf.env warp10io/warp10:tag
+ ```
+
+You can mix all of these methods, here is an example with docker-compose:
+```
+services:
+  warp10:
+    image: warp10io/warp10:tag
+    volumes:
+      - warp10_data:/data
+      - /var/warp10/99-custom.conf:/config.extra/99-custom.conf
+    ports:
+      - '8080:8080'
+      - '8081:8081'
+    environment:
+      - warpscript.maxops=100000
+      - warpscript.maxfetch=1000000
+    env_file: custom.env
+volumes:
+  warp10_data:
+```
 
 ## Build the image
 
