@@ -42,7 +42,7 @@ if [ -e "${FIRSTINIT_FILE}" ]; then
   java -cp "${WARP10_HOME}"/bin/warp10-*.jar -Dfile.encoding=UTF-8 io.warp10.GenerateCryptoKey "${WARP10_CONFIG_DIR}"/*.conf
 
   ##
-  ## Token management
+  ## Tokens/ECC key management
   ##
   if [ ! -e "${WARP10_HOME}"/etc/initial.tokens ]; then
     ##
@@ -62,6 +62,14 @@ if [ -e "${FIRSTINIT_FILE}" ]; then
     echo "sensisionWriteToken@/sensision=${SENSISION_WRITE_TOKEN}" >> "${WARP10_CONFIG_DIR}"/99-sensision-secrets.conf
     chown warp10:warp10 "${WARP10_CONFIG_DIR}"/99-sensision-secrets.conf
 
+    ##
+    ## Generate ECC key for Datalog Feeder
+    ##
+    ecc=$("${WARP10_HOME}"/bin/warp10-standalone.init run "${WARP10_HOME}"/templates/datalog-ecc-keygen.mc2)
+    private=$(echo "${ecc}" | sed -e "s/.*prime192v1%3A//" -e "s/' 'private.*//")
+    public=$(echo "${ecc}" | sed -e "s/.*{} 'prime192v1%3A//" -e "s/' 'public.*//")
+    sed -i "s/^#datalog.feeder.ecc.private/datalog.feeder.ecc.private=${private}/" "${WARP10_CONFIG_DIR}"/99-datalog-ng.conf
+    sed -i "s/^#datalog.feeder.ecc.public/datalog.feeder.ecc.public=${public}/" "${WARP10_CONFIG_DIR}"/99-datalog-ng.conf
   fi
 
   rm -rf "${WARP10_VOLUME}".bak
