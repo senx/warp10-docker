@@ -96,8 +96,12 @@ pipeline {
             steps {
                 sh 'echo ${DOCKER_HUB_CREDS_PSW} | docker login --username ${DOCKER_HUB_CREDS_USR} --password-stdin'
                 sh "docker buildx build --pull --push --platform ${PLATFORM} -t ${DOCKER_HUB_CREDS_USR}/warp10:${env.version}-ubuntu -f ubuntu/Dockerfile ."
-                sh "docker buildx build --pull --push --platform ${PLATFORM} -t ${DOCKER_HUB_CREDS_USR}/warp10:${env.version}-ubuntu-ci predictible-tokens-for-ci"
                 sh "docker buildx build --pull --push --platform ${PLATFORM_ALPINE} -t ${DOCKER_HUB_CREDS_USR}/warp10:${env.version}-alpine -f alpine/Dockerfile ."
+
+                sh "sed -i -e 's/@WARP10_VERSION@/${env.version}/' ./predictible-tokens-for-ci/Dockerfile"
+                sh "docker buildx build --pull --push --platform ${PLATFORM} -t ${DOCKER_HUB_CREDS_USR}/warp10:${env.version}-ubuntu-ci predictible-tokens-for-ci"
+                sh "./utils/test.sh docker run --pull always --rm -d -P ${DOCKER_HUB_CREDS_USR}/warp10:${env.version}-ubuntu-ci"
+
                 script {
                     notify.slack('PUBLISHED')
                 }
