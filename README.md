@@ -197,7 +197,7 @@ They are many ways to configure Warp 10 in docker. Each of the following method
 
 Use the `/config.extra` folder to add your additional configuration file, you can add multiple files.
 ```
-docker run --rm -p 8080:8080 -p 8081:8081 -v 99-custom.conf:/config.extra/99-custom.conf
+docker run -d -p 8080:8080 -p 8081:8081 -v 99-custom.conf:/config.extra/99-custom.conf warp10io/warp10:tag
 ```
 - Using environment variables:
 ```bash
