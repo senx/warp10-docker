@@ -90,11 +90,11 @@ This version embeds a pair of READ/WRITE tokens named respectively `readTokenCI`
 Examples:
 
 ```bash
-[ 'readTokenCI' '~.*' {} NOW -1 ] FETCH // Retrieve the last point for all GTS
+curl -v -H 'X-Warp10-Token: writeTokenCI' --data-binary "1// test{} 42" 'http://127.0.0.1:8080/api/v0/update'
 ```
 
 ```bash
-curl -v -H 'X-Warp10-Token: writeTokenCI' --data-binary "1// test{} 42" 'http://127.0.0.1:8080/api/v0/update'
+[ 'readTokenCI' '~.*' {} NOW -1 ] FETCH // Retrieve the last point for all GTS
 ```
 
 ## Getting Tokens
