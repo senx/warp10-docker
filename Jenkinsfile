@@ -27,13 +27,13 @@ pipeline {
         pollSCM('H/15 * * * 1-5')
     }
     environment {
-        DOCKER_HUB_CREDS = credentials('dockerhub_steven')
+        DOCKER_HUB_CREDS = credentials('dockerhub')
         GITLAB_REGISTRY_CREDS = credentials('gitlabregistry')
         PLATFORM = 'linux/amd64,linux/arm/v7,linux/arm64/v8'
         PLATFORM_ALPINE = 'linux/amd64'
     }
     parameters {
-        string(name: 'GITLAB_REPO', defaultValue: 'registry.gitlab.com/steven.gueguen/warp10-docker', description: 'Container registry')
+        string(name: 'GITLAB_REPO', defaultValue: 'registry.gitlab.com/senx/warp10-docker', description: 'Container registry')
     }
     stages {
         stage('Checkout') {
@@ -96,8 +96,12 @@ pipeline {
             steps {
                 sh 'echo ${DOCKER_HUB_CREDS_PSW} | docker login --username ${DOCKER_HUB_CREDS_USR} --password-stdin'
                 sh "docker buildx build --pull --push --platform ${PLATFORM} -t ${DOCKER_HUB_CREDS_USR}/warp10:${env.version}-ubuntu -f ubuntu/Dockerfile ."
-                sh "docker buildx build --pull --push --platform ${PLATFORM} -t ${DOCKER_HUB_CREDS_USR}/warp10:${env.version}-ubuntu-ci predictible-tokens-for-ci"
                 sh "docker buildx build --pull --push --platform ${PLATFORM_ALPINE} -t ${DOCKER_HUB_CREDS_USR}/warp10:${env.version}-alpine -f alpine/Dockerfile ."
+
+                sh "sed -i -e 's/@WARP10_VERSION@/${env.version}/' ./predictible-tokens-for-ci/Dockerfile"
+                sh "docker buildx build --pull --push --platform ${PLATFORM} -t ${DOCKER_HUB_CREDS_USR}/warp10:${env.version}-ubuntu-ci predictible-tokens-for-ci"
+                sh "./utils/test.sh docker run --pull always --rm -d -P ${DOCKER_HUB_CREDS_USR}/warp10:${env.version}-ubuntu-ci"
+
                 script {
                     notify.slack('PUBLISHED')
                 }
