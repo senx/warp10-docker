@@ -119,7 +119,8 @@ RUN set -eux; \
   # gpg --batch --verify ${HFSTORE_JAR}.asc ${HFSTORE_JAR}; \
   echo "${HFSTORE_SHA512}  ${HFSTORE_JAR}" | sha512sum -c; \
   unzip ${WARP10_HOME}/lib/warp10-ext-hfstore-${HFSTORE_VERSION}.jar hfstore -d ${WARP10_HOME}/bin; \
-  unzip ${WARP10_HOME}/lib/warp10-ext-hfstore-${HFSTORE_VERSION}.jar warp10-ext-hfstore.conf -d ${HFSTORE_CONFIG}; \
+  unzip ${WARP10_HOME}/lib/warp10-ext-hfstore-${HFSTORE_VERSION}.jar warp10-ext-hfstore.conf; \
+  mv warp10-ext-hfstore.conf ${HFSTORE_CONFIG}; \
   mkdir ${WARP10_DATA_DIR}/hfiles; \
   ln -s ${WARP10_DATA_DIR}/hfiles ${WARP10_HOME}/hfiles; \
 ##
