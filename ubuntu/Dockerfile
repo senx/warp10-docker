@@ -31,12 +31,6 @@ ENV WARP10_CONFIG_DIR=${WARP10_HOME}/etc/conf.d \
   PATH=$PATH:${WARP10_HOME}/bin
 
 ARG WARP10_VERSION=2.11.1
-ARG WARP10_VERSION=2.11.1-48-gbb5ebbb3
-
-ARG RUNNER_DIR=runners
-ARG RUNNER_DIR=warpscripts
-
-COPY ./warp10-${WARP10_VERSION}.tar.gz /opt/
 ARG WARP10_URL=https://github.com/senx/warp10-platform/releases/download/${WARP10_VERSION}/warp10-${WARP10_VERSION}.tar.gz
 ENV WARP10_VERSION=${WARP10_VERSION}
 
@@ -78,7 +72,7 @@ RUN set -eux; \
 ## Install Warp 10
 ##
   cd /opt; \
-  # wget -q ${WARP10_URL}; \
+  wget -q ${WARP10_URL}; \
   tar xzf warp10-${WARP10_VERSION}.tar.gz; \
   rm warp10-${WARP10_VERSION}.tar.gz; \
   ln -s /opt/warp10-${WARP10_VERSION} ${WARP10_HOME}; \
@@ -102,9 +96,6 @@ RUN set -eux; \
   sed -i -e 's/hex:.*/hex:hhh/g' ${WARP10_CONFIG_DIR}/*.conf; \
   rm ${WARP10_HOME}/etc/initial.tokens; \
   rm -rf ${WARP10_HOME}/conf.templates; \
-  rm -rf ${WARP10_HOME}/datalog* ${WARP10_DATA_DIR}/datalog* ; \
-  mkdir ${WARP10_DATA_DIR}/datalog-ng; \
-  ln -s ${WARP10_DATA_DIR}/datalog-ng ${WARP10_HOME}/datalog-ng ; \
 ##
 ## Install WarpStudio
 ##
@@ -128,14 +119,13 @@ RUN set -eux; \
   # gpg --batch --verify ${HFSTORE_JAR}.asc ${HFSTORE_JAR}; \
   echo "${HFSTORE_SHA512}  ${HFSTORE_JAR}" | sha512sum -c; \
   unzip ${WARP10_HOME}/lib/warp10-ext-hfstore-${HFSTORE_VERSION}.jar hfstore -d ${WARP10_HOME}/bin; \
-  unzip ${WARP10_HOME}/lib/warp10-ext-hfstore-${HFSTORE_VERSION}.jar warp10-ext-hfstore.conf; \
-  mv warp10-ext-hfstore.conf ${HFSTORE_CONFIG}; \
+  unzip ${WARP10_HOME}/lib/warp10-ext-hfstore-${HFSTORE_VERSION}.jar warp10-ext-hfstore.conf -d ${HFSTORE_CONFIG}; \
   mkdir ${WARP10_DATA_DIR}/hfiles; \
   ln -s ${WARP10_DATA_DIR}/hfiles ${WARP10_HOME}/hfiles; \
 ##
 ## Create Sensision runner directory
 ##
-  mkdir -p ${WARP10_HOME}/${RUNNER_DIR}/sensision/60000; \
+  mkdir -p ${WARP10_HOME}/warpscripts/sensision/60000; \
 ##
 ## Fix permissions
 ##
@@ -143,7 +133,6 @@ RUN set -eux; \
 ##
 ##  Prepare data directory for first run
 ##
-  mv ${WARP10_HOME}/logs/.firstinit ${WARP10_HOME}; \
   mv ${WARP10_VOLUME} ${WARP10_VOLUME}.bak; \
 ##
 ## Clean GPG
@@ -154,16 +143,9 @@ RUN set -eux; \
 ##
 ## Sensision utility files
 ##
-COPY --chown=warp10:warp10 ./resources/sensision/update-sensision.mc2 ${WARP10_VOLUME}.bak/warp10/${RUNNER_DIR}/sensision/60000
+COPY --chown=warp10:warp10 ./resources/sensision/update-sensision.mc2 ${WARP10_VOLUME}.bak/warp10/warpscripts/sensision/60000
 COPY --chown=warp10:warp10 ./resources/sensision/sensision-tokengen.mc2 ${WARP10_HOME}/templates/
 
-
-##
-## Datalog-ng configuration files
-##
-COPY --chown=warp10:warp10 ./resources/datalog/99-datalog-ng.conf ${WARP10_VOLUME}.bak/warp10/etc/conf.d
-COPY --chown=warp10:warp10 ./resources/datalog/datalog-ecc-keygen.mc2 ${WARP10_HOME}/templates/
-COPY --chown=warp10:warp10 ./resources/datalog/feeder.checkmacro.mc2 ${WARP10_VOLUME}.bak/warp10/etc/macro/datalog/
 
 # Exposing port for Warp 10, Warp Studio, and HFStore
 EXPOSE 8080 8081 4378

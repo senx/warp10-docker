@@ -23,28 +23,31 @@
 
 set -eu
 
-FIRSTINIT_FILE=${WARP10_HOME}/.firstinit
+FIRSTINIT_FILE=${WARP10_VOLUME}/warp10/logs/.firstinit
 
 ##
 ## At the first run,
 ## fill up the data dir if we don't have a volume
 ## Generate secrets and token file
 ##
-if [ -e "${FIRSTINIT_FILE}" ]; then
+if [ ! -f "${FIRSTINIT_FILE}" ]; then
   ##
   ## Populate the volume
   ##
-  if [ ! -e "${WARP10_DATA_DIR}" ]; then
+  if [ ! -d "${WARP10_DATA_DIR}" ]; then
+    echo "Populate the data volume"
     mv "${WARP10_VOLUME}".bak/* "${WARP10_VOLUME}";
+  else
+    echo "Data volume already populated"
   fi
 
   echo "Generate secrets"
   java -cp "${WARP10_HOME}"/bin/warp10-*.jar -Dfile.encoding=UTF-8 io.warp10.GenerateCryptoKey "${WARP10_CONFIG_DIR}"/*.conf
 
   ##
-  ## Tokens/ECC key management
+  ## Tokens management
   ##
-  if [ ! -e "${WARP10_HOME}"/etc/initial.tokens ]; then
+  if [ ! -f "${WARP10_HOME}"/etc/initial.tokens ]; then
     ##
     ## Generate read/write tokens valid for a period of 100 years. We use 'io.warp10.bootstrap' as application name.
     ##
@@ -62,19 +65,14 @@ if [ -e "${FIRSTINIT_FILE}" ]; then
     echo "sensisionWriteToken@/sensision=${SENSISION_WRITE_TOKEN}" >> "${WARP10_CONFIG_DIR}"/99-sensision-secrets.conf
     chown warp10:warp10 "${WARP10_CONFIG_DIR}"/99-sensision-secrets.conf
 
-    ##
-    ## Generate ECC key for Datalog Feeder
-    ##
-    ecc=$("${WARP10_HOME}"/bin/warp10-standalone.init run "${WARP10_HOME}"/templates/datalog-ecc-keygen.mc2)
-    private=$(echo "${ecc}" | sed -e "s/.*prime192v1%3A//" -e "s/' 'private.*//")
-    public=$(echo "${ecc}" | sed -e "s/.*{} 'prime192v1%3A//" -e "s/' 'public.*//")
-    sed -i "s/^#datalog.feeder.ecc.private/datalog.feeder.ecc.private=${private}/" "${WARP10_CONFIG_DIR}"/99-datalog-ng.conf
-    sed -i "s/^#datalog.feeder.ecc.public/datalog.feeder.ecc.public=${public}/" "${WARP10_CONFIG_DIR}"/99-datalog-ng.conf
   fi
 
-  rm -rf "${WARP10_VOLUME}".bak
-  rm "${FIRSTINIT_FILE}"
+  touch "${FIRSTINIT_FILE}"
+  chown warp10:warp10 "${FIRSTINIT_FILE}"
+else
+  echo "Running Warp 10 on existing data volume"
 fi
+rm -rf "${WARP10_VOLUME}".bak
 
 
 ##
