@@ -1,5 +1,5 @@
 #
-#   Copyright 2016-2022  SenX S.A.S.
+#   Copyright 2016-2023  SenX S.A.S.
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -134,7 +134,6 @@ RUN set -eux; \
 ##
 ##  Prepare data directory for first run
 ##
-  mv ${WARP10_HOME}/logs/.firstinit ${WARP10_HOME}; \
   mv ${WARP10_VOLUME} ${WARP10_VOLUME}.bak; \
 ##
 ## Clean GPG
