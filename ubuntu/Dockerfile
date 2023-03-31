@@ -69,32 +69,31 @@ RUN set -eux; \
   export GNUPGHOME="$(mktemp -d)"; \
   gpg --batch --keyserver keyserver.ubuntu.com --receive-keys 09554E7D23D569F502A90A8615E17B2FBD49DA0A; \
 ##
-## Install Warp 10
+## Install Warp 10
 ##
   cd /opt; \
   wget -q ${WARP10_URL}; \
   tar xzf warp10-${WARP10_VERSION}.tar.gz; \
   rm warp10-${WARP10_VERSION}.tar.gz; \
   ln -s /opt/warp10-${WARP10_VERSION} ${WARP10_HOME}; \
-  ${WARP10_HOME}/bin/warp10-standalone.init bootstrap; \
+  sed -i -e 's|^#WARP10_USER=.*|WARP10_USER=warp10|g' ${WARP10_HOME}/bin/warp10-env.sh; \
+  sed -i -e 's|^#WARP10_GROUP=.*|WARP10_GROUP=warp10|g' ${WARP10_HOME}/bin/warp10-env.sh; \
+  ${WARP10_HOME}/bin/warp10.sh init standalone; \
 ##
-## Configure Warp 10
+## Configure Warp 10
 ## Listen to all interface, enable SensisionWarpScriptExtension and TokenWarpScriptExtension
 ##
   sed -i -e 's|^standalone\.host.*|standalone.host = 0.0.0.0|g' ${WARP10_CONFIG_DIR}/00-warp.conf; \
   sed -i -e 's|^#warpscript.extension.token|warpscript.extension.token|g' ${WARP10_CONFIG_DIR}/70--extensions.conf; \
   sed -i -e 's|^#warpscript.extension.sensision|warpscript.extension.sensision|g' ${WARP10_CONFIG_DIR}/70--extensions.conf; \
-# TODO: to remove when sensision PR is merged
-  sed -i -e 's|^#sensision.capability = true|sensision.capability = true|g' ${WARP10_CONFIG_DIR}/70--extensions.conf; \
 ##
 ## Modify start script to run java process in foreground with exec
 ##
-  sed -i -e 's@\(${JAVACMD} ${JAVA_OPTS} -cp ${WARP10_CP} ${WARP10_CLASS} ${CONFIG_FILES}\).*@exec \1@' ${WARP10_HOME}/bin/warp10-standalone.sh; \
+  sed -i -e 's@\(${JAVACMD} ${JAVA_OPTS} -cp ${WARP10_CP} ${WARP10_CLASS} ${CONFIG_FILES}\).*@exec \1@' ${WARP10_HOME}/bin/warp10.sh; \
 ##
 ## Remove secrets and clean
 ##
   sed -i -e 's/hex:.*/hex:hhh/g' ${WARP10_CONFIG_DIR}/*.conf; \
-  rm ${WARP10_HOME}/etc/initial.tokens; \
   rm -rf ${WARP10_HOME}/conf.templates; \
 ##
 ## Install WarpStudio
@@ -148,7 +147,7 @@ COPY --chown=warp10:warp10 ./resources/sensision/update-sensision.mc2 ${WARP10_V
 COPY --chown=warp10:warp10 ./resources/sensision/sensision-tokengen.mc2 ${WARP10_HOME}/templates/
 
 
-# Exposing port for Warp 10, Warp Studio, and HFStore
+# Exposing port for Warp 10, Warp Studio, and HFStore
 EXPOSE 8080 8081 4378
 
 WORKDIR ${WARP10_HOME}
@@ -159,4 +158,4 @@ HEALTHCHECK CMD curl --fail http://localhost:8080/api/v0/check || exit 1
 COPY --chown=warp10:warp10 ./docker-entrypoint.sh /docker-entrypoint.sh
 
 ENTRYPOINT [ "/docker-entrypoint.sh" ]
-CMD [ "/opt/warp10/bin/warp10-standalone.sh", "start" ]
+CMD [ "/opt/warp10/bin/warp10.sh", "start" ]

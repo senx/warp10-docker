@@ -6,7 +6,7 @@
 
 
 #
-#   Copyright 2022  SenX S.A.S.
+#   Copyright 2022-2023  SenX S.A.S.
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -49,12 +49,6 @@ if [ ! -f "${FIRSTINIT_FILE}" ]; then
   ##
   if [ ! -f "${WARP10_HOME}"/etc/initial.tokens ]; then
     ##
-    ## Generate read/write tokens valid for a period of 100 years. We use 'io.warp10.bootstrap' as application name.
-    ##
-    gosu warp10 java -cp "${WARP10_HOME}"/bin/warp10-"${WARP10_VERSION}".jar -Dfile.encoding=UTF-8 io.warp10.worf.TokenGen "${WARP10_CONFIG_DIR}"/00-secrets.conf "${WARP10_CONFIG_DIR}"/00-warp.conf "${WARP10_HOME}"/templates/warp10-tokengen.mc2 "${WARP10_HOME}"/etc/initial.tokens
-    sed -i 's/^.\{1\}//;$ s/.$//' "${WARP10_HOME}"/etc/initial.tokens # Remove first and last character
-
-    ##
     ## Generate read/write token for sensision for a period of 100 years. We use 'sensision' as application name.
     ## Define token as MACROCONFIG key for runner script
     ##
@@ -70,7 +64,7 @@ if [ ! -f "${FIRSTINIT_FILE}" ]; then
   touch "${FIRSTINIT_FILE}"
   chown warp10:warp10 "${FIRSTINIT_FILE}"
 else
-  echo "Running Warp 10 on existing data volume"
+  echo "Running Warp 10 on existing data volume"
 fi
 rm -rf "${WARP10_VOLUME}".bak
 
@@ -104,5 +98,5 @@ if [ "true" = "${NO_SENSISION:-}" ] && [ -f "${WARP10_HOME}"/warpscripts/sensisi
 fi
 
 
-echo "Start Warp 10"
+echo "Start Warp 10"
 exec gosu warp10 "$@"
