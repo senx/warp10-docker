@@ -23,21 +23,27 @@
 
 set -eu
 
-TEMPLATE=${TEMPLATE:=standalone}
+FLAVOR=${FLAVOR:=standalone}
 WARP10_CONFIG_DIR=${WARP10_HOME}/etc/conf.d
 WARP10_DATA_DIR=${WARP10_VOLUME}/warp10
-FIRSTINIT_FILE=${WARP10_HOME}/logs/.firstinit
+FIRSTINIT_FILE=${WARP10_DATA_DIR}/.firstinit
 
 moveDir() {
   dir=$1
   if [ -e "${WARP10_DATA_DIR}/${dir}" ]; then
-      echo "Error: ${WARP10_DATA_DIR}/${dir} already exists"
-      exit 1
+      rm -rf "${WARP10_HOME:?}/${dir}"
+  else
+    mv "${WARP10_HOME}/${dir}" "${WARP10_DATA_DIR}"
   fi
 
-  mv "${WARP10_HOME}/${dir}" "${WARP10_DATA_DIR}"
   ln -s "${WARP10_DATA_DIR}/${dir}" "${WARP10_HOME}/${dir}"
 }
+
+
+##
+## Modify start script to run java process in foreground with exec
+##
+sed -i -e 's@\(${JAVACMD} ${JAVA_OPTS} -cp ${WARP10_CP} ${WARP10_CLASS} ${CONFIG_FILES}\).*@exec \1@' "${WARP10_HOME}/bin/warp10.sh"
 
 ##
 ## At the first run,
@@ -45,12 +51,7 @@ moveDir() {
 ## Generate secrets and token file
 ##
 if [ ! -f "${FIRSTINIT_FILE}" ]; then
-  "${WARP10_HOME}/bin/warp10.sh" init "${TEMPLATE}" >/dev/null 2>&1
-
-  ##
-  ## Modify start script to run java process in foreground with exec
-  ##
-  sed -i -e 's@\(${JAVACMD} ${JAVA_OPTS} -cp ${WARP10_CP} ${WARP10_CLASS} ${CONFIG_FILES}\).*@exec \1@' "${WARP10_HOME}/bin/warp10.sh"
+  "${WARP10_HOME}/bin/warp10.sh" init "${FLAVOR}" >/dev/null 2>&1
 
   ##
   ## Configure Warp 10
@@ -100,30 +101,30 @@ if [ ! -f "${FIRSTINIT_FILE}" ]; then
     chown warp10:warp10 "${WARP10_CONFIG_DIR}"/99-sensision-secrets.conf
   fi
 
-
   ##
   ## Remove templates
   ##
   rm -rf "${WARP10_HOME}/conf.templates"
+fi
 
-  ##
-  ## Move files to data dir
-  ##
-  mkdir -p "${WARP10_DATA_DIR}"
-  moveDir "calls"
-  moveDir "datalog"
-  moveDir "etc"
-  moveDir "hfiles"
-  moveDir "jars"
-  moveDir "leveldb"
-  moveDir "lib"
-  moveDir "logs"
-  moveDir "macros"
-  moveDir "runners"
-  moveDir "tokens"
+##
+## Move files to data dir
+##
+mkdir -p "${WARP10_DATA_DIR}"
+moveDir "calls"
+moveDir "datalog"
+moveDir "etc"
+moveDir "hfiles"
+moveDir "jars"
+[ "standalone" = "${FLAVOR}" ] && moveDir "leveldb"
+moveDir "lib"
+moveDir "logs"
+moveDir "macros"
+moveDir "runners"
+moveDir "tokens"
 
+if [ ! -f "${FIRSTINIT_FILE}" ]; then
   touch "${FIRSTINIT_FILE}"
-
 
   ##
   ## Fix permissions
@@ -131,7 +132,6 @@ if [ ! -f "${FIRSTINIT_FILE}" ]; then
   chown -RHh warp10:warp10 "${WARP10_HOME}"
   chown -RHh warp10:warp10 "${WARP10_VOLUME}"
   chown warp10:warp10 "${WARP10_HOME}"
-
 fi
 
 echo "Starting"
