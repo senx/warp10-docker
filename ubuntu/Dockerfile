@@ -27,7 +27,7 @@ ENV WARP10_HOME=/opt/warp10
 ENV WARP10_VOLUME=/data
 ENV PATH=$PATH:${WARP10_HOME}/bin
 
-ARG WARP10_VERSION=3.0.0-beta0
+ARG WARP10_VERSION=3.0.0-beta2
 ARG WARP10_URL=https://github.com/senx/warp10-platform/releases/download/${WARP10_VERSION}/warp10-${WARP10_VERSION}.tar.gz
 ENV WARP10_VERSION=${WARP10_VERSION}
 
