@@ -51,12 +51,12 @@ You *must* use the same `--volume` option in all your other docker commands on W
 
 ## Working in memory
 
-You can add `-e IN_MEMORY=true` to pop an in-memory Warp&nbsp;10 instance.
+You can add `-e FLAVOR=in-memory` to pop an in-memory Warp&nbsp;10 instance.
 By default, it will retain all last 48 hours.
 This is configurable.
 
 ```bash
-docker run -d -p 8080:8080 -p 8081:8081 -e IN_MEMORY=true warp10io/warp10:tag
+docker run -d -p 8080:8080 -p 8081:8081 -e FLAVOR=in-memory warp10io/warp10:tag
 ```
 ## Disable Sensision
 
