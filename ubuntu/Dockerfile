@@ -27,7 +27,7 @@ ENV WARP10_HOME=/opt/warp10
 ENV WARP10_VOLUME=/data
 ENV PATH=$PATH:${WARP10_HOME}/bin
 
-ARG WARP10_VERSION=3.0.0-beta3
+ARG WARP10_VERSION=3.0.0-beta4
 ARG WARP10_URL=https://github.com/senx/warp10-platform/releases/download/${WARP10_VERSION}/warp10-${WARP10_VERSION}.tar.gz
 ENV WARP10_VERSION=${WARP10_VERSION}
 
@@ -37,12 +37,18 @@ ARG WARPSTUDIO_URL=https://repo1.maven.org/maven2/io/warp10/warp10-plugin-warpst
 ARG WARPSTUDIO_SHA512=844de17f4d32cfe473a601914bc6501e9ebe5689187c28a6bbce77583a9fb681797fc9f72a45fc9d8ff5fd6630803bc66ba5a70fdc69181251b15bcae3dfa233
 ENV WARPSTUDIO_VERSION=${WARPSTUDIO_VERSION}
 
-
 ARG HFSTORE_VERSION=2.1.1
 ARG HFSTORE_JAR=warp10-ext-hfstore-${HFSTORE_VERSION}.jar
 ARG HFSTORE_URL=https://maven.senx.io/repository/senx-public/io/senx/warp10-ext-hfstore/${HFSTORE_VERSION}
 ARG HFSTORE_SHA512=a6201a5115b1b7b787a1b345dc620fa5b3cfa5424ce659f5d21c8b19d1b301a5baf4cd3331c0a8d82d33f01c299e0c36bafe136916579ed519e1d0745f66f833
 ENV HFSTORE_VERSION=${HFSTORE_VERSION}
+
+ARG FOUNDATIONDB_VERSION=7.1.33
+ARG FOUNDATIONDB_URL=https://github.com/apple/foundationdb/releases/download/${FOUNDATIONDB_VERSION}
+ARG FDBCLI_PKG=foundationdb-clients_${FOUNDATIONDB_VERSION}-1_amd64.deb
+ARG FDBCLI_SHA256=d73002bc796de7ce0158f1eb64fab1f8e90bada2edd90599d9b40754220150af
+ARG FDBSERVER_PKG=foundationdb-server_${FOUNDATIONDB_VERSION}-1_amd64.deb
+ARG FDBSERVER_SHA256=5a513fe0fb04df1291c875b6eb562e1dc2da7e19864f121b3ecb0cf7d4e99abb
 
 RUN set -eux; \
   apt-get update; \
@@ -91,6 +97,15 @@ RUN set -eux; \
   echo "${HFSTORE_SHA512}  ${HFSTORE_JAR}" | sha512sum -c; \
   unzip ${WARP10_HOME}/lib/warp10-ext-hfstore-${HFSTORE_VERSION}.jar hfstore -d ${WARP10_HOME}/bin; \
   mkdir ${WARP10_HOME}/hfiles; \
+##
+## Install FoundationDB client and server
+##
+  cd /var/tmp; \
+  wget -q ${FOUNDATIONDB_URL}/${FDBCLI_PKG}; \
+  echo "${FDBCLI_SHA256}  ${FDBCLI_PKG}" | sha256sum -c; \
+  wget -q ${FOUNDATIONDB_URL}/${FDBSERVER_PKG}; \
+  echo "${FDBSERVER_SHA256}  ${FDBSERVER_PKG}" | sha256sum -c; \
+  dpkg --force-architecture -i ${FDBCLI_PKG} ${FDBSERVER_PKG} || true; \
 ##
 ## Clean GPG
 ##
