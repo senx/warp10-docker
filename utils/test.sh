@@ -23,9 +23,13 @@ echo "Run docker image"
 id=$(${CMD})
 
 # Retreive dynamic ports
+warp10_port=8080
+warpstudio_port=8081
 ports=$(docker container port "${id}")
-warp10_port=$(echo "${ports}" | grep 8080 | head -1 | cut -d ':' -f2)
-warpstudio_port=$(echo "${ports}" | grep 8081 | head -1 | cut -d ':' -f2)
+if [ -n "${ports}" ]; then
+  warp10_port=$(echo "${ports}" | grep 8080 | head -1 | cut -d ':' -f2)
+  warpstudio_port=$(echo "${ports}" | grep 8081 | head -1 | cut -d ':' -f2)
+fi
 
 warp10_url=http://localhost:${warp10_port}/api/v0
 warpstudio_url=http://localhost:${warpstudio_port}
@@ -38,10 +42,13 @@ then
 fi
 
 echo "Get tokens"
-READ_TOKEN=$(docker exec "${id}" sed -e 's/{"read":{"token":"//' -e 's/".*//' /opt/warp10/etc/initial.tokens)
-WRITE_TOKEN=$(docker exec "${id}" sed -e 's/.*,"write":{"token":"//' -e 's/".*//' /opt/warp10/etc/initial.tokens)
-SENSISION_READ_TOKEN=$(docker exec "${id}" sed -e 's/.*,"id":"SensisionRead","token":"//' -e 's/".*//' /opt/warp10/etc/sensision.tokens)
-SENSISION_WRITE_TOKEN=$(docker exec "${id}" sed -e 's/.*,"id":"SensisionWrite","token":"//' -e 's/".*//' /opt/warp10/etc/sensision.tokens)
+tokens=$(docker exec "${id}" warp10.sh tokengen /opt/warp10/tokens/demo-tokengen.mc2 2>/dev/null)
+READ_TOKEN=$(echo "${tokens}" | grep DemoReadToken -A1 | tail -1 | sed -e 's/.*" : "//' -e 's/"//')
+WRITE_TOKEN=$(echo "${tokens}" | grep DemoWriteToken -A1 | tail -1 | sed -e 's/.*" : "//' -e 's/"//')
+
+tokens=$(docker exec "${id}" warp10.sh tokengen /opt/warp10/tokens/sensision-tokengen.mc2 2>/dev/null)
+SENSISION_READ_TOKEN=$(echo "${tokens}" | grep SensisionReadToken -A1 | tail -1 | sed -e 's/.*" : "//' -e 's/"//')
+SENSISION_WRITE_TOKEN=$(echo "${tokens}" | grep SensisionWriteToken -A1 | tail -1 | sed -e 's/.*" : "//' -e 's/"//')
 
 echo "Write data"
 if ! curl -s -H "X-Warp10-Token: ${WRITE_TOKEN}" "${warp10_url}"/update --data-binary '// test{} 42'; then
@@ -60,8 +67,8 @@ if [ "${res}" != "42" ]; then
 fi
 
 echo "Delete data"
-res=$(curl -s -H "X-Warp10-Token:${WRITE_TOKEN}" "${warp10_url}/delete?selector=test%7B%7D&deleteall" | cut -c -32)
-if [ "${res}" != "test{.app=io.warp10.bootstrap}{}" ]; then
+res=$(curl -s -H "X-Warp10-Token:${WRITE_TOKEN}" "${warp10_url}/delete?selector=test%7B%7D&deleteall" | cut -c -26)
+if [ "${res}" != "test{.app=demo.CHANGEME}{}" ]; then
   echo "Failed to delete data"
   echo "Result: ${res}"
   docker stop "${id}"
