@@ -36,5 +36,5 @@ sed \
   -e 's/groupadd --system --gid=942 warp10/addgroup -S -g 942 warp10/' \
   -e 's@useradd --system --gid warp10 --uid=942 --home-dir=${WARP10_HOME} --shell=/bin/bash warp10@adduser -S -u 942 -D -G warp10 -H -h ${WARP10_HOME} -s /bin/bash warp10@' \
   -e 's@\./docker-entrypoint.sh@\./alpine/docker-entrypoint.sh@' \
-  -e 's/dpkg -i/#dpkg -i/' \
+  -e 's/target=$(uname -m);/target=disabled;/' \
   ./ubuntu/Dockerfile > ./alpine/Dockerfile
