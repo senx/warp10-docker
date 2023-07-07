@@ -43,19 +43,21 @@ ARG HFSTORE_URL=https://maven.senx.io/repository/senx-public/io/senx/warp10-ext-
 ARG HFSTORE_SHA512=a6201a5115b1b7b787a1b345dc620fa5b3cfa5424ce659f5d21c8b19d1b301a5baf4cd3331c0a8d82d33f01c299e0c36bafe136916579ed519e1d0745f66f833
 ENV HFSTORE_VERSION=${HFSTORE_VERSION}
 
-ARG FOUNDATIONDB_VERSION=7.1.33
+ARG FOUNDATIONDB_VERSION=7.1.31
 ARG FOUNDATIONDB_URL=https://github.com/apple/foundationdb/releases/download/${FOUNDATIONDB_VERSION}
 ARG FDBCLI_PKG=foundationdb-clients_${FOUNDATIONDB_VERSION}-1_amd64.deb
-ARG FDBCLI_SHA256=d73002bc796de7ce0158f1eb64fab1f8e90bada2edd90599d9b40754220150af
+ARG FDBCLI_SHA256=fcf1299c762fb0d7cbbf469c40c21bfa8096ee91f53255728dfad5c4c614d9d5
 ARG FDBSERVER_PKG=foundationdb-server_${FOUNDATIONDB_VERSION}-1_amd64.deb
-ARG FDBSERVER_SHA256=5a513fe0fb04df1291c875b6eb562e1dc2da7e19864f121b3ecb0cf7d4e99abb
+ARG FDBSERVER_SHA256=f3167e57fb5108cfb406bb5ef3091bfed4f09a691293dc00cf9ea777e6634a7e
 
 RUN set -eux; \
   apt-get update; \
   apt-get install -y --no-install-recommends \
+    curl \
     dirmngr \
     gnupg \
     gosu \
+    unifont \
     unzip \
   ; \
   rm -rf /var/lib/apt/lists/*;
@@ -105,7 +107,13 @@ RUN set -eux; \
   echo "${FDBCLI_SHA256}  ${FDBCLI_PKG}" | sha256sum -c; \
   wget -q ${FOUNDATIONDB_URL}/${FDBSERVER_PKG}; \
   echo "${FDBSERVER_SHA256}  ${FDBSERVER_PKG}" | sha256sum -c; \
-  dpkg --force-architecture -i ${FDBCLI_PKG} ${FDBSERVER_PKG} || true; \
+  dpkg -i ${FDBCLI_PKG} ${FDBSERVER_PKG}; \
+  rm -f /var/tmp/*.deb; \
+##
+## Fix permissions
+##
+  chown -RHh warp10:warp10 "${WARP10_HOME}"; \
+  chown warp10:warp10 "${WARP10_HOME}"; \
 ##
 ## Clean GPG
 ##
