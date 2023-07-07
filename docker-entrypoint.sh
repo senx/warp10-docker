@@ -37,13 +37,14 @@ moveDir() {
   fi
 
   ln -s "${WARP10_DATA_DIR}/${dir}" "${WARP10_HOME}/${dir}"
+  chown -h warp10:warp10 "${WARP10_HOME}/${dir}"
 }
 
 
 ##
 ## Modify start script to run java process in foreground with exec
 ##
-sed -i -e 's@\(${JAVACMD} ${JAVA_OPTS} -cp ${WARP10_CP} ${WARP10_CLASS} ${CONFIG_FILES}\).*@exec \1@' "${WARP10_HOME}/bin/warp10.sh"
+sed -i -e 's@.*\(${JAVACMD} ${JAVA_OPTS} -cp ${WARP10_CP} ${WARP10_CLASS} ${CONFIG_FILES}\).*@  exec \1@' "${WARP10_HOME}/bin/warp10.sh"
 
 ##
 ## At the first run,
