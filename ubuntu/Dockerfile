@@ -100,15 +100,18 @@ RUN set -eux; \
   unzip ${WARP10_HOME}/lib/warp10-ext-hfstore-${HFSTORE_VERSION}.jar hfstore -d ${WARP10_HOME}/bin; \
   mkdir ${WARP10_HOME}/hfiles; \
 ##
-## Install FoundationDB client and server
+## Install FoundationDB client and server only on x86_64
 ##
-  cd /var/tmp; \
-  wget -q ${FOUNDATIONDB_URL}/${FDBCLI_PKG}; \
-  echo "${FDBCLI_SHA256}  ${FDBCLI_PKG}" | sha256sum -c; \
-  wget -q ${FOUNDATIONDB_URL}/${FDBSERVER_PKG}; \
-  echo "${FDBSERVER_SHA256}  ${FDBSERVER_PKG}" | sha256sum -c; \
-  dpkg -i ${FDBCLI_PKG} ${FDBSERVER_PKG}; \
-  rm -f /var/tmp/*.deb; \
+  target=$(uname -m); \
+  if [ "x86_64" = "${target}" ]; then \
+    cd /var/tmp; \
+    wget -q ${FOUNDATIONDB_URL}/${FDBCLI_PKG}; \
+    echo "${FDBCLI_SHA256}  ${FDBCLI_PKG}" | sha256sum -c; \
+    wget -q ${FOUNDATIONDB_URL}/${FDBSERVER_PKG}; \
+    echo "${FDBSERVER_SHA256}  ${FDBSERVER_PKG}" | sha256sum -c; \
+    dpkg -i ${FDBCLI_PKG} ${FDBSERVER_PKG}; \
+    rm -f /var/tmp/*.deb; \
+  fi; \
 ##
 ## Fix permissions
 ##
