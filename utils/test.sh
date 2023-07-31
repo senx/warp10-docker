@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 #
-#   Copyright 2021-2022  SenX S.A.S.
+#   Copyright 2021-2023  SenX S.A.S.
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -23,9 +23,13 @@ echo "Run docker image"
 id=$(${CMD})
 
 # Retreive dynamic ports
+warp10_port=8080
+warpstudio_port=8081
 ports=$(docker container port "${id}")
-warp10_port=$(echo "${ports}" | grep 8080 | head -1 | cut -d ':' -f2)
-warpstudio_port=$(echo "${ports}" | grep 8081 | head -1 | cut -d ':' -f2)
+if [ -n "${ports}" ]; then
+  warp10_port=$(echo "${ports}" | grep 8080 | head -1 | cut -d ':' -f2)
+  warpstudio_port=$(echo "${ports}" | grep 8081 | head -1 | cut -d ':' -f2)
+fi
 
 warp10_url=http://localhost:${warp10_port}/api/v0
 warpstudio_url=http://localhost:${warpstudio_port}

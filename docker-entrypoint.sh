@@ -6,7 +6,7 @@
 
 
 #
-#   Copyright 2022  SenX S.A.S.
+#   Copyright 2022-2023 SenX S.A.S.
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -66,6 +66,9 @@ if [ ! -f "${FIRSTINIT_FILE}" ]; then
     chown warp10:warp10 "${WARP10_CONFIG_DIR}"/99-sensision-secrets.conf
 
   fi
+
+  # Disable PID check on snapshot
+  sed -i '96,99s/^/#/' "${WARP10_HOME}/bin/snapshot.sh"
 
   touch "${FIRSTINIT_FILE}"
   chown warp10:warp10 "${FIRSTINIT_FILE}"

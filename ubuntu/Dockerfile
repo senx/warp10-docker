@@ -34,12 +34,12 @@ ARG WARP10_VERSION=2.11.1
 ARG WARP10_URL=https://github.com/senx/warp10-platform/releases/download/${WARP10_VERSION}/warp10-${WARP10_VERSION}.tar.gz
 ENV WARP10_VERSION=${WARP10_VERSION}
 
-ARG WARPSTUDIO_VERSION=2.0.9-uberjar
+ARG WARPSTUDIO_VERSION=2.1.1-uberjar
 ARG WARPSTUDIO_CONFIG=${WARP10_CONFIG_DIR}/99-io.warp10-warp10-plugin-warpstudio.conf
 ARG WARPSTUDIO_JAR=warp10-plugin-warpstudio-${WARPSTUDIO_VERSION}.jar
 ARG WARPSTUDIO_URL=https://repo1.maven.org/maven2/io/warp10/warp10-plugin-warpstudio/${WARPSTUDIO_VERSION}
-ARG WARPSTUDIO_SHA512=c71e0863af358178f4b61a302f64ccec3ab375df97cd6cb905b413c7722a467198dac514a765d74568049b2d7e5ffcd860d6900ca7dd07e902ab40a61a152acf
-
+ARG WARPSTUDIO_SHA512=844de17f4d32cfe473a601914bc6501e9ebe5689187c28a6bbce77583a9fb681797fc9f72a45fc9d8ff5fd6630803bc66ba5a70fdc69181251b15bcae3dfa233
+ENV WARPSTUDIO_VERSION=${WARPSTUDIO_VERSION}
 
 ARG HFSTORE_VERSION=2.1.1
 ARG HFSTORE_CONFIG=${WARP10_CONFIG_DIR}/99-io.senx-warp10-ext-hfstore.conf
@@ -50,9 +50,11 @@ ARG HFSTORE_SHA512=a6201a5115b1b7b787a1b345dc620fa5b3cfa5424ce659f5d21c8b19d1b30
 RUN set -eux; \
   apt-get update; \
   apt-get install -y --no-install-recommends \
+    curl \
     dirmngr \
     gnupg \
     gosu \
+    unifont \
     unzip \
   ; \
   rm -rf /var/lib/apt/lists/*;
