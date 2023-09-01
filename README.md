@@ -1,9 +1,10 @@
 # Warp&nbsp;10 Docker image
 
-<p align="center"><img src="https://warp10.io/assets/img/warp10_bySenx_dark.png" alt="Warp 10 Logo" width="50%"></p>
+<p align="center">
+  <img src="https://warp10.io/assets/img/warp10_bySenx_dark.png" alt="Warp 10 Logo" width="50%"/>
+</p>
 
 ## Quick reference
-
 - **Where to get help:**
   - Website: https://warp10.io
   - Warp&nbsp;10 community slack: https://lounge.warp10.io/
@@ -17,37 +18,43 @@
 
 ## What is Warp&nbsp;10
 
-<p align="center"><a href="https://youtu.be/-5dAB7-dHaQ"><img src="https://warp10.io/assets/img/thumbnail_warp10_video.jpg" alt="Warp 10 simplifies sensor data management and analytics." width="50%"></a></p>
+<p align="center">
+  <a href="https://youtu.be/WkSXb5ZRltA"><img src="https://img.youtube.com/vi/WkSXb5ZRltA/hqdefault.jpg" alt="Watch the Warp 10 presentation video" width="50%"/></a>
+  <br/>
+  Watch the Warp 10 presentation video
+</p>
 
-The Warp&nbsp;10 Platform is designed to collect, store and manipulate sensor data. Sensor data are ingested as sequences of measurements (also called time series). The Warp&nbsp;10 Platform offers the possibility for each measurement to also have spatial metadata specifying the geographic coordinates and/or the elevation of the sensor at the time of the reading. Those augmented measurements form what we call Geo Time Series (GTS).
 
-The easiest way to set up the Warp&nbsp;10 platform is to use [Docker](https://www.docker.com/). Officials builds are available on [Docker Hub](https://hub.docker.com/r/warp10io/warp10) containing:
+The Warp&nbsp;10 Platform is designed to collect, store and manipulate sensor data. Sensor data are ingested as sequences of measurements (also called time series). The Warp&nbsp;10 Platform provides the ability to add spatial metadata to each measurement, specifying the geographic coordinates and/or the elevation of the sensor at the time of measurement. These enhanced measurements form what we call Geo Time Series (GTS).
 
-- The Warp&nbsp;10 platform for storing and analyzing Geo&nbsp;Time&nbsp;Series
-- WarpStudio: a web application aiming to allow users to interact with the platform
-- Sensision: a service for monitoring Warp&nbsp;10 platform metrics
+The easiest way to set up the Warp&nbsp;10 platform is to use [Docker](https://www.docker.com/). Official images are available on the [Docker Hub](https://hub.docker.com/r/warp10io/warp10) and include:
+
+- The Warp&nbsp;10 platform, for storing and analyzing Geo&nbsp;Time&nbsp;Series
+- WarpStudio, a web application that allows users to interact with the platform
+- Sensision, a service for monitoring Warp&nbsp;10 platform metrics
+- The HFStore extension, which allows you to manage Historical Files ([HFile](https://senx.io/hfiles))
 
 ## Start a Warp&nbsp;10 instance
 
 Start your image binding the external ports `8080` for Warp&nbsp;10 and `8081` for WarpStudio:
 
 ```bash
-docker run -d -p 8080:8080 -p 8081:8081 warp10io/warp10:tag
+docker run -d -p 8080:8080 -p 8081:8081 warp10io/warp10:<tag>
 ```
-... where tag is the tag specifying the Warp&nbsp;10 version you want.
+... where <tag> is the <tag> specifying the Warp&nbsp;10 version you want.
 
 ## Mapping volume for persistence
 
 Docker containers are easy to delete. If you delete your container instance, you will lose the Warp&nbsp;10 storage and configuration. You may want to add a volume mapping to the containers `/data` folder.
 
 ```bash
-docker run -d -p 8080:8080 -p 8081:8081 --volume=mydata:/data warp10io/warp10:tag
+docker run -d -p 8080:8080 -p 8081:8081 --volume=mydata:/data warp10io/warp10:<tag>
 ```
 
-In this example, the docker volume `mydata` is mounted in the container internal data folder `/data`. The volume will be created if it does not exist.
-Prefer docker volumes to bind mounts.
+In this example, the docker volume `mydata` is mounted in the container internal data folder `/data`. The volume will be created if it does not already exist.
+It is prefereable to use Docker volumes to bind mounts.
 
-You *must* use the same `--volume` option in all your other docker commands on Warp&nbsp;10 image.
+You *must* use the same `--volume` option in all your other docker commands on the Warp&nbsp;10 image.
 
 ## Working in memory
 
@@ -56,16 +63,16 @@ By default, it will retain all last 48 hours.
 This is configurable.
 
 ```bash
-docker run -d -p 8080:8080 -p 8081:8081 -e FLAVOR=in-memory warp10io/warp10:tag
+docker run -d -p 8080:8080 -p 8081:8081 -e FLAVOR=in-memory warp10io/warp10:<tag>
 ```
 ## Disable Sensision
 
-By default, Sensision collects metrics about the instance usage (ie: number of GTS, number of function calls, …) and store them in your Warp&nbsp;10 instance. This allows you to monitor usage.
+By default, Sensision collects metrics about the instance usage (ie: number of GTS, number of function calls, …) and stores them in your Warp&nbsp;10 instance. This allows you to monitor usage.
 
 You can add `-e NO_SENSISION=true` to disable this behavior.
 
 ```bash
-docker run -d -p 8080:8080 -p 8081:8081 -e NO_SENSISION=true warp10io/warp10:tag
+docker run -d -p 8080:8080 -p 8081:8081 -e NO_SENSISION=true warp10io/warp10:<tag>
 ```
 
 ## Setting JVM heap size
@@ -77,7 +84,7 @@ You can use environment variable to set the JVM heap size:
 The default configuration is WARP10_HEAP=1g and WARP10_HEAP_MAX=1g
 
 ```bash
-docker run -d -p 8080:8080 -p 8081:8081 -e WARP10_HEAP=8g -e WARP10_HEAP_MAX=8g warp10io/warp10:tag
+docker run -d -p 8080:8080 -p 8081:8081 -e WARP10_HEAP=8g -e WARP10_HEAP_MAX=8g warp10io/warp10:<tag>
 ```
 
 
@@ -101,11 +108,11 @@ curl -v -H 'X-Warp10-Token: writeTokenCI' --data-binary "1// test{} 42" 'http://
 
 The Warp&nbsp;10 platform is built with a robust security model that allows you to have a tight control of who has the right to write and/or read data. The model is structured around the [concepts](https://www.warp10.io/content/03_Documentation/05_Security/01_Overview) of `data producer`, `data owner` and `application`, and `WRITE` and `READ` tokens.
 
-The `ci` version embeds a pair of pre-generated READ/WRITE tokens named respectively `readTokenCI` and `writeTokenCI`. These tokens are in the `predictible-tokens-for-ci/ci.tokens` file.
+The `ci` version embeds a pair of pre-generated READ/WRITE tokens named respectively `readTokenCI` and `writeTokenCI`. These tokens are located in the `predictible-tokens-for-ci/ci.tokens` file.
 
-Otherwise, for the purposes of this setup, you need to generate write and read tokens for a test application for a test user that is both the producer and the owner of the data. In order to interact with the user/token/application system, you need interactive access to Warp&nbsp;10's [TokenGen](https://www.warp10.io/content/03_Documentation/05_Security/03_Token_Management) component.
+Otherwise, for the purposes of this setup, you need to generate write and read tokens for a test application for a test user that is both the producer and the owner of the data. To interact with the user/token/application system, you need interactive access to Warp&nbsp;10's [TokenGen](https://www.warp10.io/content/03_Documentation/05_Security/03_Token_Management) component.
 
-Create an `envelope` file and, adapt it to your needs. Here is an example:
+Create an `envelope` file and, adapt it your needs. Here is an example:
 ```warpscript
 'myapp' 'applicationName' STORE
 NOW 1 ADDYEARS 'expiryDate' STORE
@@ -197,22 +204,22 @@ They are many ways to configure Warp&nbsp;10 in docker. Each of the following me
 
 Use the `/config.extra` folder to add your additional configuration file, you can add multiple files.
 ```
-docker run -d -p 8080:8080 -p 8081:8081 -v /custom/99-custom.conf:/config.extra/99-custom.conf warp10io/warp10:tag
+docker run -d -p 8080:8080 -p 8081:8081 -v /custom/99-custom.conf:/config.extra/99-custom.conf warp10io/warp10:<tag>
 ```
 - Using environment variables:
 ```bash
-docker run -d -p 8080:8080 -p 8081:8081 -e warpscript.maxops=100000 -e warpscript.maxfetch=1000000 warp10io/warp10:tag
+docker run -d -p 8080:8080 -p 8081:8081 -e warpscript.maxops=100000 -e warpscript.maxfetch=1000000 warp10io/warp10:<tag>
  ```
 - Using environment file:
  ```bash
-docker run -d -p 8080:8080 -p 8081:8081 --env-file=./myconf.env warp10io/warp10:tag
+docker run -d -p 8080:8080 -p 8081:8081 --env-file=./myconf.env warp10io/warp10:<tag>
  ```
 
 You can mix all of these methods, here is an example with docker-compose:
 ```
 services:
   warp10:
-    image: warp10io/warp10:tag
+    image: warp10io/warp10:<tag>
     volumes:
       - warp10_data:/data
       - /var/warp10/99-custom.conf:/config.extra/99-custom.conf
@@ -252,5 +259,5 @@ First, you have to install [Docker](https://docs.docker.com/docker-for-windows/i
 
 
 ```bash
-docker run --volume=c:\\warp10:/data -p 8080:8080 -p 8081:8081 -d -i warp10io/warp10:tag
+docker run --volume=c:\\warp10:/data -p 8080:8080 -p 8081:8081 -d -i warp10io/warp10:<tag>
 ```
