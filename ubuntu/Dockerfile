@@ -14,11 +14,7 @@
 #   limitations under the License.
 #
 
-##
-## Use focal image because there is a segfault with jammy on our build platform
-##   => qemu: uncaught target signal 11 (Segmentation fault) - core dumped
-##
-FROM eclipse-temurin:8-jre-focal
+FROM eclipse-temurin:8-jre
 
 LABEL author="SenX S.A.S."
 LABEL maintainer="contact@senx.io"
@@ -29,6 +25,7 @@ ENV PATH=$PATH:${WARP10_HOME}/bin
 
 ARG WARP10_VERSION=3.0.3
 ARG WARP10_URL=https://github.com/senx/warp10-platform/releases/download/${WARP10_VERSION}/warp10-${WARP10_VERSION}.tar.gz
+ARG WARP10_SHA512=2700cc0467ec42c5996cbaa0aaf1571a96ba77ab74b71ba5de27ad5cd8aefbf5def177a2fa85eb7b0b1eab3cbc8079cbb868a30fd4c873b5c49ed3ea8e48623f
 ENV WARP10_VERSION=${WARP10_VERSION}
 
 ARG WARPSTUDIO_VERSION=2.1.4-uberjar
@@ -37,10 +34,10 @@ ARG WARPSTUDIO_URL=https://repo1.maven.org/maven2/io/warp10/warp10-plugin-warpst
 ARG WARPSTUDIO_SHA512=2c95d429e472874c3c66b216d423e1feb3a296de4fe2784d9382ff9beedffbcd89464df161a55d3b92a160f541f7b4a7ef6743d92f63dc881cfcdc3b45ed0327
 ENV WARPSTUDIO_VERSION=${WARPSTUDIO_VERSION}
 
-ARG HFSTORE_VERSION=2.1.1
+ARG HFSTORE_VERSION=3.0.1
 ARG HFSTORE_JAR=warp10-ext-hfstore-${HFSTORE_VERSION}.jar
 ARG HFSTORE_URL=https://maven.senx.io/repository/senx-public/io/senx/warp10-ext-hfstore/${HFSTORE_VERSION}
-ARG HFSTORE_SHA512=a6201a5115b1b7b787a1b345dc620fa5b3cfa5424ce659f5d21c8b19d1b301a5baf4cd3331c0a8d82d33f01c299e0c36bafe136916579ed519e1d0745f66f833
+ARG HFSTORE_SHA512=ee0a096f6eceda3c12e614f0280311cf557a7db5e5da49ca37d0a750d4726c526c600de41498ff51ebd1d05c2279ed75f0981def940b7b0a57c546c705f8953f
 ENV HFSTORE_VERSION=${HFSTORE_VERSION}
 
 ARG FOUNDATIONDB_VERSION=7.1.37
@@ -78,6 +75,7 @@ RUN set -eux; \
 ##
   cd /opt; \
   wget -q ${WARP10_URL}; \
+  echo "${WARP10_SHA512}  warp10-${WARP10_VERSION}.tar.gz" | sha512sum -c; \
   tar xzf warp10-${WARP10_VERSION}.tar.gz; \
   rm warp10-${WARP10_VERSION}.tar.gz; \
   ln -s /opt/warp10-${WARP10_VERSION} ${WARP10_HOME}; \
