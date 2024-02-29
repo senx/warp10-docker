@@ -6,7 +6,7 @@
 
 
 #
-#   Copyright 2022-2023  SenX S.A.S.
+#   Copyright 2022-2024  SenX S.A.S.
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -95,8 +95,8 @@ if [ ! -f "${FIRSTINIT_FILE}" ]; then
     ## Define token as MACROCONFIG key for runner script
     ##
     tokens=$("${WARP10_HOME}"/bin/warp10.sh tokengen "${WARP10_HOME}/tokens/sensision-tokengen.mc2" 2>/dev/null)
-    SENSISION_READ_TOKEN=$(echo "${tokens}" | grep SensisionReadToken -A1 | tail -1 | sed -e 's/.*" : "//' -e 's/"//')
-    SENSISION_WRITE_TOKEN=$(echo "${tokens}" | grep SensisionWriteToken -A1 | tail -1 | sed -e 's/.*" : "//' -e 's/"//')
+    SENSISION_READ_TOKEN=$(echo "${tokens}" | grep '"token"' | tail -1 | sed -e 's/.*" : "//' -e 's/".*//')
+    SENSISION_WRITE_TOKEN=$(echo "${tokens}" | grep '"token"' | head -1 | sed -e 's/.*" : "//' -e 's/".*//')
     echo "sensisionReadToken@/sensision=${SENSISION_READ_TOKEN}" >> "${WARP10_CONFIG_DIR}"/99-sensision-secrets.conf
     echo "sensisionWriteToken@/sensision=${SENSISION_WRITE_TOKEN}" >> "${WARP10_CONFIG_DIR}"/99-sensision-secrets.conf
     chown warp10:warp10 "${WARP10_CONFIG_DIR}"/99-sensision-secrets.conf

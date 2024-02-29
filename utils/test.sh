@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 #
-#   Copyright 2021-2022  SenX S.A.S.
+#   Copyright 2021-2024  SenX S.A.S.
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -43,12 +43,12 @@ fi
 
 echo "Get tokens"
 tokens=$(docker exec "${id}" warp10.sh tokengen /opt/warp10/tokens/demo-tokengen.mc2 2>/dev/null)
-READ_TOKEN=$(echo "${tokens}" | grep DemoReadToken -A1 | tail -1 | sed -e 's/.*" : "//' -e 's/"//')
-WRITE_TOKEN=$(echo "${tokens}" | grep DemoWriteToken -A1 | tail -1 | sed -e 's/.*" : "//' -e 's/"//')
+READ_TOKEN=$(echo "${tokens}" | grep '"token"' | tail -1 | sed -e 's/.*" : "//' -e 's/".*//')
+WRITE_TOKEN=$(echo "${tokens}" | grep '"token"' | head -1 | sed -e 's/.*" : "//' -e 's/".*//')
 
 tokens=$(docker exec "${id}" warp10.sh tokengen /opt/warp10/tokens/sensision-tokengen.mc2 2>/dev/null)
-SENSISION_READ_TOKEN=$(echo "${tokens}" | grep SensisionReadToken -A1 | tail -1 | sed -e 's/.*" : "//' -e 's/"//')
-SENSISION_WRITE_TOKEN=$(echo "${tokens}" | grep SensisionWriteToken -A1 | tail -1 | sed -e 's/.*" : "//' -e 's/"//')
+SENSISION_READ_TOKEN=$(echo "${tokens}" | grep '"token"' | tail -1 | sed -e 's/.*" : "//' -e 's/".*//')
+SENSISION_WRITE_TOKEN=$(echo "${tokens}" | grep '"token"' | head -1 | sed -e 's/.*" : "//' -e 's/".*//')
 
 echo "Write data"
 if ! curl -s -H "X-Warp10-Token: ${WRITE_TOKEN}" "${warp10_url}"/update --data-binary '// test{} 42'; then
@@ -114,3 +114,4 @@ echo "Stop container"
 docker stop "${id}"
 
 echo "Test successful"
+
