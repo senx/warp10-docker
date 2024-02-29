@@ -1,5 +1,5 @@
 #
-#   Copyright 2016-2023  SenX S.A.S.
+#   Copyright 2016-2024  SenX S.A.S.
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -23,9 +23,9 @@ ENV WARP10_HOME=/opt/warp10
 ENV WARP10_VOLUME=/data
 ENV PATH=$PATH:${WARP10_HOME}/bin
 
-ARG WARP10_VERSION=3.1.2
+ARG WARP10_VERSION=3.2.0
 ARG WARP10_URL=https://github.com/senx/warp10-platform/releases/download/${WARP10_VERSION}/warp10-${WARP10_VERSION}.tar.gz
-ARG WARP10_SHA512=4280fabcc950a69afa4053ebb3f93f1f95809a2f01f01509551dd39acd296786f2ff5520bfe9b24652c1027f831e5dcd137c29b5bd5662d1ce0f51a64e324036
+ARG WARP10_SHA512=774866750b6443fe0b84e9c7a30bbb14d61964236d76f74af581fc66cd4b839e593aaab6fd0c335d41bea0206982dc71722a1f7e355455ded69c5394c0fbaed9
 ENV WARP10_VERSION=${WARP10_VERSION}
 
 ARG WARPSTUDIO_VERSION=2.1.4-uberjar
