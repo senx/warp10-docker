@@ -148,11 +148,11 @@ TOKENGEN
 ```
 
 ```bash
-docker exec -i <container_id> warp10-standalone.sh tokengen - < envelope.mc2
+docker exec -i <container_id> warp10.sh tokengen - < envelope.mc2
 ```
 
 ```bash
-docker exec -i 77426631869b warp10-standalone.sh tokengen - < envelope.mc2 | jq
+docker exec -i <container_id> warp10.sh tokengen - < envelope.mc2 | jq
 2023-01-23T13:54:30,594 main WARN  script.WarpFleetMacroRepository - No validator macro, default macro will reject all URLs.
 [
   {
