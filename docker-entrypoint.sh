@@ -44,6 +44,7 @@ moveDir() {
 ##
 ## Modify start script to run java process in foreground with exec
 ##
+# shellcheck disable=SC2016
 sed -i -e 's@.*\(${JAVACMD} ${JAVA_OPTS} -cp ${WARP10_CP} ${WARP10_CLASS} ${CONFIG_FILES}\).*@  exec \1@' "${WARP10_HOME}/bin/warp10.sh"
 
 ##
@@ -69,14 +70,17 @@ if [ ! -f "${FIRSTINIT_FILE}" ]; then
     echo 'debug.capability = false'
   } >> "${WARP10_CONFIG_DIR}/99-docker.conf"
 
-  ##
-  ## Set configuration for WarpStudio
-  ##
-  {
-    echo 'warp10.plugin.warpstudio = io.warp10.plugins.warpstudio.WarpStudioPlugin'
-    echo 'warpstudio.port = 8081'
-    echo 'warpstudio.host = ${standalone.host}'
-  } >> "${WARP10_CONFIG_DIR}/99-io.warp10-warp10-plugin-warpstudio.conf"
+  if [ "true" = "${BUILD_WARPSTUDIO}" ]; then
+    ##
+    ## Set configuration for WarpStudio
+    ##
+    {
+      echo 'warp10.plugin.warpstudio = io.warp10.plugins.warpstudio.WarpStudioPlugin'
+      echo 'warpstudio.port = 8081'
+      # shellcheck disable=SC2016
+      echo 'warpstudio.host = ${standalone.host}'
+    } >> "${WARP10_CONFIG_DIR}/99-io.warp10-warp10-plugin-warpstudio.conf"
+  fi
 
   # TODO: enable this when HFStore has been upgraded for 3.0
   # ##

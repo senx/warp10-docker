@@ -19,108 +19,159 @@ FROM eclipse-temurin:8-jre
 LABEL author="SenX S.A.S."
 LABEL maintainer="contact@senx.io"
 
+ARG BUILD_FDB=true
+ARG BUILD_WARPSTUDIO=true
+ARG BUILD_HFSTORE=true
+ARG BUILD_AWS_BUNDLE=false
+
+ENV BUILD_FDB=${BUILD_FDB}
+ENV BUILD_WARPSTUDIO=${BUILD_WARPSTUDIO}
+ENV BUILD_HFSTORE=${BUILD_HFSTORE}
+ENV BUILD_AWS_BUNDLE=${BUILD_AWS_BUNDLE}
+
 ENV WARP10_HOME=/opt/warp10
 ENV WARP10_VOLUME=/data
 ENV PATH=$PATH:${WARP10_HOME}/bin
 
-ARG WARP10_VERSION=3.2.0
+ARG WARP10_VERSION=3.3.0
 ARG WARP10_URL=https://github.com/senx/warp10-platform/releases/download/${WARP10_VERSION}/warp10-${WARP10_VERSION}.tar.gz
-ARG WARP10_SHA512=774866750b6443fe0b84e9c7a30bbb14d61964236d76f74af581fc66cd4b839e593aaab6fd0c335d41bea0206982dc71722a1f7e355455ded69c5394c0fbaed9
+ARG WARP10_SHA512=e13cd739754d136be719c833a8d36b942b4e5bf1782a1123b4f4f623af701c9bdc6643ed8fefeb81426413c251844b28a8bba9b529dba612e1d37dfa9b26cd82
 ENV WARP10_VERSION=${WARP10_VERSION}
 
-ARG WARPSTUDIO_VERSION=2.1.4-uberjar
+ARG WARPSTUDIO_VERSION=2.1.8-uberjar
 ARG WARPSTUDIO_JAR=warp10-plugin-warpstudio-${WARPSTUDIO_VERSION}.jar
 ARG WARPSTUDIO_URL=https://repo1.maven.org/maven2/io/warp10/warp10-plugin-warpstudio/${WARPSTUDIO_VERSION}
-ARG WARPSTUDIO_SHA512=2c95d429e472874c3c66b216d423e1feb3a296de4fe2784d9382ff9beedffbcd89464df161a55d3b92a160f541f7b4a7ef6743d92f63dc881cfcdc3b45ed0327
+ARG WARPSTUDIO_SHA512=5b9d95446efee82bc817eb841dda910c74158c44a285953d4be13bb428394188b5a829896c5ac78884742adf8eb56d568b6f16c50036bb5329e03393fbb91e02
 ENV WARPSTUDIO_VERSION=${WARPSTUDIO_VERSION}
 
-ARG HFSTORE_VERSION=3.0.1
+ARG HFSTORE_VERSION=3.11.2
 ARG HFSTORE_JAR=warp10-ext-hfstore-${HFSTORE_VERSION}.jar
 ARG HFSTORE_URL=https://maven.senx.io/repository/senx-public/io/senx/warp10-ext-hfstore/${HFSTORE_VERSION}
-ARG HFSTORE_SHA512=ee0a096f6eceda3c12e614f0280311cf557a7db5e5da49ca37d0a750d4726c526c600de41498ff51ebd1d05c2279ed75f0981def940b7b0a57c546c705f8953f
+ARG HFSTORE_SHA512=4322e6fc96f26fa0cb1ace93999c79ae61c9f8515ddd2324073fbe335433d6b268987825a3b426c568ea9cffa60015cce53855649b850bc7feb2af8b32ebb5b2
 ENV HFSTORE_VERSION=${HFSTORE_VERSION}
 
 ARG FOUNDATIONDB_VERSION=7.1.37
 ARG FOUNDATIONDB_URL=https://github.com/apple/foundationdb/releases/download/${FOUNDATIONDB_VERSION}
 ARG FDBCLI_PKG=foundationdb-clients_${FOUNDATIONDB_VERSION}-1_amd64.deb
 ARG FDBCLI_SHA256=dbabbe59b33129e5ebd30f766f85de5c39373047fffb4d354eb9c124797b4dc0
-ARG FDBSERVER_PKG=foundationdb-server_${FOUNDATIONDB_VERSION}-1_amd64.deb
-ARG FDBSERVER_SHA256=449f879b839638f709be5ddff7494e015ca8c829d47c4299890d9cacb071e53a
 
-RUN set -eux; \
-  apt-get update; \
+ARG AWS_BUNDLE_VERSION=1.12.747
+ARG AWS_BUNDLE_JAR=aws-java-sdk-bundle-${AWS_BUNDLE_VERSION}.jar
+ARG AWS_BUNDLE_URL=https://repo1.maven.org/maven2/com/amazonaws/aws-java-sdk-bundle/${AWS_BUNDLE_VERSION}
+ARG AWS_BUNDLE_SHA1=ed5b002ba2160c7d82f60b7223e033efdd251fc9
+ENV AWS_BUNDLE_VERSION=${AWS_BUNDLE_VERSION}
+
+RUN <<EOF
+  set -eux
+  apt-get update
   DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
     curl \
     dirmngr \
     gnupg \
     gosu \
     unifont \
-    unzip \
-  ; \
-  rm -rf /var/lib/apt/lists/*;
+    unzip
+  rm -rf /var/lib/apt/lists/*
+EOF
 
-RUN set -eux; \
-##
-## Create warp10 user
-##
-	groupadd --system --gid=942 warp10; \
-	useradd --system --gid warp10 --uid=942 --home-dir=${WARP10_HOME} --shell=/bin/bash warp10; \
-##
-## Get GPG key
-##
-  export GNUPGHOME="$(mktemp -d)"; \
-  gpg --batch --keyserver keyserver.ubuntu.com --receive-keys 09554E7D23D569F502A90A8615E17B2FBD49DA0A; \
-##
-## Install Warp 10
-##
-  cd /opt; \
-  wget -q ${WARP10_URL}; \
-  echo "${WARP10_SHA512}  warp10-${WARP10_VERSION}.tar.gz" | sha512sum -c; \
-  tar xzf warp10-${WARP10_VERSION}.tar.gz; \
-  rm warp10-${WARP10_VERSION}.tar.gz; \
-  ln -s /opt/warp10-${WARP10_VERSION} ${WARP10_HOME}; \
-##
-## Install WarpStudio
-##
-  cd ${WARP10_HOME}/lib; \
-  wget -q ${WARPSTUDIO_URL}/${WARPSTUDIO_JAR}; \
-  wget -q ${WARPSTUDIO_URL}/${WARPSTUDIO_JAR}.asc; \
-  gpg --batch --verify ${WARPSTUDIO_JAR}.asc ${WARPSTUDIO_JAR}; \
-  rm ${WARPSTUDIO_JAR}.asc; \
-  echo "${WARPSTUDIO_SHA512}  ${WARPSTUDIO_JAR}" | sha512sum -c; \
-##
-## Install HFStore
-##
-  wget -q ${HFSTORE_URL}/${HFSTORE_JAR}; \
-  # wget -q ${HFSTORE_URL}/${HFSTORE_JAR}.asc; \
-  # gpg --batch --verify ${HFSTORE_JAR}.asc ${HFSTORE_JAR}; \
-  echo "${HFSTORE_SHA512}  ${HFSTORE_JAR}" | sha512sum -c; \
-  unzip ${WARP10_HOME}/lib/warp10-ext-hfstore-${HFSTORE_VERSION}.jar hfstore -d ${WARP10_HOME}/bin; \
-  mkdir ${WARP10_HOME}/hfiles; \
-##
-## Install FoundationDB client and server only on x86_64
-##
-  target=$(uname -m); \
-  if [ "x86_64" = "${target}" ]; then \
-    cd /var/tmp; \
-    wget -q ${FOUNDATIONDB_URL}/${FDBCLI_PKG}; \
-    echo "${FDBCLI_SHA256}  ${FDBCLI_PKG}" | sha256sum -c; \
-    wget -q ${FOUNDATIONDB_URL}/${FDBSERVER_PKG}; \
-    echo "${FDBSERVER_SHA256}  ${FDBSERVER_PKG}" | sha256sum -c; \
-    dpkg -i ${FDBCLI_PKG} ${FDBSERVER_PKG}; \
-    rm -f /var/tmp/*.deb; \
-  fi; \
-##
-## Fix permissions
-##
-  chown -RHh warp10:warp10 "${WARP10_HOME}"; \
-  chown warp10:warp10 "${WARP10_HOME}"; \
-##
-## Clean GPG
-##
-  gpgconf --kill all; \
-  rm -rf "$GNUPGHOME";
+RUN <<EOF
+  set -eux
 
+  ##
+  ## Create warp10 user
+  ##
+
+  groupadd --system --gid=942 warp10
+  useradd --system --gid warp10 --uid=942 --home-dir=${WARP10_HOME} --shell=/bin/bash warp10
+
+  ##
+  ## Get GPG keys for: SenX, HBS, AWS SDK
+  ##
+
+  export GNUPGHOME="$(mktemp -d)"
+  gpg --batch --keyserver keyserver.ubuntu.com --receive-keys 09554E7D23D569F502A90A8615E17B2FBD49DA0A 6528656C2E1408C4D0E0EE57941FD9BB07CAB131 FEB9209F2F2F3F4664841E55AC107B386692DADD
+
+  ##
+  ## Install Warp 10
+  ##
+
+  cd /opt
+  wget -q ${WARP10_URL}
+  echo "${WARP10_SHA512}  warp10-${WARP10_VERSION}.tar.gz" | sha512sum -c
+  tar xzf warp10-${WARP10_VERSION}.tar.gz
+  rm warp10-${WARP10_VERSION}.tar.gz
+  ln -s /opt/warp10-${WARP10_VERSION} ${WARP10_HOME}
+
+  ##
+  ## Install WarpStudio
+  ##
+
+  if [ "true" = "${BUILD_WARPSTUDIO}" ]; then
+    cd ${WARP10_HOME}/lib
+    wget -q ${WARPSTUDIO_URL}/${WARPSTUDIO_JAR}
+    wget -q ${WARPSTUDIO_URL}/${WARPSTUDIO_JAR}.asc
+    gpg --batch --verify ${WARPSTUDIO_JAR}.asc ${WARPSTUDIO_JAR}
+    rm ${WARPSTUDIO_JAR}.asc
+    echo "${WARPSTUDIO_SHA512}  ${WARPSTUDIO_JAR}" | sha512sum -c
+  fi
+
+  ##
+  ## Install HFStore
+  ##
+
+  mkdir ${WARP10_HOME}/hfiles
+  if [ "true" = "${BUILD_HFSTORE}" ]; then
+    cd ${WARP10_HOME}/lib
+    wget -q ${HFSTORE_URL}/${HFSTORE_JAR}
+    wget -q ${HFSTORE_URL}/${HFSTORE_JAR}.asc
+    gpg --batch --verify ${HFSTORE_JAR}.asc ${HFSTORE_JAR}
+    echo "${HFSTORE_SHA512}  ${HFSTORE_JAR}" | sha512sum -c
+    rm ${HFSTORE_JAR}.asc
+    unzip ${WARP10_HOME}/lib/warp10-ext-hfstore-${HFSTORE_VERSION}.jar hfstore -d ${WARP10_HOME}/bin
+  fi
+
+  ##
+  ## Install FoundationDB client only on x86_64
+  ##
+
+  if [ "true" = "${BUILD_FDB}" ]; then
+    target=$(uname -m)
+    if [ "x86_64" = "${target}" ]; then
+      cd /var/tmp
+      wget -q ${FOUNDATIONDB_URL}/${FDBCLI_PKG}
+      echo "${FDBCLI_SHA256}  ${FDBCLI_PKG}" | sha256sum -c
+      dpkg -i ${FDBCLI_PKG}
+      rm -f /var/tmp/${FDBCLI_PKG}
+    fi
+  fi
+
+  ##
+  ## Install AWS Java SDK Bundle
+  ##
+
+  if [ "true" = "${BUILD_AWS_BUNDLE}" ]; then
+    cd ${WARP10_HOME}/lib
+    wget -q ${AWS_BUNDLE_URL}/${AWS_BUNDLE_JAR}
+    wget -q ${AWS_BUNDLE_URL}/${AWS_BUNDLE_JAR}.asc
+    gpg --batch --verify ${AWS_BUNDLE_JAR}.asc ${AWS_BUNDLE_JAR}
+    echo "${AWS_BUNDLE_SHA1}  ${AWS_BUNDLE_JAR}" | sha1sum -c
+    rm ${AWS_BUNDLE_JAR}.asc
+  fi
+
+  ##
+  ## Fix permissions
+  ##
+
+  chown -RHh warp10:warp10 "${WARP10_HOME}"
+  chown warp10:warp10 "${WARP10_HOME}"
+
+  ##
+  ## Clean GPG
+  ##
+
+  gpgconf --kill all
+  rm -rf "$GNUPGHOME"
+EOF
 
 # Exposing port for Warp 10, Warp Studio, and HFStore
 EXPOSE 8080 8081 4378
