@@ -30,11 +30,11 @@ chmod +x ./alpine/docker-entrypoint.sh
 ##
 sed \
   -e 's/FROM.*/FROM eclipse-temurin:8-jre-alpine/' \
-  -e 's/apt-get update;/apk add --no-cache/' \
+  -e 's/BUILD_FDB=true/BUILD_FDB=false/' \
+  -e 's/apt-get update/apk add --no-cache\\/' \
   -e 's/DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends/  bash \\\n    libstdc++/' \
   -e 's/gosu/su-exec/' \
   -e 's/groupadd --system --gid=942 warp10/addgroup -S -g 942 warp10/' \
   -e 's@useradd --system --gid warp10 --uid=942 --home-dir=${WARP10_HOME} --shell=/bin/bash warp10@adduser -S -u 942 -D -G warp10 -H -h ${WARP10_HOME} -s /bin/bash warp10@' \
   -e 's@\./docker-entrypoint.sh@\./alpine/docker-entrypoint.sh@' \
-  -e 's/target=$(uname -m);/target=disabled;/' \
   ./ubuntu/Dockerfile > ./alpine/Dockerfile
