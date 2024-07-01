@@ -2,3 +2,5 @@
 .vscode
 *.gz
 .history
+
+alpine/
