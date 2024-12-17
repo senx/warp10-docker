@@ -35,7 +35,7 @@ warp10_url=http://localhost:${warp10_port}/api/v0
 warpstudio_url=http://localhost:${warpstudio_port}
 
 echo "Wait for container to start-up"
-if ! timeout 120s sh -c "while ! curl -s --fail ${warp10_url}/check; do sleep 1; done";
+if ! timeout 240s sh -c "while ! curl -s --fail ${warp10_url}/check; do sleep 1; done";
 then
    echo "Failed to start container"
    exit 1
